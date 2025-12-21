@@ -1,0 +1,84 @@
+{
+  "entries": [
+    {
+      "timestamp": "2025-12-20T01:05:19.866362+00:00",
+      "block_height": 999999,
+      "block_hash": "demo_hash_1766192719",
+      "miner_id": "looping_demo_miner",
+      "nonce": 94552,
+      "leading_zeros": 16,
+      "meets_difficulty": true,
+      "mining_result_data": {
+        "success": true,
+        "method": "demo_simulated_submission",
+        "demo_mode": true,
+        "leading_zeros": 16,
+        "block_hash": "demo_hash_1766192719",
+        "nonce": 94552,
+        "leading_zeros_achieved": 16,
+        "hash_rate": 0,
+        "block_height": 999999,
+        "mining_duration": 0,
+        "network_submitted": false,
+        "hash_count": 0,
+        "actual_sha256_attempts": 0
+      }
+    },
+    {
+      "timestamp": "2025-12-20T01:12:42.510655+00:00",
+      "block_height": 1,
+      "block_hash": "demo_hash_1766193162",
+      "miner_id": "looping_demo_miner",
+      "nonce": 925416,
+      "leading_zeros": 16,
+      "meets_difficulty": true,
+      "mining_result_data": {
+        "success": true,
+        "method": "demo_simulated_submission",
+        "demo_mode": true,
+        "leading_zeros": 16,
+        "block_hash": "demo_hash_1766193162",
+        "nonce": 925416,
+        "leading_zeros_achieved": 16,
+        "hash_rate": 0,
+        "block_height": 1,
+        "mining_duration": 0,
+        "network_submitted": false,
+        "hash_count": 0,
+        "actual_sha256_attempts": 0
+      }
+    },
+    {
+      "timestamp": "2025-12-20T01:17:37.989228+00:00",
+      "block_height": 1,
+      "block_hash": "demo_hash_1766193457",
+      "miner_id": "looping_demo_miner",
+      "nonce": 793429,
+      "leading_zeros": 16,
+      "meets_difficulty": true,
+      "mining_result_data": {
+        "success": true,
+        "method": "demo_simulated_submission",
+        "demo_mode": true,
+        "leading_zeros": 16,
+        "block_hash": "demo_hash_1766193457",
+        "nonce": 793429,
+        "leading_zeros_achieved": 16,
+        "hash_rate": 0,
+        "block_height": 1,
+        "mining_duration": 0,
+        "network_submitted": false,
+        "hash_count": 0,
+        "actual_sha256_attempts": 0
+      }
+    }
+  ],
+  "metadata": {
+    "created": "2025-12-20T02:42:00.878409",
+    "level": "week",
+    "component": "Looping",
+    "mode": "demo",
+    "last_updated": "2025-12-20T02:42:00.878409",
+    "total_entries": 3
+  }
+}

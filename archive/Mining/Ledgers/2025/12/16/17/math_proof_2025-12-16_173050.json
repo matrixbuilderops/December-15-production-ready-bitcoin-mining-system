@@ -1,0 +1,57 @@
+{
+  "proof_id": "proof_2025-12-16_173050",
+  "timestamp": "2025-12-16T17:30:50.878498-06:00",
+  "block_height": 928166,
+  "miner_id": "MINER_ALPHA",
+  "hardware_attestation": {
+    "ip_address": "127.0.1.1",
+    "mac_address": "58:63:8f:3c:f3:cc",
+    "hostname": "HP-Phantom-Core",
+    "cpu": {
+      "model": "x86_64",
+      "physical_cores": 10,
+      "logical_cores": 12,
+      "current_freq_mhz": 1399.9924166666667,
+      "max_freq_mhz": 4133.333333333333,
+      "min_freq_mhz": 400.0
+    },
+    "ram": {
+      "total_gb": 62.52,
+      "available_gb": 19.33,
+      "percent_used": 69.1
+    },
+    "system_uptime_seconds": 1123281,
+    "process_id": 1489789
+  },
+  "computation_proof": {
+    "nonce": 4278804689,
+    "merkleroot": "",
+    "block_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+    "difficulty_target": "00000000000000000001e63a0000000000000000000000000000000000000000",
+    "leading_zeros": 255
+  },
+  "dtm_validation": {
+    "valid": true,
+    "checks_performed": {
+      "nonce_in_range": true,
+      "hash_correct": true,
+      "meets_difficulty": true,
+      "merkle_root_valid": true,
+      "block_structure_valid": true
+    },
+    "validation_timestamp": "2025-12-16T17:30:50.874745-06:00",
+    "reason": "All validation checks passed"
+  },
+  "mathematical_framework": {
+    "categories_applied": [
+      "families",
+      "lanes",
+      "strides",
+      "palette",
+      "sandbox"
+    ],
+    "knuth_parameters": {},
+    "universe_bitload": "208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909"
+  },
+  "validation_status": "DTM_APPROVED"
+}

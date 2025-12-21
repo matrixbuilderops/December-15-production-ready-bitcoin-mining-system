@@ -1,0 +1,40 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_week",
+    "component": "LoopingSmoke",
+    "level": "week",
+    "scope": "Contains: Week 50 + all days/hours",
+    "created": "2025-12-17T18:51:46.115498",
+    "last_updated": "2025-12-17T19:30:52.054361",
+    "mode": "demo"
+  },
+  "summary": {
+    "total_entries": 3,
+    "data_sources": [
+      "Test/Demo/Mining/System/System_Reports/LoopingSmoke/system_report_global.json"
+    ]
+  },
+  "aggregated_data": {
+    "entries": [
+      {
+        "id": "smoke-demo",
+        "note": "looping agg smoke demo",
+        "source_path": "Test/Demo/Mining/System/System_Reports/LoopingSmoke/system_report_global.json",
+        "timestamp": "2025-12-17T18:51:46.125810"
+      },
+      {
+        "id": "smoke-demo",
+        "note": "looping agg smoke demo",
+        "source_path": "Test/Demo/Mining/System/System_Reports/LoopingSmoke/system_report_global.json",
+        "timestamp": "2025-12-17T19:30:12.301001"
+      },
+      {
+        "id": "smoke-demo",
+        "note": "looping agg smoke demo",
+        "source_path": "Test/Demo/Mining/System/System_Reports/LoopingSmoke/system_report_global.json",
+        "timestamp": "2025-12-17T19:30:52.054361"
+      }
+    ]
+  },
+  "sub_levels": []
+}

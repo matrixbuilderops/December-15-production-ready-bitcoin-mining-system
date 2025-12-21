@@ -1,0 +1,233 @@
+{
+  "metadata": {
+    "file_type": "hourly_math_proof",
+    "created": "2025-12-16T08:01:25.216637",
+    "hour": 8,
+    "owned_by": "DTM",
+    "last_updated": "2025-12-16T08:52:30.951946"
+  },
+  "hour": "2025-12-16_08",
+  "proofs_this_hour": 0,
+  "proofs": [
+    {
+      "proof_id": "proof_20251216_080236_3378550602",
+      "timestamp": "2025-12-16T08:02:36.649646",
+      "block_height": 0,
+      "miner_id": "terminal_1",
+      "hardware_attestation": {
+        "ip_address": "127.0.1.1",
+        "hostname": "HP-Phantom-Core",
+        "cpu": {
+          "model": "x86_64",
+          "physical_cores": 10,
+          "logical_cores": 12,
+          "current_freq_mhz": 1399.9288333333334,
+          "max_freq_mhz": 4133.333333333333,
+          "min_freq_mhz": 400.0
+        },
+        "ram": {
+          "total_gb": 62.52,
+          "available_gb": 20.4,
+          "percent_used": 67.4
+        }
+      },
+      "computation_proof": {
+        "nonce": 3378550602,
+        "merkleroot": "",
+        "block_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+        "difficulty_target": 18446744073709551616,
+        "leading_zeros": 0
+      },
+      "mathematical_framework": {
+        "categories_applied": [
+          "families",
+          "lanes",
+          "strides",
+          "palette",
+          "sandbox"
+        ],
+        "knuth_parameters": {
+          "levels": 80,
+          "iterations": 156912
+        },
+        "universe_bitload": "208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909"
+      }
+    },
+    {
+      "proof_id": "proof_20251216_081544_2557348457",
+      "timestamp": "2025-12-16T08:15:44.758627",
+      "block_height": 0,
+      "miner_id": "terminal_1",
+      "hardware_attestation": {
+        "ip_address": "127.0.1.1",
+        "hostname": "HP-Phantom-Core",
+        "cpu": {
+          "model": "x86_64",
+          "physical_cores": 10,
+          "logical_cores": 12,
+          "current_freq_mhz": 1316.4470833333332,
+          "max_freq_mhz": 4133.333333333333,
+          "min_freq_mhz": 400.0
+        },
+        "ram": {
+          "total_gb": 62.52,
+          "available_gb": 20.19,
+          "percent_used": 67.7
+        }
+      },
+      "computation_proof": {
+        "nonce": 2557348457,
+        "merkleroot": "",
+        "block_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+        "difficulty_target": 18446744073709551616,
+        "leading_zeros": 0
+      },
+      "mathematical_framework": {
+        "categories_applied": [
+          "families",
+          "lanes",
+          "strides",
+          "palette",
+          "sandbox"
+        ],
+        "knuth_parameters": {
+          "levels": 80,
+          "iterations": 156912
+        },
+        "universe_bitload": "208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909"
+      }
+    },
+    {
+      "proof_id": "proof_20251216_082914_2947610120",
+      "timestamp": "2025-12-16T08:29:14.438173",
+      "block_height": 0,
+      "miner_id": "terminal_1",
+      "hardware_attestation": {
+        "ip_address": "127.0.1.1",
+        "hostname": "HP-Phantom-Core",
+        "cpu": {
+          "model": "x86_64",
+          "physical_cores": 10,
+          "logical_cores": 12,
+          "current_freq_mhz": 1400.1633333333332,
+          "max_freq_mhz": 4133.333333333333,
+          "min_freq_mhz": 400.0
+        },
+        "ram": {
+          "total_gb": 62.52,
+          "available_gb": 20.25,
+          "percent_used": 67.6
+        }
+      },
+      "computation_proof": {
+        "nonce": 2947610120,
+        "merkleroot": "",
+        "block_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+        "difficulty_target": 18446744073709551616,
+        "leading_zeros": 0
+      },
+      "mathematical_framework": {
+        "categories_applied": [
+          "families",
+          "lanes",
+          "strides",
+          "palette",
+          "sandbox"
+        ],
+        "knuth_parameters": {
+          "levels": 80,
+          "iterations": 156912
+        },
+        "universe_bitload": "208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909"
+      }
+    },
+    {
+      "proof_id": "proof_20251216_084215_2123495478",
+      "timestamp": "2025-12-16T08:42:15.003334",
+      "block_height": 0,
+      "miner_id": "terminal_1",
+      "hardware_attestation": {
+        "ip_address": "127.0.1.1",
+        "hostname": "HP-Phantom-Core",
+        "cpu": {
+          "model": "x86_64",
+          "physical_cores": 10,
+          "logical_cores": 12,
+          "current_freq_mhz": 1400.01925,
+          "max_freq_mhz": 4133.333333333333,
+          "min_freq_mhz": 400.0
+        },
+        "ram": {
+          "total_gb": 62.52,
+          "available_gb": 20.08,
+          "percent_used": 67.9
+        }
+      },
+      "computation_proof": {
+        "nonce": 2123495478,
+        "merkleroot": "",
+        "block_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+        "difficulty_target": 18446744073709551616,
+        "leading_zeros": 0
+      },
+      "mathematical_framework": {
+        "categories_applied": [
+          "families",
+          "lanes",
+          "strides",
+          "palette",
+          "sandbox"
+        ],
+        "knuth_parameters": {
+          "levels": 80,
+          "iterations": 156912
+        },
+        "universe_bitload": "208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909"
+      }
+    },
+    {
+      "proof_id": "proof_20251216_085230_330110994",
+      "timestamp": "2025-12-16T08:52:30.951946",
+      "block_height": 0,
+      "miner_id": "terminal_1",
+      "hardware_attestation": {
+        "ip_address": "127.0.1.1",
+        "hostname": "HP-Phantom-Core",
+        "cpu": {
+          "model": "x86_64",
+          "physical_cores": 10,
+          "logical_cores": 12,
+          "current_freq_mhz": 1400.0618333333332,
+          "max_freq_mhz": 4133.333333333333,
+          "min_freq_mhz": 400.0
+        },
+        "ram": {
+          "total_gb": 62.52,
+          "available_gb": 20.31,
+          "percent_used": 67.5
+        }
+      },
+      "computation_proof": {
+        "nonce": 330110994,
+        "merkleroot": "",
+        "block_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+        "difficulty_target": 18446744073709551616,
+        "leading_zeros": 0
+      },
+      "mathematical_framework": {
+        "categories_applied": [
+          "families",
+          "lanes",
+          "strides",
+          "palette",
+          "sandbox"
+        ],
+        "knuth_parameters": {
+          "levels": 80,
+          "iterations": 156912
+        },
+        "universe_bitload": "208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909"
+      }
+    }
+  ]
+}

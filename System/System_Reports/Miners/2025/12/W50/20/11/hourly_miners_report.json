@@ -1,0 +1,57 @@
+{
+  "metadata": {
+    "hour": 11,
+    "component": "Miners",
+    "last_updated": "2025-12-20T11:49:54.822762"
+  },
+  "reports": [
+    {
+      "timestamp": "2025-12-20T11:27:56.323684",
+      "component": "Miners",
+      "event": "initialization",
+      "miner_id": "MINER_ALPHA",
+      "process_id": "process_1",
+      "mode": "demo",
+      "daemon_mode": false,
+      "brain_qtl_ready": false,
+      "brainstem_connected": true,
+      "status": "initialized"
+    },
+    {
+      "timestamp": "2025-12-20T11:38:16.243204",
+      "component": "Miners",
+      "event": "initialization",
+      "miner_id": "MINER_ALPHA",
+      "process_id": "process_1",
+      "mode": "demo",
+      "daemon_mode": false,
+      "brain_qtl_ready": false,
+      "brainstem_connected": true,
+      "status": "initialized"
+    },
+    {
+      "timestamp": "2025-12-20T11:39:43.315936",
+      "component": "Miners",
+      "event": "initialization",
+      "miner_id": "MINER_ALPHA",
+      "process_id": "process_1",
+      "mode": "demo",
+      "daemon_mode": false,
+      "brain_qtl_ready": false,
+      "brainstem_connected": true,
+      "status": "initialized"
+    },
+    {
+      "timestamp": "2025-12-20T11:49:54.822746",
+      "component": "Miners",
+      "event": "initialization",
+      "miner_id": "MINER_ALPHA",
+      "process_id": "process_1",
+      "mode": "demo",
+      "daemon_mode": false,
+      "brain_qtl_ready": false,
+      "brainstem_connected": true,
+      "status": "initialized"
+    }
+  ]
+}

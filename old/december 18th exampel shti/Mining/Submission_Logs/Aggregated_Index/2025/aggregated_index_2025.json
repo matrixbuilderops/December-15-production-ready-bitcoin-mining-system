@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_year",
+    "component": "Production-Miner",
+    "level": "year",
+    "scope": "Contains: Year 2025 + all months/weeks/days/hours",
+    "created": "2025-12-18T00:34:46.660836",
+    "last_updated": "2025-12-18T00:34:46.660836",
+    "mode": "live"
+  },
+  "summary": {
+    "total_entries": 0,
+    "data_sources": []
+  },
+  "aggregated_data": {},
+  "sub_levels": []
+}

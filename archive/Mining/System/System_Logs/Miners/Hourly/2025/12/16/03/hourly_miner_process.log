@@ -1,0 +1,18 @@
+2025-12-16 03:03:56,325 - DAEMON_1 - ERROR - Cannot read registry, initializing from template: [Errno 21] Is a directory: '/media/phantomcore/AI_DRIVE/AI_Shit_mining/new testing/December 15 production ready bitcoin mining system/Mining'
+2025-12-16 03:03:56,329 - DAEMON_1 - ERROR - Cannot write registry: [Errno 21] Is a directory: '/media/phantomcore/AI_DRIVE/AI_Shit_mining/new testing/December 15 production ready bitcoin mining system/Mining'
+2025-12-16 03:03:56,330 - DAEMON_1 - INFO - Registry saved to fallback: /tmp/global_submission_registry.json
+2025-12-16 03:14:23,331 - DAEMON_1 - ERROR - Cannot read registry, initializing from template: [Errno 21] Is a directory: '/media/phantomcore/AI_DRIVE/AI_Shit_mining/new testing/December 15 production ready bitcoin mining system/Mining'
+2025-12-16 03:14:23,334 - DAEMON_1 - ERROR - Cannot write registry: [Errno 21] Is a directory: '/media/phantomcore/AI_DRIVE/AI_Shit_mining/new testing/December 15 production ready bitcoin mining system/Mining'
+2025-12-16 03:14:23,334 - DAEMON_1 - INFO - Registry saved to fallback: /tmp/global_submission_registry.json
+2025-12-16 03:24:47,833 - DAEMON_1 - ERROR - Cannot read registry, initializing from template: [Errno 21] Is a directory: '/media/phantomcore/AI_DRIVE/AI_Shit_mining/new testing/December 15 production ready bitcoin mining system/Mining'
+2025-12-16 03:24:47,836 - DAEMON_1 - ERROR - Cannot write registry: [Errno 21] Is a directory: '/media/phantomcore/AI_DRIVE/AI_Shit_mining/new testing/December 15 production ready bitcoin mining system/Mining'
+2025-12-16 03:24:47,837 - DAEMON_1 - INFO - Registry saved to fallback: /tmp/global_submission_registry.json
+2025-12-16 03:38:23,036 - DAEMON_1 - ERROR - Cannot read registry, initializing from template: [Errno 21] Is a directory: '/media/phantomcore/AI_DRIVE/AI_Shit_mining/new testing/December 15 production ready bitcoin mining system/Mining'
+2025-12-16 03:38:23,040 - DAEMON_1 - ERROR - Cannot write registry: [Errno 21] Is a directory: '/media/phantomcore/AI_DRIVE/AI_Shit_mining/new testing/December 15 production ready bitcoin mining system/Mining'
+2025-12-16 03:38:23,040 - DAEMON_1 - INFO - Registry saved to fallback: /tmp/global_submission_registry.json
+2025-12-16 03:48:38,162 - DAEMON_1 - ERROR - Cannot read registry, initializing from template: [Errno 21] Is a directory: '/media/phantomcore/AI_DRIVE/AI_Shit_mining/new testing/December 15 production ready bitcoin mining system/Mining'
+2025-12-16 03:48:38,164 - DAEMON_1 - ERROR - Cannot write registry: [Errno 21] Is a directory: '/media/phantomcore/AI_DRIVE/AI_Shit_mining/new testing/December 15 production ready bitcoin mining system/Mining'
+2025-12-16 03:48:38,165 - DAEMON_1 - INFO - Registry saved to fallback: /tmp/global_submission_registry.json
+2025-12-16 04:01:41,152 - DAEMON_1 - ERROR - Cannot read registry, initializing from template: [Errno 21] Is a directory: '/media/phantomcore/AI_DRIVE/AI_Shit_mining/new testing/December 15 production ready bitcoin mining system/Mining'
+2025-12-16 04:01:41,156 - DAEMON_1 - ERROR - Cannot write registry: [Errno 21] Is a directory: '/media/phantomcore/AI_DRIVE/AI_Shit_mining/new testing/December 15 production ready bitcoin mining system/Mining'
+2025-12-16 04:01:41,156 - DAEMON_1 - INFO - Registry saved to fallback: /tmp/global_submission_registry.json

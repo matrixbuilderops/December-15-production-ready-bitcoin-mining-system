@@ -1,0 +1,16 @@
+{
+  "submissions": [
+    {
+      "id": "smoke-test",
+      "note": "agg smoke test"
+    }
+  ],
+  "metadata": {
+    "created": "2025-12-17T18:38:48.795822",
+    "level": "hour",
+    "component": "SmokeTest",
+    "mode": "test",
+    "last_updated": "2025-12-17T18:38:48.795822",
+    "total_entries": 1
+  }
+}

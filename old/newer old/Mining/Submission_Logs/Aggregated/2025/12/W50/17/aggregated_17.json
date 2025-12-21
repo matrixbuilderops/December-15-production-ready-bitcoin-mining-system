@@ -1,0 +1,28 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_day",
+    "component": "LoopingSmoke",
+    "level": "day",
+    "scope": "Contains: Day 17 + all hours",
+    "created": "2025-12-17T19:42:15.007562",
+    "last_updated": "2025-12-17T19:42:15.025947",
+    "mode": "staging"
+  },
+  "summary": {
+    "total_entries": 1,
+    "data_sources": [
+      "Mining/Submission_Logs/submission_global.json"
+    ]
+  },
+  "aggregated_data": {
+    "submissions": [
+      {
+        "id": "smoke-staging",
+        "note": "looping agg smoke staging",
+        "source_path": "Mining/Submission_Logs/submission_global.json",
+        "timestamp": "2025-12-17T19:42:15.025947"
+      }
+    ]
+  },
+  "sub_levels": []
+}

@@ -1,0 +1,16 @@
+{
+  "errors": [
+    {
+      "id": "smoke-1",
+      "note": "demo aggregation smoke"
+    }
+  ],
+  "metadata": {
+    "created": "2025-12-17T18:30:17.633258",
+    "level": "hour",
+    "component": "SmokeTest",
+    "mode": "demo",
+    "last_updated": "2025-12-17T18:30:17.633258",
+    "total_entries": 1
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "file_type": "ledger_root",
+    "component": "LoopingSmoke",
+    "level": "root",
+    "created": "2025-12-17T18:51:46.130706",
+    "mode": "test",
+    "note": "Created without template - using fallback structure",
+    "last_updated": "2025-12-17T19:50:49.044083",
+    "total_entries": 6
+  },
+  "entries": [
+    {
+      "id": "smoke-test",
+      "note": "looping agg smoke test"
+    },
+    {
+      "id": "smoke-test",
+      "note": "looping agg smoke test"
+    },
+    {
+      "id": "smoke-test",
+      "note": "looping agg smoke test"
+    },
+    {
+      "id": "smoke-test",
+      "note": "looping agg smoke test"
+    },
+    {
+      "id": "test",
+      "note": "brainstem"
+    },
+    {
+      "id": "test",
+      "note": "looping"
+    }
+  ]
+}

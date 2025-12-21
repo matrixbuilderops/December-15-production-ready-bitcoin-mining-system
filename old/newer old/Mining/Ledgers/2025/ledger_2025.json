@@ -1,0 +1,11 @@
+{
+  "metadata": {
+    "file_type": "ledger_year",
+    "component": "LoopingSmoke",
+    "level": "year",
+    "created": "2025-12-17T18:51:46.158331",
+    "mode": "staging",
+    "note": "Created without template - using fallback structure"
+  },
+  "entries": []
+}

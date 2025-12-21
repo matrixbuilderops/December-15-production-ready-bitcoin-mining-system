@@ -1,0 +1,18 @@
+{
+  "hour": "2025-12-20_12",
+  "test_mode": false,
+  "demo_mode": true,
+  "blocks_found_this_hour": 1,
+  "blocks": [
+    {
+      "block_height": 999999,
+      "block_hash": "",
+      "leading_zeros": 0,
+      "nonce": 123456789,
+      "difficulty": "00000000ffff0000000000000000000000000000000000000000000000000000",
+      "timestamp": "2025-12-20T12:10:15.848455",
+      "mode": "demo"
+    }
+  ],
+  "created": "2025-12-20T12:10:15.848455"
+}

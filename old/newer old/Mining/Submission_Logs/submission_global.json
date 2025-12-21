@@ -1,0 +1,36 @@
+{
+  "metadata": {
+    "file_type": "submission_root",
+    "component": "LoopingSmoke",
+    "level": "root",
+    "created": "2025-12-17T18:51:46.161278",
+    "mode": "staging",
+    "note": "Created without template - using fallback structure",
+    "last_updated": "2025-12-17T19:42:15.025050",
+    "total_entries": 4
+  },
+  "entries": [
+    {
+      "id": "smoke-staging",
+      "note": "looping agg smoke staging"
+    }
+  ],
+  "submissions": [
+    {
+      "id": "smoke-staging",
+      "note": "looping agg smoke staging"
+    },
+    {
+      "id": "smoke-staging",
+      "note": "looping agg smoke staging"
+    },
+    {
+      "id": "smoke-staging",
+      "note": "looping agg smoke staging"
+    },
+    {
+      "id": "smoke-staging",
+      "note": "looping agg smoke staging"
+    }
+  ]
+}

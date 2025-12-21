@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "id": "smoke-test",
+      "note": "looping agg smoke test"
+    },
+    {
+      "id": "test",
+      "note": "brainstem"
+    },
+    {
+      "id": "test",
+      "note": "looping"
+    }
+  ],
+  "metadata": {
+    "created": "2025-12-17T19:42:14.973767",
+    "level": "hour",
+    "component": "LoopingSmoke",
+    "mode": "test",
+    "last_updated": "2025-12-17T19:50:49.044083",
+    "total_entries": 3
+  }
+}

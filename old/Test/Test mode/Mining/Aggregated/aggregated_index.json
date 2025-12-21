@@ -1,0 +1,76 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_master",
+    "component": "Brain",
+    "created": "2025-12-17T18:38:48.791584",
+    "last_updated": "2025-12-17T18:38:48.808684",
+    "mode": "test"
+  },
+  "summary": {
+    "total_entries": 5,
+    "by_type": {
+      "ledger": 1,
+      "math_proof": 1,
+      "submission": 1,
+      "system_report": 1,
+      "error_report": 1
+    }
+  },
+  "aggregated_data": {
+    "ledger": {
+      "entries": [
+        {
+          "id": "smoke-test",
+          "note": "agg smoke test",
+          "component": "SmokeTest",
+          "file_type": "ledger",
+          "timestamp": "2025-12-17T18:38:48.791584"
+        }
+      ]
+    },
+    "math_proof": {
+      "proofs": [
+        {
+          "id": "smoke-test",
+          "note": "agg smoke test",
+          "component": "SmokeTest",
+          "file_type": "math_proof",
+          "timestamp": "2025-12-17T18:38:48.795444"
+        }
+      ]
+    },
+    "submission": {
+      "submissions": [
+        {
+          "id": "smoke-test",
+          "note": "agg smoke test",
+          "component": "SmokeTest",
+          "file_type": "submission",
+          "timestamp": "2025-12-17T18:38:48.800308"
+        }
+      ]
+    },
+    "system_report": {
+      "entries": [
+        {
+          "id": "smoke-test",
+          "note": "agg smoke test",
+          "component": "SmokeTest",
+          "file_type": "system_report",
+          "timestamp": "2025-12-17T18:38:48.805741"
+        }
+      ]
+    },
+    "error_report": {
+      "entries": [
+        {
+          "id": "smoke-test",
+          "note": "agg smoke test",
+          "component": "SmokeTest",
+          "file_type": "error_report",
+          "timestamp": "2025-12-17T18:38:48.808684"
+        }
+      ]
+    }
+  }
+}

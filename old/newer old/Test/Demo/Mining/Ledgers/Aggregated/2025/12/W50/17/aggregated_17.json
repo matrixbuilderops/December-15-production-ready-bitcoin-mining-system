@@ -1,0 +1,49 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_day",
+    "component": "LoopingSmoke",
+    "level": "day",
+    "scope": "Contains: Day 17 + all hours",
+    "created": "2025-12-17T19:42:14.918712",
+    "last_updated": "2025-12-17T19:50:49.022910",
+    "mode": "demo"
+  },
+  "summary": {
+    "total_entries": 3,
+    "data_sources": [
+      "Test/Demo/Mining/Ledgers/ledger_global.json",
+      "Test/Demo/Mining/Ledgers/math_proof_global.json"
+    ]
+  },
+  "aggregated_data": {
+    "entries": [
+      {
+        "id": "smoke-demo",
+        "note": "looping agg smoke demo",
+        "source_path": "Test/Demo/Mining/Ledgers/ledger_global.json",
+        "timestamp": "2025-12-17T19:42:14.930903"
+      },
+      {
+        "id": "demo",
+        "note": "brainstem",
+        "source_path": "Test/Demo/Mining/Ledgers/ledger_global.json",
+        "timestamp": "2025-12-17T19:50:49.013297"
+      },
+      {
+        "id": "demo",
+        "note": "looping",
+        "source_path": "Test/Demo/Mining/Ledgers/ledger_global.json",
+        "timestamp": "2025-12-17T19:50:49.022910"
+      }
+    ],
+    "proofs": [
+      {
+        "id": "smoke-demo",
+        "note": "looping agg smoke demo",
+        "source_path": "Test/Demo/Mining/Ledgers/math_proof_global.json",
+        "timestamp": "2025-12-17T19:42:14.936784"
+      }
+    ]
+  },
+  "sub_levels": []
+}

@@ -1,0 +1,16 @@
+{
+  "proofs": [
+    {
+      "id": "smoke-demo",
+      "note": "looping agg smoke demo"
+    }
+  ],
+  "metadata": {
+    "created": "2025-12-17T18:51:46.120083",
+    "level": "hour",
+    "component": "LoopingSmoke",
+    "mode": "demo",
+    "last_updated": "2025-12-17T18:51:46.120083",
+    "total_entries": 1
+  }
+}

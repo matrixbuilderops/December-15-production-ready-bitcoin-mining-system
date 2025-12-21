@@ -1,0 +1,90 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_master",
+    "component": "Brain",
+    "created": "2025-12-17T19:42:15.018345",
+    "last_updated": "2025-12-17T19:50:49.067850",
+    "mode": "staging"
+  },
+  "summary": {
+    "total_entries": 7,
+    "by_type": {
+      "ledger": 3,
+      "math_proof": 1,
+      "submission": 1,
+      "system_report": 1,
+      "error_report": 1
+    }
+  },
+  "aggregated_data": {
+    "ledger": {
+      "entries": [
+        {
+          "id": "smoke-staging",
+          "note": "looping agg smoke staging",
+          "component": "LoopingSmoke",
+          "file_type": "ledger",
+          "timestamp": "2025-12-17T19:42:15.018345"
+        },
+        {
+          "id": "staging",
+          "note": "brainstem",
+          "component": "LoopingSmoke",
+          "file_type": "ledger",
+          "timestamp": "2025-12-17T19:50:49.059867"
+        },
+        {
+          "id": "staging",
+          "note": "looping",
+          "component": "LoopingSmoke",
+          "file_type": "ledger",
+          "timestamp": "2025-12-17T19:50:49.067850"
+        }
+      ]
+    },
+    "math_proof": {
+      "proofs": [
+        {
+          "id": "smoke-staging",
+          "note": "looping agg smoke staging",
+          "component": "LoopingSmoke",
+          "file_type": "math_proof",
+          "timestamp": "2025-12-17T19:42:15.024127"
+        }
+      ]
+    },
+    "submission": {
+      "submissions": [
+        {
+          "id": "smoke-staging",
+          "note": "looping agg smoke staging",
+          "component": "LoopingSmoke",
+          "file_type": "submission",
+          "timestamp": "2025-12-17T19:42:15.029711"
+        }
+      ]
+    },
+    "system_report": {
+      "entries": [
+        {
+          "id": "smoke-staging",
+          "note": "looping agg smoke staging",
+          "component": "LoopingSmoke",
+          "file_type": "system_report",
+          "timestamp": "2025-12-17T19:42:15.035593"
+        }
+      ]
+    },
+    "error_report": {
+      "entries": [
+        {
+          "id": "smoke-staging",
+          "note": "looping agg smoke staging",
+          "component": "LoopingSmoke",
+          "file_type": "error_report",
+          "timestamp": "2025-12-17T19:42:15.040869"
+        }
+      ]
+    }
+  }
+}

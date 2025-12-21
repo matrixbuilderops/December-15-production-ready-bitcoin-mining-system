@@ -1,0 +1,30 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_hour",
+    "component": "Looping",
+    "level": "hour",
+    "scope": "Contains: Hour 11 only",
+    "created": "2025-12-17T11:52:37.337069",
+    "last_updated": "2025-12-17T11:52:37.350269",
+    "mode": "sandbox"
+  },
+  "summary": {
+    "total_entries": 1,
+    "data_sources": [
+      "Mining/Submission_Logs/Global/global_submission_log.json"
+    ]
+  },
+  "aggregated_data": {
+    "submissions": [
+      {
+        "timestamp": "2025-12-17T15:45:00",
+        "block_hash": "hash-sub-log",
+        "accepted": false,
+        "error": "reject",
+        "response": "reject",
+        "source_path": "Mining/Submission_Logs/Global/global_submission_log.json"
+      }
+    ]
+  },
+  "sub_levels": []
+}

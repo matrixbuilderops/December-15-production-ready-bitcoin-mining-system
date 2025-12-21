@@ -1,0 +1,16 @@
+{
+  "errors": [
+    {
+      "id": "smoke-demo",
+      "note": "looping agg smoke demo"
+    }
+  ],
+  "metadata": {
+    "created": "2025-12-17T19:42:14.954107",
+    "level": "hour",
+    "component": "LoopingSmoke",
+    "mode": "demo",
+    "last_updated": "2025-12-17T19:42:14.954107",
+    "total_entries": 1
+  }
+}

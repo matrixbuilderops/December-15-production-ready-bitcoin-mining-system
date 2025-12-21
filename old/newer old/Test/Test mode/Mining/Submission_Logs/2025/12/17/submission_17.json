@@ -1,0 +1,24 @@
+{
+  "metadata": {
+    "file_type": "submission_day",
+    "component": "LoopingSmoke",
+    "level": "day",
+    "created": "2025-12-17T18:51:46.133264",
+    "mode": "test",
+    "note": "Created without template - using fallback structure",
+    "last_updated": "2025-12-17T19:30:12.329296",
+    "total_entries": 1
+  },
+  "entries": [
+    {
+      "id": "smoke-test",
+      "note": "looping agg smoke test"
+    }
+  ],
+  "submissions": [
+    {
+      "id": "smoke-test",
+      "note": "looping agg smoke test"
+    }
+  ]
+}

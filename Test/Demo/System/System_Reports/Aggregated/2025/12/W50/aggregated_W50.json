@@ -1,0 +1,18 @@
+{
+  "metadata": {
+    "file_type": "aggregated_W50",
+    "component": "Looping",
+    "level": "week",
+    "created": "2025-12-19T14:25:36.574206",
+    "mode": "demo",
+    "time_scope": {
+      "year": "2025",
+      "month": "12",
+      "week": "W50",
+      "day": null,
+      "hour": null
+    },
+    "note": "Created from Brain.QTL pattern_levels - fallback structure"
+  },
+  "entries": []
+}

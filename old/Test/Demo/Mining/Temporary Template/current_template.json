@@ -1,0 +1,12 @@
+{
+  "height": 850000,
+  "bits": "1703a2c2",
+  "previousblockhash": "00000000000000000002a7c4c1e48d76c5a37902165a270156b7a8d72728a054",
+  "transactions": [],
+  "coinbasevalue": 625000000,
+  "target": "00000000000002c20000000000000000000000000000000000000000000000000",
+  "version": 536870912,
+  "curtime": 1765946479,
+  "created_by": "Singularity_Dave_Mining_System",
+  "created_at": "2025-12-16T22:41:19.473737"
+}

@@ -1,0 +1,92 @@
+{
+  "metadata": {
+    "file_type": "hourly_miners_report",
+    "component": "Miners",
+    "level": "hour",
+    "created": "2025-12-20T13:15:34.308173",
+    "mode": "demo",
+    "time_scope": {
+      "year": "2025",
+      "month": "12",
+      "week": "W50",
+      "day": "20",
+      "hour": "13"
+    },
+    "note": "Created from Brain.QTL pattern_levels - fallback structure",
+    "last_updated": "2025-12-20T13:46:30.256668"
+  },
+  "entries": [
+    {
+      "timestamp": "2025-12-20T13:15:35.868454",
+      "component": "Miners",
+      "event": "initialization",
+      "miner_id": "MINER_ALPHA",
+      "process_id": "process_1",
+      "mode": "production",
+      "daemon_mode": false,
+      "brain_qtl_ready": false,
+      "brainstem_connected": true,
+      "status": "initialized"
+    },
+    {
+      "timestamp": "2025-12-20T13:16:05.642389",
+      "component": "Miners",
+      "event": "initialization",
+      "miner_id": "MINER_ALPHA",
+      "process_id": "process_1",
+      "mode": "production",
+      "daemon_mode": false,
+      "brain_qtl_ready": false,
+      "brainstem_connected": true,
+      "status": "initialized"
+    },
+    {
+      "timestamp": "2025-12-20T13:17:02.939172",
+      "component": "Miners",
+      "event": "initialization",
+      "miner_id": "MINER_ALPHA",
+      "process_id": "process_1",
+      "mode": "production",
+      "daemon_mode": false,
+      "brain_qtl_ready": false,
+      "brainstem_connected": true,
+      "status": "initialized"
+    },
+    {
+      "timestamp": "2025-12-20T13:21:04.717462",
+      "component": "Miners",
+      "event": "initialization",
+      "miner_id": "MINER_ALPHA",
+      "process_id": "process_1",
+      "mode": "production",
+      "daemon_mode": false,
+      "brain_qtl_ready": false,
+      "brainstem_connected": true,
+      "status": "initialized"
+    },
+    {
+      "timestamp": "2025-12-20T13:45:47.006391",
+      "component": "Miners",
+      "event": "initialization",
+      "miner_id": "MINER_ALPHA",
+      "process_id": "process_1",
+      "mode": "production",
+      "daemon_mode": false,
+      "brain_qtl_ready": false,
+      "brainstem_connected": true,
+      "status": "initialized"
+    },
+    {
+      "timestamp": "2025-12-20T13:46:30.256637",
+      "component": "Miners",
+      "event": "initialization",
+      "miner_id": "MINER_ALPHA",
+      "process_id": "process_1",
+      "mode": "production",
+      "daemon_mode": false,
+      "brain_qtl_ready": false,
+      "brainstem_connected": true,
+      "status": "initialized"
+    }
+  ]
+}

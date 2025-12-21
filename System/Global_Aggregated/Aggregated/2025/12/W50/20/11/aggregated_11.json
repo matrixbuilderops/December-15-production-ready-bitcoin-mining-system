@@ -1,0 +1,74 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_hour",
+    "component": "Brain",
+    "created": "2025-12-20T11:27:56.376683",
+    "last_updated": "2025-12-20T11:49:54.833346",
+    "mode": "live"
+  },
+  "summary": {
+    "total_entries": 4,
+    "by_type": {
+      "system_report": 4
+    },
+    "data_sources": []
+  },
+  "aggregated_data": {
+    "system_report": {
+      "entries": [
+        {
+          "timestamp": "2025-12-20T11:27:56.323684",
+          "component": "Miners",
+          "event": "initialization",
+          "miner_id": "MINER_ALPHA",
+          "process_id": "process_1",
+          "mode": "demo",
+          "daemon_mode": false,
+          "brain_qtl_ready": false,
+          "brainstem_connected": true,
+          "status": "initialized",
+          "file_type": "system_report"
+        },
+        {
+          "timestamp": "2025-12-20T11:38:16.243204",
+          "component": "Miners",
+          "event": "initialization",
+          "miner_id": "MINER_ALPHA",
+          "process_id": "process_1",
+          "mode": "demo",
+          "daemon_mode": false,
+          "brain_qtl_ready": false,
+          "brainstem_connected": true,
+          "status": "initialized",
+          "file_type": "system_report"
+        },
+        {
+          "timestamp": "2025-12-20T11:39:43.315936",
+          "component": "Miners",
+          "event": "initialization",
+          "miner_id": "MINER_ALPHA",
+          "process_id": "process_1",
+          "mode": "demo",
+          "daemon_mode": false,
+          "brain_qtl_ready": false,
+          "brainstem_connected": true,
+          "status": "initialized",
+          "file_type": "system_report"
+        },
+        {
+          "timestamp": "2025-12-20T11:49:54.822746",
+          "component": "Miners",
+          "event": "initialization",
+          "miner_id": "MINER_ALPHA",
+          "process_id": "process_1",
+          "mode": "demo",
+          "daemon_mode": false,
+          "brain_qtl_ready": false,
+          "brainstem_connected": true,
+          "status": "initialized",
+          "file_type": "system_report"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_month",
+    "component": "Production-Miner",
+    "level": "month",
+    "scope": "Contains: Month 12 + all weeks/days/hours",
+    "created": "2025-12-18T00:34:46.656469",
+    "last_updated": "2025-12-18T00:34:46.656469",
+    "mode": "live"
+  },
+  "summary": {
+    "total_entries": 0,
+    "data_sources": []
+  },
+  "aggregated_data": {},
+  "sub_levels": []
+}

@@ -1,0 +1,16 @@
+{
+  "submissions": [
+    {
+      "id": "smoke-staging",
+      "note": "looping agg smoke staging"
+    }
+  ],
+  "metadata": {
+    "created": "2025-12-17T19:42:15.025050",
+    "level": "hour",
+    "component": "LoopingSmoke",
+    "mode": "staging",
+    "last_updated": "2025-12-17T19:42:15.025050",
+    "total_entries": 1
+  }
+}

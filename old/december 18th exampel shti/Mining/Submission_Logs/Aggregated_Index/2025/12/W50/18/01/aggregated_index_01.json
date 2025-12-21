@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_hour",
+    "component": "Production-Miner",
+    "level": "hour",
+    "scope": "Contains: Hour 01 only",
+    "created": "2025-12-18T01:38:25.654703",
+    "last_updated": "2025-12-18T01:38:25.654703",
+    "mode": "live"
+  },
+  "summary": {
+    "total_entries": 0,
+    "data_sources": []
+  },
+  "aggregated_data": {},
+  "sub_levels": []
+}

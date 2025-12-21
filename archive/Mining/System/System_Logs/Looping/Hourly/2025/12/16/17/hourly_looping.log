@@ -1,0 +1,19 @@
+2025-12-16 17:10:07,179 - INFO - ✅ Configuration loaded from /media/phantomcore/AI_DRIVE/AI_Shit_mining/new testing/December 15 production ready bitcoin mining system/config.json
+2025-12-16 17:10:07,179 - INFO - ✅ ZMQ configuration loaded from config.json: ['rawblock', 'hashblock']
+2025-12-16 17:10:09,084 - INFO - ✅ Brain.QTL file structure initialized via Brainstem
+2025-12-16 17:10:09,088 - INFO - ✅ Configuration loaded from /media/phantomcore/AI_DRIVE/AI_Shit_mining/new testing/December 15 production ready bitcoin mining system/config.json
+2025-12-16 17:10:09,089 - INFO - 🔍 Checking Bitcoin node connectivity...
+2025-12-16 17:10:09,114 - INFO - 🔄 Fetching fresh block template from Bitcoin node...
+2025-12-16 17:10:09,936 - INFO - ✅ Fresh template retrieved:
+2025-12-16 17:10:09,940 - INFO -    🧱 Height: 928191
+2025-12-16 17:10:09,940 - INFO -    📦 Transactions: 2370
+2025-12-16 17:10:09,940 - INFO -    🎯 Target: 0000000000000000...
+2025-12-16 17:10:09,940 - INFO -    🔗 Previous: 0000000000000000...
+2025-12-16 17:10:09,941 - INFO - 🧹 Cleaning up temporary files for new template...
+2025-12-16 17:10:09,956 - INFO - ✅ No temporary files needed cleaning
+2025-12-16 17:10:10,771 - INFO - ✅ GPS enhancement added: target_nonce=674363834
+2025-12-16 17:10:10,960 - INFO - ✅ Template saved to centralized location: /media/phantomcore/AI_DRIVE/AI_Shit_mining/new testing/December 15 production ready bitcoin mining system/Mining/Temporary Template/current_template.json
+2025-12-16 17:10:11,209 - INFO - 📡 Setting up ZMQ real-time block monitoring...
+2025-12-16 17:10:11,302 - INFO - ✅ ZMQ context created successfully
+2025-12-16 17:10:11,308 - INFO - 📡 ZMQ connected: rawblock -> tcp://127.0.0.1:28333
+2025-12-16 17:10:11,309 - INFO - 📡 ZMQ connected: hashblock -> tcp://127.0.0.1:28335

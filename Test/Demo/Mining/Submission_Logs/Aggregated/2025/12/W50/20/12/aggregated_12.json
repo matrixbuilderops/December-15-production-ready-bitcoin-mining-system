@@ -1,0 +1,82 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_hour",
+    "component": "Looping",
+    "level": "hour",
+    "scope": "Contains: Hour 12 only",
+    "created": "2025-12-20T12:10:13.862033",
+    "last_updated": "2025-12-20T12:10:15.716331",
+    "mode": "demo"
+  },
+  "summary": {
+    "total_entries": 2,
+    "data_sources": [
+      "Test/Demo/Mining/Submission_Logs/submission_global.json"
+    ]
+  },
+  "aggregated_data": {
+    "submissions": [
+      {
+        "submission_id": "demo_20251220T181015_712967+0000",
+        "timestamp": "2025-12-20T18:10:15.712967+00:00",
+        "block_height": 999999,
+        "block_hash": "demo_hash_1766254215",
+        "block_submission_file": "Test/Demo/Mining/Submission_Logs/block_submission_999999_20251220T181015_713051_0000.json",
+        "miner_id": "looping_demo_miner",
+        "nonce": 398056,
+        "network_response": null,
+        "confirmation_tracking": {
+          "confirmations": 0,
+          "first_seen_by_node": null,
+          "confirmed_in_blockchain": null,
+          "orphaned": false
+        },
+        "payout": {
+          "expected_btc": 3.125,
+          "actual_btc": 0,
+          "payout_address": "bc1qrqk4qwwy37xtpcvxs7ayeufld07tja652ka2wv",
+          "transaction_id": null,
+          "maturity_blocks": 100,
+          "spendable_after_height": 1000099
+        },
+        "references": {
+          "ledger_entry": null,
+          "math_proof": null,
+          "block_submission": "Test/Demo/Mining/Submission_Logs/block_submission_999999_20251220T181015_713051_0000.json"
+        },
+        "source_path": "Test/Demo/Mining/Submission_Logs/submission_global.json"
+      },
+      {
+        "submission_id": "demo_20251220T181015_712967+0000",
+        "timestamp": "2025-12-20T18:10:15.712967+00:00",
+        "block_height": 999999,
+        "block_hash": "demo_hash_1766254215",
+        "block_submission_file": "Test/Demo/Mining/Submission_Logs/block_submission_999999_20251220T181015_713051_0000.json",
+        "miner_id": "looping_demo_miner",
+        "nonce": 398056,
+        "network_response": null,
+        "confirmation_tracking": {
+          "confirmations": 0,
+          "first_seen_by_node": null,
+          "confirmed_in_blockchain": null,
+          "orphaned": false
+        },
+        "payout": {
+          "expected_btc": 3.125,
+          "actual_btc": 0,
+          "payout_address": "bc1qrqk4qwwy37xtpcvxs7ayeufld07tja652ka2wv",
+          "transaction_id": null,
+          "maturity_blocks": 100,
+          "spendable_after_height": 1000099
+        },
+        "references": {
+          "ledger_entry": null,
+          "math_proof": null,
+          "block_submission": "Test/Demo/Mining/Submission_Logs/block_submission_999999_20251220T181015_713051_0000.json"
+        },
+        "source_path": "Test/Demo/Mining/Submission_Logs/submission_global.json"
+      }
+    ]
+  },
+  "sub_levels": []
+}

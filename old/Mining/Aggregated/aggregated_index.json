@@ -1,0 +1,132 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_master",
+    "component": "Brain",
+    "created": "2025-12-17T11:52:37.342659",
+    "last_updated": "2025-12-17T18:38:48.842131",
+    "mode": "sandbox"
+  },
+  "summary": {
+    "total_entries": 11,
+    "by_type": {
+      "ledger": 2,
+      "submission": 3,
+      "submission_log": 1,
+      "system_report": 2,
+      "error_report": 2,
+      "math_proof": 1
+    }
+  },
+  "aggregated_data": {
+    "ledger": {
+      "entries": [
+        {
+          "timestamp": "2025-12-17T15:45:00",
+          "block_hash": "hash-ledger",
+          "nonce": 123,
+          "miner_id": "miner-ledger",
+          "leading_zeros": 7,
+          "payload": "L1",
+          "component": "Looping",
+          "file_type": "ledger"
+        },
+        {
+          "id": "smoke-staging",
+          "note": "agg smoke staging",
+          "component": "SmokeTest",
+          "file_type": "ledger",
+          "timestamp": "2025-12-17T18:38:48.825985"
+        }
+      ]
+    },
+    "submission": {
+      "submissions": [
+        {
+          "timestamp": "2025-12-17T15:45:00",
+          "block_hash": "hash-sub",
+          "nonce": 456,
+          "accepted": true,
+          "network_latency_ms": 120,
+          "component": "Looping",
+          "file_type": "submission"
+        },
+        {
+          "timestamp": "2025-12-17T15:45:00",
+          "block_hash": "hash-sub",
+          "nonce": 456,
+          "accepted": true,
+          "network_latency_ms": 120,
+          "component": "Looping",
+          "file_type": "submission"
+        },
+        {
+          "id": "smoke-staging",
+          "note": "agg smoke staging",
+          "component": "SmokeTest",
+          "file_type": "submission",
+          "timestamp": "2025-12-17T18:38:48.835681"
+        }
+      ]
+    },
+    "submission_log": {
+      "submissions": [
+        {
+          "timestamp": "2025-12-17T15:45:00",
+          "block_hash": "hash-sub-log",
+          "accepted": false,
+          "error": "reject",
+          "response": "reject",
+          "component": "Looping",
+          "file_type": "submission_log"
+        }
+      ]
+    },
+    "system_report": {
+      "entries": [
+        {
+          "timestamp": "2025-12-17T15:45:00",
+          "status": "ok",
+          "details": "report-smoke",
+          "component": "Looping",
+          "file_type": "system_report"
+        },
+        {
+          "id": "smoke-staging",
+          "note": "agg smoke staging",
+          "component": "SmokeTest",
+          "file_type": "system_report",
+          "timestamp": "2025-12-17T18:38:48.838940"
+        }
+      ]
+    },
+    "error_report": {
+      "entries": [
+        {
+          "timestamp": "2025-12-17T15:45:00",
+          "severity": "error",
+          "message": "error-smoke",
+          "component": "Looping",
+          "file_type": "error_report"
+        },
+        {
+          "id": "smoke-staging",
+          "note": "agg smoke staging",
+          "component": "SmokeTest",
+          "file_type": "error_report",
+          "timestamp": "2025-12-17T18:38:48.842131"
+        }
+      ]
+    },
+    "math_proof": {
+      "proofs": [
+        {
+          "id": "smoke-staging",
+          "note": "agg smoke staging",
+          "component": "SmokeTest",
+          "file_type": "math_proof",
+          "timestamp": "2025-12-17T18:38:48.832128"
+        }
+      ]
+    }
+  }
+}

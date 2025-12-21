@@ -1,0 +1,85 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_root",
+    "component": "LoopingSmoke",
+    "level": "root",
+    "scope": "Contains: All years, months, weeks, days, hours",
+    "created": "2025-12-17T18:51:46.159499",
+    "last_updated": "2025-12-17T19:50:49.063624",
+    "mode": "staging"
+  },
+  "summary": {
+    "total_entries": 6,
+    "data_sources": [
+      "Mining/Ledgers/ledger_global.json",
+      "Mining/Ledgers/math_proof_global.json"
+    ]
+  },
+  "aggregated_data": {
+    "entries": [
+      {
+        "id": "smoke-staging",
+        "note": "looping agg smoke staging",
+        "source_path": "Mining/Ledgers/ledger_global.json",
+        "timestamp": "2025-12-17T18:51:46.168637"
+      },
+      {
+        "id": "smoke-staging",
+        "note": "looping agg smoke staging",
+        "source_path": "Mining/Ledgers/ledger_global.json",
+        "timestamp": "2025-12-17T19:30:12.353243"
+      },
+      {
+        "id": "smoke-staging",
+        "note": "looping agg smoke staging",
+        "source_path": "Mining/Ledgers/ledger_global.json",
+        "timestamp": "2025-12-17T19:30:52.096557"
+      },
+      {
+        "id": "smoke-staging",
+        "note": "looping agg smoke staging",
+        "source_path": "Mining/Ledgers/ledger_global.json",
+        "timestamp": "2025-12-17T19:42:15.014565"
+      },
+      {
+        "id": "staging",
+        "note": "brainstem",
+        "source_path": "Mining/Ledgers/ledger_global.json",
+        "timestamp": "2025-12-17T19:50:49.053350"
+      },
+      {
+        "id": "staging",
+        "note": "looping",
+        "source_path": "Mining/Ledgers/ledger_global.json",
+        "timestamp": "2025-12-17T19:50:49.063624"
+      }
+    ],
+    "proofs": [
+      {
+        "id": "smoke-staging",
+        "note": "looping agg smoke staging",
+        "source_path": "Mining/Ledgers/math_proof_global.json",
+        "timestamp": "2025-12-17T18:51:46.173036"
+      },
+      {
+        "id": "smoke-staging",
+        "note": "looping agg smoke staging",
+        "source_path": "Mining/Ledgers/math_proof_global.json",
+        "timestamp": "2025-12-17T19:30:12.358142"
+      },
+      {
+        "id": "smoke-staging",
+        "note": "looping agg smoke staging",
+        "source_path": "Mining/Ledgers/math_proof_global.json",
+        "timestamp": "2025-12-17T19:30:52.101645"
+      },
+      {
+        "id": "smoke-staging",
+        "note": "looping agg smoke staging",
+        "source_path": "Mining/Ledgers/math_proof_global.json",
+        "timestamp": "2025-12-17T19:42:15.020046"
+      }
+    ]
+  },
+  "sub_levels": []
+}

@@ -1,0 +1,39 @@
+{
+  "hour": "2025-12-20_12",
+  "proofs": [
+    {
+      "block_height": 999999,
+      "block_hash": "",
+      "mathematical_framework": "Knuth-Sorrellian-Class_5x_Universe_Scale",
+      "dual_knuth_applied": true,
+      "categories_processed": 5,
+      "knuth_levels": 80,
+      "knuth_iterations": 156912,
+      "cycles": 161,
+      "result": {
+        "hash": "",
+        "leading_zeros": 0,
+        "nonce": 123456789,
+        "valid": true
+      },
+      "proof_metadata": {
+        "ip_address": "127.0.1.1",
+        "machine_id": "HP-Phantom-Core",
+        "system_info": {
+          "hostname": "HP-Phantom-Core",
+          "system": "Linux",
+          "machine": "x86_64",
+          "processor": "x86_64",
+          "python_version": "3.12.3",
+          "user": "phantomcore"
+        },
+        "proof_generated_at": "2025-12-20T12:10:15.848455",
+        "timezone": "local"
+      },
+      "mode": "demo",
+      "timestamp": "2025-12-20T12:10:15.848455"
+    }
+  ],
+  "total_proofs": 1,
+  "created": "2025-12-20T12:10:15.848455"
+}

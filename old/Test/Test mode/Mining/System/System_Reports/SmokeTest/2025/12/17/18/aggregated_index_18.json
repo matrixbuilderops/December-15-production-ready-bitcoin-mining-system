@@ -1,0 +1,28 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_hour",
+    "component": "SmokeTest",
+    "level": "hour",
+    "scope": "Contains: Hour 18 only",
+    "created": "2025-12-17T18:38:48.785923",
+    "last_updated": "2025-12-17T18:38:48.802264",
+    "mode": "test"
+  },
+  "summary": {
+    "total_entries": 1,
+    "data_sources": [
+      "Test/Test mode/Mining/System/System_Reports/SmokeTest/system_report_global.json"
+    ]
+  },
+  "aggregated_data": {
+    "entries": [
+      {
+        "id": "smoke-test",
+        "note": "agg smoke test",
+        "source_path": "Test/Test mode/Mining/System/System_Reports/SmokeTest/system_report_global.json",
+        "timestamp": "2025-12-17T18:38:48.802264"
+      }
+    ]
+  },
+  "sub_levels": []
+}

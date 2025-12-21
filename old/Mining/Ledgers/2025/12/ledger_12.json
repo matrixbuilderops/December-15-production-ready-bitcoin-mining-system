@@ -1,0 +1,23 @@
+{
+  "metadata": {
+    "created_by": "DTM",
+    "purpose": "Track all mining attempts",
+    "version": "1.0",
+    "level": "month",
+    "created": "2025-12-17T18:38:48.809528",
+    "mode": "staging"
+  },
+  "total_hashes": 0,
+  "total_blocks_found": 0,
+  "total_attempts": 0,
+  "computational_hours": 0.0,
+  "system_status": {
+    "status": "operational",
+    "last_update": "2025-12-04T00:00:00.000000Z",
+    "active_miners": 0,
+    "miners_with_issues": 0,
+    "average_hash_rate": 0,
+    "issues": []
+  },
+  "entries": []
+}

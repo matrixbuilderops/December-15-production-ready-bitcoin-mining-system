@@ -1,0 +1,22 @@
+{
+  "metadata": {
+    "created_by": "Looping",
+    "file_type": "submission_log",
+    "level": "hour",
+    "hour": "2025-01-01_00",
+    "created": "2025-01-01T00:00:00Z",
+    "last_updated": "2025-01-01T00:00:00Z"
+  },
+  "hour": "2025-01-01_00",
+  "total_submissions_this_hour": 0,
+  "accepted_this_hour": 0,
+  "rejected_this_hour": 0,
+  "orphaned_this_hour": 0,
+  "pending_this_hour": 0,
+  "system_status": {
+    "status": "operational",
+    "timestamp": "2025-01-01T00:00:00Z",
+    "issues": []
+  },
+  "submissions": []
+}

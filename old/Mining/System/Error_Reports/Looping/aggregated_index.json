@@ -1,0 +1,28 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_root",
+    "component": "Looping",
+    "level": "root",
+    "scope": "Contains: All years, months, weeks, days, hours",
+    "created": "2025-12-17T11:52:37.338572",
+    "last_updated": "2025-12-17T11:52:37.358496",
+    "mode": "sandbox"
+  },
+  "summary": {
+    "total_entries": 1,
+    "data_sources": [
+      "Mining/System/Error_Reports/Looping/Global/global_looping_error.json"
+    ]
+  },
+  "aggregated_data": {
+    "entries": [
+      {
+        "timestamp": "2025-12-17T15:45:00",
+        "severity": "error",
+        "message": "error-smoke",
+        "source_path": "Mining/System/Error_Reports/Looping/Global/global_looping_error.json"
+      }
+    ]
+  },
+  "sub_levels": []
+}

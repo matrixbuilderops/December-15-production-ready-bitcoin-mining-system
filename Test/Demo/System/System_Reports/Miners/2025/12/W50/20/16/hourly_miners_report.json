@@ -1,0 +1,32 @@
+{
+  "metadata": {
+    "file_type": "hourly_miners_report",
+    "component": "Miners",
+    "level": "hour",
+    "created": "2025-12-20T16:57:02.020593",
+    "mode": "demo",
+    "time_scope": {
+      "year": "2025",
+      "month": "12",
+      "week": "W50",
+      "day": "20",
+      "hour": "16"
+    },
+    "note": "Created from Brain.QTL pattern_levels - fallback structure",
+    "last_updated": "2025-12-20T16:57:03.826996"
+  },
+  "entries": [
+    {
+      "timestamp": "2025-12-20T16:57:03.826971",
+      "component": "Miners",
+      "event": "initialization",
+      "miner_id": "MINER_ALPHA",
+      "process_id": "process_1",
+      "mode": "production",
+      "daemon_mode": false,
+      "brain_qtl_ready": false,
+      "brainstem_connected": true,
+      "status": "initialized"
+    }
+  ]
+}

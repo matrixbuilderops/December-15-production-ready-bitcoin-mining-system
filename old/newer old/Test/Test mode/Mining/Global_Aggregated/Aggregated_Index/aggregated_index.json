@@ -1,0 +1,90 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_master",
+    "component": "Brain",
+    "created": "2025-12-17T19:42:14.978607",
+    "last_updated": "2025-12-17T19:50:49.049454",
+    "mode": "test"
+  },
+  "summary": {
+    "total_entries": 7,
+    "by_type": {
+      "ledger": 3,
+      "math_proof": 1,
+      "submission": 1,
+      "system_report": 1,
+      "error_report": 1
+    }
+  },
+  "aggregated_data": {
+    "ledger": {
+      "entries": [
+        {
+          "id": "smoke-test",
+          "note": "looping agg smoke test",
+          "component": "LoopingSmoke",
+          "file_type": "ledger",
+          "timestamp": "2025-12-17T19:42:14.978607"
+        },
+        {
+          "id": "test",
+          "note": "brainstem",
+          "component": "LoopingSmoke",
+          "file_type": "ledger",
+          "timestamp": "2025-12-17T19:50:49.041224"
+        },
+        {
+          "id": "test",
+          "note": "looping",
+          "component": "LoopingSmoke",
+          "file_type": "ledger",
+          "timestamp": "2025-12-17T19:50:49.049454"
+        }
+      ]
+    },
+    "math_proof": {
+      "proofs": [
+        {
+          "id": "smoke-test",
+          "note": "looping agg smoke test",
+          "component": "LoopingSmoke",
+          "file_type": "math_proof",
+          "timestamp": "2025-12-17T19:42:14.984544"
+        }
+      ]
+    },
+    "submission": {
+      "submissions": [
+        {
+          "id": "smoke-test",
+          "note": "looping agg smoke test",
+          "component": "LoopingSmoke",
+          "file_type": "submission",
+          "timestamp": "2025-12-17T19:42:14.990115"
+        }
+      ]
+    },
+    "system_report": {
+      "entries": [
+        {
+          "id": "smoke-test",
+          "note": "looping agg smoke test",
+          "component": "LoopingSmoke",
+          "file_type": "system_report",
+          "timestamp": "2025-12-17T19:42:14.995498"
+        }
+      ]
+    },
+    "error_report": {
+      "entries": [
+        {
+          "id": "smoke-test",
+          "note": "looping agg smoke test",
+          "component": "LoopingSmoke",
+          "file_type": "error_report",
+          "timestamp": "2025-12-17T19:42:15.000492"
+        }
+      ]
+    }
+  }
+}

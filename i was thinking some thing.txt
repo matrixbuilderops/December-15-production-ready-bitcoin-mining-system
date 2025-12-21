@@ -1,0 +1,233 @@
+i was thinking some thing like this
+Ledgers
+	aggreated 
+		yearly folderdyanimc, mothly fodler  dynamic, wekly fodler dyamic,daily folder dyamic, houlry folder dyamic
+	aggreadted index
+	yearly folderdyanimc, mothly fodler  dynamic, wekly fodler dyamic,daily folder dyamic, houlry folder dyamic
+	global math proof
+	global ledger
+		yearly folder dyanmic year folder
+			yearly math proof files
+			yearly leadfre fiels
+			mothly folder dyanic month folder
+				mothly math proof files
+				mothly ledger files
+				weekly folder dymaic weekly folder
+					weekly ledger files
+					weekly math proof files
+					houlry folder dyamic hourly folder
+						houlry ledger fiel 
+						houlry math proof ifels
+						
+
+
+System
+	system report
+		brain
+			dynamic yearly fodler 
+				sytem reprot
+					dyamnmic mothly folder 
+						sytem repot
+							dyamic weekly folder
+								system report
+									dyamic daily fodler
+										syteem repot
+											dyamic hourly fodler
+												system rperot
+												
+		brainstem
+			
+			dynamic yearly fodler 
+				sytem reprot
+					dyamnmic mothly folder 
+						sytem repot
+							dyamic weekly folder
+								system report
+									dyamic daily fodler
+										syteem repot
+											dyamic hourly fodler
+												system rperot
+		looping
+			
+			dynamic yearly fodler 
+				sytem reprot
+					dyamnmic mothly folder 
+						sytem repot
+							dyamic weekly folder
+								system report
+									dyamic daily fodler
+										syteem repot
+											dyamic hourly fodler
+												system rperot
+		DTM
+			
+			dynamic yearly fodler 
+				sytem reprot
+					dyamnmic mothly folder 
+						sytem repot
+							dyamic weekly folder
+								system report
+									dyamic daily fodler
+										syteem repot
+											dyamic hourly fodler
+												system rperot
+		production miners
+			
+			dynamic yearly fodler 
+				sytem reprot
+					dyamnmic mothly folder 
+						sytem repot
+							dyamic weekly folder
+								system report
+									dyamic daily fodler
+										syteem repot
+											dyamic hourly fodler
+												system rperot
+		aggreated ndex
+			
+			dynamic yearly fodler 
+				sytem reprot
+					dyamnmic mothly folder 
+						sytem repot
+							dyamic weekly folder
+								system report
+									dyamic daily fodler
+										syteem repot
+											dyamic hourly fodler
+												system rperot
+		aggreated
+			
+			dynamic yearly fodler 
+				sytem reprot
+					dyamnmic mothly folder 
+						sytem repot
+							dyamic weekly folder
+								system report
+									dyamic daily fodler
+										syteem repot
+											dyamic hourly fodler
+												system rperot
+	system error
+		brain
+			dynamic yearly fodler 
+				sytem reprot
+					dyamnmic mothly folder 
+						sytem repot
+							dyamic weekly folder
+								system report
+									dyamic daily fodler
+										syteem repot
+											dyamic hourly fodler
+												system rperot
+												
+		brainstem
+			
+			dynamic yearly fodler 
+				sytem reprot
+					dyamnmic mothly folder 
+						sytem repot
+							dyamic weekly folder
+								system report
+									dyamic daily fodler
+										syteem repot
+											dyamic hourly fodler
+												system rperot
+		looping
+			
+			dynamic yearly fodler 
+				sytem reprot
+					dyamnmic mothly folder 
+						sytem repot
+							dyamic weekly folder
+								system report
+									dyamic daily fodler
+										syteem repot
+											dyamic hourly fodler
+												system rperot
+		DTM
+			
+			dynamic yearly fodler 
+				sytem reprot
+					dyamnmic mothly folder 
+						sytem repot
+							dyamic weekly folder
+								system report
+									dyamic daily fodler
+										syteem repot
+											dyamic hourly fodler
+												system rperot
+		production miners
+			
+			dynamic yearly fodler 
+				sytem reprot
+					dyamnmic mothly folder 
+						sytem repot
+							dyamic weekly folder
+								system report
+									dyamic daily fodler
+										syteem repot
+											dyamic hourly fodler
+												system rperot
+		aggreated ndex
+			
+			dynamic yearly fodler 
+				sytem reprot
+					dyamnmic mothly folder 
+						sytem repot
+							dyamic weekly folder
+								system report
+									dyamic daily fodler
+										syteem repot
+											dyamic hourly fodler
+												system rperot
+		aggreated
+			
+			dynamic yearly fodler 
+				sytem reprot
+					dyamnmic mothly folder 
+						sytem repot
+							dyamic weekly folder
+								system report
+									dyamic daily fodler
+										syteem repot
+											dyamic hourly fodler
+												system rperot
+	system error
+
+submissions
+		yearly folderdyanimc, mothly fodler  dynamic, wekly fodler dyamic,daily folder dyamic, houlry folder dyamic
+		aggreated 
+				yearly folderdyanimc, mothly fodler  dynamic, wekly fodler dyamic,daily folder dyamic, houlry folder dyamic
+				
+			aggreated idex
+					yearly folderdyanimc, mothly fodler  dynamic, wekly fodler dyamic,daily folder dyamic, houlry folder dyamic
+					
+					
+Global Aggreateed
+	agerated 
+			yearly folderdyanimc, mothly fodler  dynamic, wekly fodler dyamic,daily folder dyamic, houlry folder dyamic
+	aggreated inedex
+			yearly folderdyanimc, mothly fodler  dynamic, wekly fodler dyamic,daily folder dyamic, houlry folder dyamic
+
+
+
+
+temporary tempalte
+	dymaic foldeer fore ach minig nprocess
+	smining tempalte is saved here
+	submission fiel is saved here
+	
+	
+	
+files mkae
+
+loopin gmakes the submission logs, system reprot and error repot for its fiel
+
+DTM makes math proof and ledgers and amkes the sytem reprot and erro reprot for its fiel
+
+produciton miner make the solution file, make the sytem reprot and error reprot for tis fiel
+
+brainstem makes the sytem report and eror reprot sfor its file
+
+
+brain  make the sytem reprot and error reprots for its fiel along with all of the aggreated repots and aggreated inexed rperots

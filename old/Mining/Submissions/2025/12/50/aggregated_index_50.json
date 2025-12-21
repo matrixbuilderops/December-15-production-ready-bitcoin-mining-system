@@ -1,0 +1,39 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_week",
+    "component": "Looping",
+    "level": "week",
+    "scope": "Contains: Week 50 + all days/hours",
+    "created": "2025-12-17T11:52:37.335659",
+    "last_updated": "2025-12-17T11:52:37.346369",
+    "mode": "sandbox"
+  },
+  "summary": {
+    "total_entries": 2,
+    "data_sources": [
+      "Mining/Submissions/global.json",
+      "Mining/Submissions/global_submission.json"
+    ]
+  },
+  "aggregated_data": {
+    "submissions": [
+      {
+        "timestamp": "2025-12-17T15:45:00",
+        "block_hash": "hash-sub",
+        "nonce": 456,
+        "accepted": true,
+        "network_latency_ms": 120,
+        "source_path": "Mining/Submissions/global.json"
+      },
+      {
+        "timestamp": "2025-12-17T15:45:00",
+        "block_hash": "hash-sub",
+        "nonce": 456,
+        "accepted": true,
+        "network_latency_ms": 120,
+        "source_path": "Mining/Submissions/global_submission.json"
+      }
+    ]
+  },
+  "sub_levels": []
+}

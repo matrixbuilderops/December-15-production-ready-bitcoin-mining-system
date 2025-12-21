@@ -1,0 +1,85 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_month",
+    "component": "LoopingSmoke",
+    "level": "month",
+    "scope": "Contains: Month 12 + all weeks/days/hours",
+    "created": "2025-12-17T18:51:46.111778",
+    "last_updated": "2025-12-17T19:50:49.022910",
+    "mode": "demo"
+  },
+  "summary": {
+    "total_entries": 6,
+    "data_sources": [
+      "Test/Demo/Mining/Ledgers/ledger_global.json",
+      "Test/Demo/Mining/Ledgers/math_proof_global.json"
+    ]
+  },
+  "aggregated_data": {
+    "entries": [
+      {
+        "id": "smoke-demo",
+        "note": "looping agg smoke demo",
+        "source_path": "Test/Demo/Mining/Ledgers/ledger_global.json",
+        "timestamp": "2025-12-17T18:51:46.118331"
+      },
+      {
+        "id": "smoke-demo",
+        "note": "looping agg smoke demo",
+        "source_path": "Test/Demo/Mining/Ledgers/ledger_global.json",
+        "timestamp": "2025-12-17T19:30:12.285278"
+      },
+      {
+        "id": "smoke-demo",
+        "note": "looping agg smoke demo",
+        "source_path": "Test/Demo/Mining/Ledgers/ledger_global.json",
+        "timestamp": "2025-12-17T19:30:52.039043"
+      },
+      {
+        "id": "smoke-demo",
+        "note": "looping agg smoke demo",
+        "source_path": "Test/Demo/Mining/Ledgers/ledger_global.json",
+        "timestamp": "2025-12-17T19:42:14.930903"
+      },
+      {
+        "id": "demo",
+        "note": "brainstem",
+        "source_path": "Test/Demo/Mining/Ledgers/ledger_global.json",
+        "timestamp": "2025-12-17T19:50:49.013297"
+      },
+      {
+        "id": "demo",
+        "note": "looping",
+        "source_path": "Test/Demo/Mining/Ledgers/ledger_global.json",
+        "timestamp": "2025-12-17T19:50:49.022910"
+      }
+    ],
+    "proofs": [
+      {
+        "id": "smoke-demo",
+        "note": "looping agg smoke demo",
+        "source_path": "Test/Demo/Mining/Ledgers/math_proof_global.json",
+        "timestamp": "2025-12-17T18:51:46.120788"
+      },
+      {
+        "id": "smoke-demo",
+        "note": "looping agg smoke demo",
+        "source_path": "Test/Demo/Mining/Ledgers/math_proof_global.json",
+        "timestamp": "2025-12-17T19:30:12.290341"
+      },
+      {
+        "id": "smoke-demo",
+        "note": "looping agg smoke demo",
+        "source_path": "Test/Demo/Mining/Ledgers/math_proof_global.json",
+        "timestamp": "2025-12-17T19:30:52.044314"
+      },
+      {
+        "id": "smoke-demo",
+        "note": "looping agg smoke demo",
+        "source_path": "Test/Demo/Mining/Ledgers/math_proof_global.json",
+        "timestamp": "2025-12-17T19:42:14.936784"
+      }
+    ]
+  },
+  "sub_levels": []
+}

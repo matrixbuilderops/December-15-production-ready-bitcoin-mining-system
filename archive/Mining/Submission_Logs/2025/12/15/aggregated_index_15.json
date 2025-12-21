@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_day",
+    "component": "Looping",
+    "level": "day",
+    "scope": "Contains: Day 15 + all hours",
+    "created": "2025-12-15T16:23:22.688457",
+    "last_updated": "2025-12-15T16:23:22.688457",
+    "mode": "staging"
+  },
+  "summary": {
+    "total_entries": 0,
+    "data_sources": []
+  },
+  "aggregated_data": {},
+  "sub_levels": []
+}

@@ -1,0 +1,37 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_root",
+    "component": "Looping",
+    "level": "root",
+    "scope": "Contains: All years, months, weeks, days, hours",
+    "created": "2025-12-15T16:06:15.385762",
+    "last_updated": "2025-12-17T18:30:17.617456",
+    "mode": "demo"
+  },
+  "summary": {
+    "total_entries": 1,
+    "data_sources": [
+      "Test/Demo/Mining/Ledgers/ledger_global.json",
+      "Test/Demo/Mining/Ledgers/math_proof_global.json"
+    ]
+  },
+  "aggregated_data": {
+    "entries": [
+      {
+        "id": "smoke-1",
+        "note": "demo aggregation smoke",
+        "source_path": "Test/Demo/Mining/Ledgers/ledger_global.json",
+        "timestamp": "2025-12-17T18:30:17.611302"
+      }
+    ],
+    "proofs": [
+      {
+        "id": "smoke-1",
+        "note": "demo aggregation smoke",
+        "source_path": "Test/Demo/Mining/Ledgers/math_proof_global.json",
+        "timestamp": "2025-12-17T18:30:17.617456"
+      }
+    ]
+  },
+  "sub_levels": []
+}

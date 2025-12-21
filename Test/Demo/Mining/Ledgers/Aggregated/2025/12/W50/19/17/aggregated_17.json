@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_hour",
+    "component": "Looping",
+    "level": "hour",
+    "scope": "Contains: Hour 17 only",
+    "created": "2025-12-19T17:30:51.427826",
+    "last_updated": "2025-12-19T17:30:51.427826",
+    "mode": "demo"
+  },
+  "summary": {
+    "total_entries": 0,
+    "data_sources": []
+  },
+  "aggregated_data": {},
+  "sub_levels": []
+}

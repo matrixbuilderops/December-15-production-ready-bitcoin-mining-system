@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "file_type": "aggregated_system_reports",
+    "created_by": "Brain",
+    "purpose": "Master aggregation from Brain, Brainstem, DTM, Looping, Miners",
+    "created": "2025-12-10T00:00:00.000000Z",
+    "last_updated": "2025-12-17T11:54:38.716998-06:00",
+    "aggregated_from": [
+      "looping"
+    ]
+  },
+  "summary": {
+    "total_reports": 0,
+    "reports_by_component": {
+      "Brain": 0,
+      "Brainstem": 0,
+      "DTM": 0,
+      "Looping": 0,
+      "Miners": 0
+    }
+  },
+  "entries": [
+    {
+      "timestamp": "2025-12-17T11:54:38.716998-06:00",
+      "system_status": "OPERATIONAL",
+      "total_hashes": 0,
+      "total_blocks_found": 0,
+      "total_submissions": 2,
+      "components": {
+        "looping": {
+          "status": "healthy",
+          "mining_sessions": 2,
+          "last_update": "2025-12-17T11:52:37.352592"
+        }
+      }
+    }
+  ]
+}

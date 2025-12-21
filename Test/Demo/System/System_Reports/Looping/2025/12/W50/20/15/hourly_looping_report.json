@@ -1,0 +1,37 @@
+{
+  "metadata": {
+    "file_type": "hourly_looping_report",
+    "component": "Looping",
+    "level": "hour",
+    "created": "2025-12-20T15:14:11.355953",
+    "mode": "demo",
+    "time_scope": {
+      "year": "2025",
+      "month": "12",
+      "week": "W50",
+      "day": "20",
+      "hour": "15"
+    },
+    "note": "Created from Brain.QTL pattern_levels - fallback structure",
+    "last_updated": "2025-12-20T15:14:11.811311"
+  },
+  "entries": [
+    {
+      "timestamp": "2025-12-20T21:14:11.811275+00:00",
+      "component": "Looping",
+      "event": "startup",
+      "mode": "demo",
+      "blocks_target": 1,
+      "status": "initialized"
+    }
+  ],
+  "hour": "2025-11-30_06",
+  "mining_sessions": 1,
+  "templates_distributed": 1,
+  "miners_coordinated": {
+    "miner_001": {
+      "status": "active",
+      "template_received": true
+    }
+  }
+}

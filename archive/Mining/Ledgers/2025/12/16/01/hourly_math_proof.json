@@ -1,0 +1,101 @@
+{
+  "metadata": {
+    "file_type": "hourly_math_proof",
+    "created": "2025-12-16T01:10:01.831935",
+    "hour": 1,
+    "owned_by": "DTM",
+    "last_updated": "2025-12-16T01:50:40.835151"
+  },
+  "hour": "2025-12-16_01",
+  "proofs_this_hour": 0,
+  "proofs": [
+    {
+      "proof_id": "proof_20251216_014024_438131314",
+      "timestamp": "2025-12-16T01:40:24.597023",
+      "block_height": 0,
+      "miner_id": "terminal_1",
+      "hardware_attestation": {
+        "ip_address": "127.0.1.1",
+        "hostname": "HP-Phantom-Core",
+        "cpu": {
+          "model": "x86_64",
+          "physical_cores": 10,
+          "logical_cores": 12,
+          "current_freq_mhz": 1168.8515833333333,
+          "max_freq_mhz": 4133.333333333333,
+          "min_freq_mhz": 400.0
+        },
+        "ram": {
+          "total_gb": 62.52,
+          "available_gb": 26.1,
+          "percent_used": 58.2
+        }
+      },
+      "computation_proof": {
+        "nonce": 438131314,
+        "merkleroot": "",
+        "block_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+        "difficulty_target": 18446744073709551616,
+        "leading_zeros": 0
+      },
+      "mathematical_framework": {
+        "categories_applied": [
+          "families",
+          "lanes",
+          "strides",
+          "palette",
+          "sandbox"
+        ],
+        "knuth_parameters": {
+          "levels": 80,
+          "iterations": 156912
+        },
+        "universe_bitload": "208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909"
+      }
+    },
+    {
+      "proof_id": "proof_20251216_015040_1052500720",
+      "timestamp": "2025-12-16T01:50:40.835151",
+      "block_height": 0,
+      "miner_id": "terminal_1",
+      "hardware_attestation": {
+        "ip_address": "127.0.1.1",
+        "hostname": "HP-Phantom-Core",
+        "cpu": {
+          "model": "x86_64",
+          "physical_cores": 10,
+          "logical_cores": 12,
+          "current_freq_mhz": 1316.8039999999999,
+          "max_freq_mhz": 4133.333333333333,
+          "min_freq_mhz": 400.0
+        },
+        "ram": {
+          "total_gb": 62.52,
+          "available_gb": 25.93,
+          "percent_used": 58.5
+        }
+      },
+      "computation_proof": {
+        "nonce": 1052500720,
+        "merkleroot": "",
+        "block_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+        "difficulty_target": 18446744073709551616,
+        "leading_zeros": 0
+      },
+      "mathematical_framework": {
+        "categories_applied": [
+          "families",
+          "lanes",
+          "strides",
+          "palette",
+          "sandbox"
+        ],
+        "knuth_parameters": {
+          "levels": 80,
+          "iterations": 156912
+        },
+        "universe_bitload": "208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909"
+      }
+    }
+  ]
+}

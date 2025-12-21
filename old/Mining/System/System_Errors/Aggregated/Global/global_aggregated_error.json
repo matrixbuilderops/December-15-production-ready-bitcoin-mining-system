@@ -1,0 +1,30 @@
+{
+  "metadata": {
+    "file_type": "global_aggregated_error",
+    "component": "Brain",
+    "created": "2025-12-17T11:54:38.718469-06:00",
+    "last_updated": "2025-12-17T11:54:38.718469-06:00",
+    "aggregated_from": [
+      "Brain",
+      "Brainstem",
+      "DTM",
+      "Looping",
+      "Miners"
+    ]
+  },
+  "total_errors": 0,
+  "errors_by_component": {
+    "Brain": 0,
+    "Brainstem": 0,
+    "DTM": 0,
+    "Looping": 0,
+    "Miners": 0
+  },
+  "errors_by_severity": {
+    "critical": 0,
+    "error": 0,
+    "warning": 0,
+    "info": 0
+  },
+  "errors": []
+}

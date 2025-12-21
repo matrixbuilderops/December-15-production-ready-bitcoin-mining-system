@@ -1,0 +1,41 @@
+{
+  "submissions": [
+    {
+      "submission_id": "demo_20251220T011737_989228+0000",
+      "timestamp": "2025-12-20T01:17:37.989228+00:00",
+      "block_height": 1,
+      "block_hash": "demo_hash_1766193457",
+      "block_submission_file": null,
+      "miner_id": "looping_demo_miner",
+      "nonce": 793429,
+      "network_response": null,
+      "confirmation_tracking": {
+        "confirmations": 0,
+        "first_seen_by_node": null,
+        "confirmed_in_blockchain": null,
+        "orphaned": false
+      },
+      "payout": {
+        "expected_btc": 3.125,
+        "actual_btc": 0,
+        "payout_address": "bc1qrqk4qwwy37xtpcvxs7ayeufld07tja652ka2wv",
+        "transaction_id": null,
+        "maturity_blocks": 100,
+        "spendable_after_height": 101
+      },
+      "references": {
+        "ledger_entry": null,
+        "math_proof": null,
+        "block_submission": null
+      }
+    }
+  ],
+  "metadata": {
+    "created": "2025-12-20T02:42:00.856266",
+    "level": "day",
+    "component": "Looping",
+    "mode": "demo",
+    "last_updated": "2025-12-20T02:42:00.856266",
+    "total_entries": 1
+  }
+}

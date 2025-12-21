@@ -1,0 +1,82 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_hour",
+    "component": "Brainstem",
+    "level": "hour",
+    "scope": "Contains: Hour 02 only",
+    "created": "2025-12-20T02:42:00.487676",
+    "last_updated": "2025-12-20T02:58:10.167243",
+    "mode": "demo"
+  },
+  "summary": {
+    "total_entries": 6,
+    "data_sources": [
+      "Test/Demo/System/System_Reports/Brainstem/global_brainstem_report.json"
+    ]
+  },
+  "aggregated_data": {
+    "entries": [
+      {
+        "timestamp": "2025-12-20T02:42:00.486640",
+        "component": "Brainstem",
+        "event": "initialization_complete",
+        "mode": "demo",
+        "base_path": "Test/Demo/Mining",
+        "total_folders": 23,
+        "status": "success",
+        "source_path": "Test/Demo/System/System_Reports/Brainstem/global_brainstem_report.json"
+      },
+      {
+        "timestamp": "2025-12-20T02:42:00.486640",
+        "component": "Brainstem",
+        "event": "initialization_complete",
+        "mode": "demo",
+        "base_path": "Test/Demo/Mining",
+        "total_folders": 23,
+        "status": "success",
+        "source_path": "Test/Demo/System/System_Reports/Brainstem/global_brainstem_report.json"
+      },
+      {
+        "timestamp": "2025-12-20T02:57:11.820743",
+        "component": "Brainstem",
+        "event": "initialization_complete",
+        "mode": "demo",
+        "base_path": "Test/Demo/Mining",
+        "total_folders": 23,
+        "status": "success",
+        "source_path": "Test/Demo/System/System_Reports/Brainstem/global_brainstem_report.json"
+      },
+      {
+        "timestamp": "2025-12-20T02:57:11.820743",
+        "component": "Brainstem",
+        "event": "initialization_complete",
+        "mode": "demo",
+        "base_path": "Test/Demo/Mining",
+        "total_folders": 23,
+        "status": "success",
+        "source_path": "Test/Demo/System/System_Reports/Brainstem/global_brainstem_report.json"
+      },
+      {
+        "timestamp": "2025-12-20T02:58:10.166096",
+        "component": "Brainstem",
+        "event": "initialization_complete",
+        "mode": "demo",
+        "base_path": "Test/Demo/Mining",
+        "total_folders": 23,
+        "status": "success",
+        "source_path": "Test/Demo/System/System_Reports/Brainstem/global_brainstem_report.json"
+      },
+      {
+        "timestamp": "2025-12-20T02:58:10.166096",
+        "component": "Brainstem",
+        "event": "initialization_complete",
+        "mode": "demo",
+        "base_path": "Test/Demo/Mining",
+        "total_folders": 23,
+        "status": "success",
+        "source_path": "Test/Demo/System/System_Reports/Brainstem/global_brainstem_report.json"
+      }
+    ]
+  },
+  "sub_levels": []
+}

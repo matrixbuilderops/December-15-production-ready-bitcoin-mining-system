@@ -1,0 +1,46 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_root",
+    "component": "LoopingSmoke",
+    "level": "root",
+    "scope": "Contains: All years, months, weeks, days, hours",
+    "created": "2025-12-17T18:51:46.135107",
+    "last_updated": "2025-12-17T19:42:14.991883",
+    "mode": "test"
+  },
+  "summary": {
+    "total_entries": 4,
+    "data_sources": [
+      "Test/Test mode/Mining/System/System_Reports/LoopingSmoke/system_report_global.json"
+    ]
+  },
+  "aggregated_data": {
+    "entries": [
+      {
+        "id": "smoke-test",
+        "note": "looping agg smoke test",
+        "source_path": "Test/Test mode/Mining/System/System_Reports/LoopingSmoke/system_report_global.json",
+        "timestamp": "2025-12-17T18:51:46.152739"
+      },
+      {
+        "id": "smoke-test",
+        "note": "looping agg smoke test",
+        "source_path": "Test/Test mode/Mining/System/System_Reports/LoopingSmoke/system_report_global.json",
+        "timestamp": "2025-12-17T19:30:12.335672"
+      },
+      {
+        "id": "smoke-test",
+        "note": "looping agg smoke test",
+        "source_path": "Test/Test mode/Mining/System/System_Reports/LoopingSmoke/system_report_global.json",
+        "timestamp": "2025-12-17T19:30:52.082408"
+      },
+      {
+        "id": "smoke-test",
+        "note": "looping agg smoke test",
+        "source_path": "Test/Test mode/Mining/System/System_Reports/LoopingSmoke/system_report_global.json",
+        "timestamp": "2025-12-17T19:42:14.991883"
+      }
+    ]
+  },
+  "sub_levels": []
+}

@@ -1,0 +1,28 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_hour",
+    "component": "LoopingSmoke",
+    "level": "hour",
+    "scope": "Contains: Hour 19 only",
+    "created": "2025-12-17T19:42:14.972302",
+    "last_updated": "2025-12-17T19:42:14.997193",
+    "mode": "test"
+  },
+  "summary": {
+    "total_entries": 1,
+    "data_sources": [
+      "Test/Test mode/Mining/System/Error_Reports/LoopingSmoke/error_report_global.json"
+    ]
+  },
+  "aggregated_data": {
+    "entries": [
+      {
+        "id": "smoke-test",
+        "note": "looping agg smoke test",
+        "source_path": "Test/Test mode/Mining/System/Error_Reports/LoopingSmoke/error_report_global.json",
+        "timestamp": "2025-12-17T19:42:14.997193"
+      }
+    ]
+  },
+  "sub_levels": []
+}

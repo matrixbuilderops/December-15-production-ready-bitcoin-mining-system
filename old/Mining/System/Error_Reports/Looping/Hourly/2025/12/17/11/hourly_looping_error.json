@@ -1,0 +1,23 @@
+{
+  "metadata": {
+    "created_by": "Looping",
+    "hour": "2025-11-30_06",
+    "last_updated": "2025-12-17T11:52:37.357089"
+  },
+  "hour": "2025-11-30_06",
+  "errors": [
+    {
+      "error_id": "loop_err_001",
+      "timestamp": "2025-11-30T06:00:05.000000Z",
+      "severity": "critical",
+      "error_type": "submission_rejected",
+      "message": "Block rejected by network",
+      "network_response": "duplicate"
+    },
+    {
+      "timestamp": "2025-12-17T15:45:00",
+      "severity": "error",
+      "message": "error-smoke"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_hour",
+    "component": "Miners",
+    "level": "hour",
+    "scope": "Contains: Hour 15 only",
+    "created": "2025-12-20T15:14:12.747676",
+    "last_updated": "2025-12-20T15:14:12.747671",
+    "mode": "demo"
+  },
+  "summary": {
+    "total_entries": 2,
+    "data_sources": [
+      "Test/Demo/System/System_Reports/Miners/global_miners_report.json"
+    ]
+  },
+  "aggregated_data": {
+    "entries": [
+      {
+        "timestamp": "2025-12-20T15:14:12.746038",
+        "component": "Miners",
+        "event": "initialization",
+        "miner_id": "MINER_ALPHA",
+        "process_id": "process_1",
+        "mode": "production",
+        "daemon_mode": false,
+        "brain_qtl_ready": false,
+        "brainstem_connected": true,
+        "status": "initialized",
+        "source_path": "Test/Demo/System/System_Reports/Miners/global_miners_report.json"
+      },
+      {
+        "timestamp": "2025-12-20T15:14:12.746038",
+        "component": "Miners",
+        "event": "initialization",
+        "miner_id": "MINER_ALPHA",
+        "process_id": "process_1",
+        "mode": "production",
+        "daemon_mode": false,
+        "brain_qtl_ready": false,
+        "brainstem_connected": true,
+        "status": "initialized",
+        "source_path": "Test/Demo/System/System_Reports/Miners/global_miners_report.json"
+      }
+    ]
+  },
+  "sub_levels": []
+}

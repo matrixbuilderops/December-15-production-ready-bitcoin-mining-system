@@ -1,0 +1,46 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_year",
+    "component": "LoopingSmoke",
+    "level": "year",
+    "scope": "Contains: Year 2025 + all months/weeks/days/hours",
+    "created": "2025-12-17T18:51:46.163694",
+    "last_updated": "2025-12-17T19:42:15.031649",
+    "mode": "staging"
+  },
+  "summary": {
+    "total_entries": 4,
+    "data_sources": [
+      "Mining/System/System_Reports/LoopingSmoke/system_report_global.json"
+    ]
+  },
+  "aggregated_data": {
+    "entries": [
+      {
+        "id": "smoke-staging",
+        "note": "looping agg smoke staging",
+        "source_path": "Mining/System/System_Reports/LoopingSmoke/system_report_global.json",
+        "timestamp": "2025-12-17T18:51:46.181366"
+      },
+      {
+        "id": "smoke-staging",
+        "note": "looping agg smoke staging",
+        "source_path": "Mining/System/System_Reports/LoopingSmoke/system_report_global.json",
+        "timestamp": "2025-12-17T19:30:12.369379"
+      },
+      {
+        "id": "smoke-staging",
+        "note": "looping agg smoke staging",
+        "source_path": "Mining/System/System_Reports/LoopingSmoke/system_report_global.json",
+        "timestamp": "2025-12-17T19:30:52.110548"
+      },
+      {
+        "id": "smoke-staging",
+        "note": "looping agg smoke staging",
+        "source_path": "Mining/System/System_Reports/LoopingSmoke/system_report_global.json",
+        "timestamp": "2025-12-17T19:42:15.031649"
+      }
+    ]
+  },
+  "sub_levels": []
+}

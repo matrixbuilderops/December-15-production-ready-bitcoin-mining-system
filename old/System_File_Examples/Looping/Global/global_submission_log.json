@@ -1,0 +1,20 @@
+{
+  "metadata": {
+    "created_by": "Looping",
+    "file_type": "submission_log",
+    "level": "global",
+    "created": "2025-01-01T00:00:00Z",
+    "last_updated": "2025-01-01T00:00:00Z"
+  },
+  "total_submissions": 0,
+  "accepted": 0,
+  "rejected": 0,
+  "orphaned": 0,
+  "pending": 0,
+  "system_status": {
+    "status": "operational",
+    "last_update": "2025-01-01T00:00:00Z",
+    "issues": []
+  },
+  "submissions": []
+}

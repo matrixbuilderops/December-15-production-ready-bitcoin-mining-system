@@ -1,0 +1,28 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_root",
+    "component": "SmokeTest",
+    "level": "root",
+    "scope": "Contains: All years, months, weeks, days, hours",
+    "created": "2025-12-17T18:30:17.608812",
+    "last_updated": "2025-12-17T18:30:17.635039",
+    "mode": "demo"
+  },
+  "summary": {
+    "total_entries": 1,
+    "data_sources": [
+      "Test/Demo/Mining/System/Error_Reports/SmokeTest/error_report_global.json"
+    ]
+  },
+  "aggregated_data": {
+    "entries": [
+      {
+        "id": "smoke-1",
+        "note": "demo aggregation smoke",
+        "source_path": "Test/Demo/Mining/System/Error_Reports/SmokeTest/error_report_global.json",
+        "timestamp": "2025-12-17T18:30:17.635039"
+      }
+    ]
+  },
+  "sub_levels": []
+}

@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "id": "smoke-staging",
+      "note": "looping agg smoke staging"
+    },
+    {
+      "id": "staging",
+      "note": "brainstem"
+    },
+    {
+      "id": "staging",
+      "note": "looping"
+    }
+  ],
+  "metadata": {
+    "created": "2025-12-17T19:42:15.013740",
+    "level": "hour",
+    "component": "LoopingSmoke",
+    "mode": "staging",
+    "last_updated": "2025-12-17T19:50:49.062754",
+    "total_entries": 3
+  }
+}

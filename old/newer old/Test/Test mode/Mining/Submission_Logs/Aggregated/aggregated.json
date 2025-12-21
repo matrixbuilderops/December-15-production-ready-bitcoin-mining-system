@@ -1,0 +1,46 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_root",
+    "component": "LoopingSmoke",
+    "level": "root",
+    "scope": "Contains: All years, months, weeks, days, hours",
+    "created": "2025-12-17T18:51:46.133825",
+    "last_updated": "2025-12-17T19:42:14.986214",
+    "mode": "test"
+  },
+  "summary": {
+    "total_entries": 4,
+    "data_sources": [
+      "Test/Test mode/Mining/Submission_Logs/submission_global.json"
+    ]
+  },
+  "aggregated_data": {
+    "submissions": [
+      {
+        "id": "smoke-test",
+        "note": "looping agg smoke test",
+        "source_path": "Test/Test mode/Mining/Submission_Logs/submission_global.json",
+        "timestamp": "2025-12-17T18:51:46.148105"
+      },
+      {
+        "id": "smoke-test",
+        "note": "looping agg smoke test",
+        "source_path": "Test/Test mode/Mining/Submission_Logs/submission_global.json",
+        "timestamp": "2025-12-17T19:30:12.330466"
+      },
+      {
+        "id": "smoke-test",
+        "note": "looping agg smoke test",
+        "source_path": "Test/Test mode/Mining/Submission_Logs/submission_global.json",
+        "timestamp": "2025-12-17T19:30:52.077751"
+      },
+      {
+        "id": "smoke-test",
+        "note": "looping agg smoke test",
+        "source_path": "Test/Test mode/Mining/Submission_Logs/submission_global.json",
+        "timestamp": "2025-12-17T19:42:14.986214"
+      }
+    ]
+  },
+  "sub_levels": []
+}

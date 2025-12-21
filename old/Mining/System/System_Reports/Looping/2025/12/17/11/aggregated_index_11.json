@@ -1,0 +1,28 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_hour",
+    "component": "Looping",
+    "level": "hour",
+    "scope": "Contains: Hour 11 only",
+    "created": "2025-12-17T11:52:37.337796",
+    "last_updated": "2025-12-17T11:52:37.354040",
+    "mode": "sandbox"
+  },
+  "summary": {
+    "total_entries": 1,
+    "data_sources": [
+      "Mining/System/System_Reports/Looping/Global/global_looping_report.json"
+    ]
+  },
+  "aggregated_data": {
+    "entries": [
+      {
+        "timestamp": "2025-12-17T15:45:00",
+        "status": "ok",
+        "details": "report-smoke",
+        "source_path": "Mining/System/System_Reports/Looping/Global/global_looping_report.json"
+      }
+    ]
+  },
+  "sub_levels": []
+}

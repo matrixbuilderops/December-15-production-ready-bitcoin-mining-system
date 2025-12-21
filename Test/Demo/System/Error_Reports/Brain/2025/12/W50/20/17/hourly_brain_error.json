@@ -1,0 +1,18 @@
+{
+  "metadata": {
+    "file_type": "hourly_brain_error",
+    "component": "Brain",
+    "level": "hour",
+    "created": "2025-12-20T17:05:33.281469",
+    "mode": "demo",
+    "time_scope": {
+      "year": "2025",
+      "month": "12",
+      "week": "W50",
+      "day": "20",
+      "hour": "17"
+    },
+    "note": "Created from Brain.QTL pattern_levels - fallback structure"
+  },
+  "entries": []
+}

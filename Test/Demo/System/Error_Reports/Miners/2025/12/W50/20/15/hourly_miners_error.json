@@ -1,0 +1,18 @@
+{
+  "metadata": {
+    "file_type": "hourly_miners_error",
+    "component": "Miners",
+    "level": "hour",
+    "created": "2025-12-20T15:14:11.357073",
+    "mode": "demo",
+    "time_scope": {
+      "year": "2025",
+      "month": "12",
+      "week": "W50",
+      "day": "20",
+      "hour": "15"
+    },
+    "note": "Created from Brain.QTL pattern_levels - fallback structure"
+  },
+  "entries": []
+}

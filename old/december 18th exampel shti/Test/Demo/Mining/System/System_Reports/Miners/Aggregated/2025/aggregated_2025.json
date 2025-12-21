@@ -1,0 +1,30 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_year",
+    "component": "Miners",
+    "level": "year",
+    "scope": "Contains: Year 2025 + all months/weeks/days/hours",
+    "created": "2025-12-18T01:47:41.077374",
+    "last_updated": "2025-12-18T01:47:41.077370",
+    "mode": "demo"
+  },
+  "summary": {
+    "total_entries": 1,
+    "data_sources": [
+      "Test/Demo/Mining/System/System_Reports/Miners/Global/global_miners_report.json"
+    ]
+  },
+  "aggregated_data": {
+    "entries": [
+      {
+        "event": "mining_session_start",
+        "timestamp": "2025-12-18T01:47:41.076423",
+        "miner_id": "MINER_ALPHA",
+        "target_zeros": 80,
+        "mode": "production",
+        "source_path": "Test/Demo/Mining/System/System_Reports/Miners/Global/global_miners_report.json"
+      }
+    ]
+  },
+  "sub_levels": []
+}

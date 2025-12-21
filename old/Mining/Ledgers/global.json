@@ -1,0 +1,20 @@
+{
+  "entries": [
+    {
+      "timestamp": "2025-12-17T15:45:00",
+      "block_hash": "hash-ledger",
+      "nonce": 123,
+      "miner_id": "miner-ledger",
+      "leading_zeros": 7,
+      "payload": "L1"
+    }
+  ],
+  "metadata": {
+    "created": "2025-12-17T11:52:37.339893",
+    "level": "global",
+    "component": "Looping",
+    "mode": "sandbox",
+    "last_updated": "2025-12-17T11:52:37.339893",
+    "total_entries": 1
+  }
+}
