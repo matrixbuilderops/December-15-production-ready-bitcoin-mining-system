@@ -3,15 +3,18 @@
     "file_type": "aggregated_index_root",
     "component": "Brain",
     "created": "2025-12-19T14:25:36.599724",
-    "last_updated": "2025-12-20T20:59:42.316026",
+    "last_updated": "2025-12-22T21:42:04.964069",
     "mode": "demo"
   },
   "summary": {
-    "total_entries": 104,
+    "total_entries": 110,
     "by_type": {
-      "system_report": 82,
-      "ledger": 12,
-      "submission_log": 10
+      "system_report": 83,
+      "ledger": 13,
+      "submission_log": 10,
+      "math_proof": 1,
+      "submission": 2,
+      "error_report": 1
     },
     "data_sources": []
   },
@@ -1085,6 +1088,17 @@
           "brainstem_connected": true,
           "status": "initialized",
           "file_type": "system_report"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-22T21:42:04.740215",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "system_report"
         }
       ]
     },
@@ -1401,6 +1415,17 @@
           },
           "component": "Looping",
           "file_type": "ledger"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-22T21:42:04.740215",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "ledger"
         }
       ]
     },
@@ -1715,6 +1740,62 @@
           },
           "component": "Looping",
           "file_type": "submission_log"
+        }
+      ]
+    },
+    "math_proof": {
+      "proofs": [
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-22T21:42:04.740215",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "math_proof"
+        }
+      ]
+    },
+    "submission": {
+      "submissions": [
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-22T21:42:04.740215",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "submission"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-22T21:42:04.740215",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "submission"
+        }
+      ]
+    },
+    "error_report": {
+      "entries": [
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-22T21:42:04.740215",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "error_report"
         }
       ]
     }

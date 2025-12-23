@@ -289,6 +289,15 @@
         "math_proof": null,
         "block_submission": "Test/Demo/Mining/Submission_Logs/block_submission_999999_20251220T181015_713051_0000.json"
       }
+    },
+    {
+      "test_id": "week_folder_test",
+      "timestamp": "2025-12-22T21:42:04.740215",
+      "mode": "demo",
+      "leading_zeros": 19,
+      "meets_difficulty": true,
+      "nonce": 123456789,
+      "block_hash": "0000000000000000000abcdef"
     }
   ],
   "metadata": {
@@ -296,7 +305,7 @@
     "level": "global",
     "component": "Looping",
     "mode": "demo",
-    "last_updated": "2025-12-20T12:10:15.714393",
-    "total_entries": 10
+    "last_updated": "2025-12-22T21:42:04.833522",
+    "total_entries": 11
   }
 }

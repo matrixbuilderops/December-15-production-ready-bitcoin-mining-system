@@ -1,0 +1,24 @@
+{
+  "metadata": {
+    "file_type": "global_ledger",
+    "created_by": "TestComponent",
+    "purpose": "Track all mining attempts and results",
+    "version": "1.0",
+    "created": "2025-12-22T21:42:04.986626",
+    "last_updated": "2025-12-22T21:42:04.986638"
+  },
+  "total_attempts": 1,
+  "total_blocks_found": 1,
+  "best_leading_zeros": 19,
+  "entries": [
+    {
+      "test_id": "week_folder_test",
+      "timestamp": "2025-12-22T21:42:04.986295",
+      "mode": "test",
+      "leading_zeros": 19,
+      "meets_difficulty": true,
+      "nonce": 123456789,
+      "block_hash": "0000000000000000000abcdef"
+    }
+  ]
+}

@@ -3,9 +3,9 @@
     "created_by": "DTM",
     "purpose": "Mathematical proofs",
     "version": "1.0",
-    "last_updated": "2025-12-20T18:10:15.846957+00:00"
+    "last_updated": "2025-12-22T21:42:04.790252"
   },
-  "total_proofs": 9,
+  "total_proofs": 10,
   "total_blocks_proven": 9,
   "proofs": [
     {
@@ -309,6 +309,15 @@
         "network_submission": false,
         "confirmation_status": "pending"
       }
+    },
+    {
+      "test_id": "week_folder_test",
+      "timestamp": "2025-12-22T21:42:04.740215",
+      "mode": "demo",
+      "leading_zeros": 19,
+      "meets_difficulty": true,
+      "nonce": 123456789,
+      "block_hash": "0000000000000000000abcdef"
     }
   ]
 }

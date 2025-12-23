@@ -2,8 +2,32 @@
   "metadata": {
     "file_type": "math_proof",
     "created": "2025-12-19T18:36:09.878524",
-    "owned_by": "DTM"
+    "owned_by": "DTM",
+    "created_by": "DTM",
+    "purpose": "Mathematical proofs",
+    "version": "1.0",
+    "last_updated": "2025-12-22T21:42:05.181815"
   },
-  "total_proofs": 0,
-  "proofs": []
+  "total_proofs": 2,
+  "proofs": [
+    {
+      "test_id": "week_folder_test",
+      "timestamp": "2025-12-22T21:42:05.062963",
+      "mode": "staging",
+      "leading_zeros": 19,
+      "meets_difficulty": true,
+      "nonce": 123456789,
+      "block_hash": "0000000000000000000abcdef"
+    },
+    {
+      "test_id": "week_folder_test",
+      "timestamp": "2025-12-22T21:42:05.152456",
+      "mode": "live",
+      "leading_zeros": 19,
+      "meets_difficulty": true,
+      "nonce": 123456789,
+      "block_hash": "0000000000000000000abcdef"
+    }
+  ],
+  "total_blocks_proven": 0
 }

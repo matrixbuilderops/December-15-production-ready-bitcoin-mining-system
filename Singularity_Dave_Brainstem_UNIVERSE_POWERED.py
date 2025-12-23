@@ -9630,6 +9630,43 @@ def brain_create_file(file_path, data, file_type="json", component=None):
         print(f"❌ Brain file creation failed {file_path}: {e}")
         return None
 
+# ============================================================================
+# HIERARCHICAL STRUCTURE DOCUMENTATION
+# ============================================================================
+# ALL files (Ledgers, Math Proofs, Submissions, System Reports, Error Reports)
+# follow this EXACT hierarchy with WEEK folders:
+#
+# Root/
+# ├── global_{type}.json (aggregates EVERYTHING)
+# ├── YYYY/ (dynamic year folder)
+# │   ├── {type}_YYYY.json (aggregates year)
+# │   ├── MM/ (dynamic month folder)
+# │   │   ├── {type}_MM.json (aggregates month)
+# │   │   ├── WXX/ (dynamic WEEK folder) ← CRITICAL!
+# │   │   │   ├── {type}_WXX.json (aggregates week)
+# │   │   │   ├── DD/ (dynamic day folder)
+# │   │   │   │   ├── {type}_DD.json (aggregates day)
+# │   │   │   │   ├── HH/ (dynamic hourly folder)
+# │   │   │   │   │   ├── {type}_HH.json (final data)
+#
+# WEEK FOLDER FORMAT: W00-W53 (ISO week number via strftime('%W'))
+# ============================================================================
+
+def brain_get_hierarchical_path_info():
+    """
+    Get current hierarchical path components for consistent folder creation.
+    Returns dict with year, month, week, day, hour for universal use.
+    """
+    now = datetime.now()
+    return {
+        "year": f"{now.year:04d}",
+        "month": f"{now.month:02d}",
+        "week": f"W{now.strftime('%W')}",
+        "day": f"{now.day:02d}",
+        "hour": f"{now.hour:02d}",
+        "timestamp": now.isoformat()
+    }
+
 def brain_write_hierarchical(entry_data, base_dir, file_type="ledger", component=None):
     """
     Hierarchical writer with staged rollups:
@@ -11272,10 +11309,11 @@ def brain_create_system_examples():
 
 def brain_save_ledger(entry_data, component_name="Unknown"):
     """
-    CANONICAL ledger writer with TEMPLATE MERGE.
+    CANONICAL ledger writer with TEMPLATE MERGE and WEEK FOLDER support.
     - NEW files: Load complete structure from System_File_Examples
     - EXISTING files: Merge new fields from template (preserves data)
     - Template changes propagate automatically to all outputs
+    - Creates full hierarchy: Global → Year → Month → WEEK → Day → Hour
     """
     try:
         base_dir = brain_get_path("ledger", component_name)
@@ -11300,7 +11338,7 @@ def brain_save_ledger(entry_data, component_name="Unknown"):
                 for key, value in template.items():
                     if key not in ledger and key not in ['entries', 'metadata']:
                         ledger[key] = value
-                        print(f"📝 Merged from template: {key}")
+                        # print(f"📝 Merged from template: {key}")  # Reduced verbosity
                 
                 # Merge metadata (add new keys, preserve existing)
                 if 'metadata' in template:
@@ -11309,14 +11347,14 @@ def brain_save_ledger(entry_data, component_name="Unknown"):
                     for key, value in template['metadata'].items():
                         if key not in ledger['metadata']:
                             ledger['metadata'][key] = value
-                            print(f"📝 Merged metadata: {key}")
+                            # print(f"📝 Merged metadata: {key}")  # Reduced verbosity
         else:
             # NEW FILE - Load complete template
             if template:
                 ledger = template.copy()
                 if 'entries' not in ledger:
                     ledger['entries'] = []
-                print("📝 Initialized from template")
+                # print("📝 Initialized from template")  # Reduced verbosity
             else:
                 # Fallback if template missing
                 ledger = {
@@ -11347,7 +11385,7 @@ def brain_save_ledger(entry_data, component_name="Unknown"):
         with open(global_ledger_path, 'w') as f:
             json.dump(ledger, f, indent=2)
         
-        # Write hierarchical
+        # Write hierarchical with WEEK folders (brain_write_hierarchical handles this automatically)
         results = brain_write_hierarchical(entry_data, base_dir, "ledger", component_name)
         
         return {"success": True, "global_path": str(global_ledger_path), "hierarchical": results}

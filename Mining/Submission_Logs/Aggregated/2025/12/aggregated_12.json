@@ -5,13 +5,99 @@
     "level": "month",
     "scope": "Contains: Month 12 + all weeks/days/hours",
     "created": "2025-12-20T20:34:54.176737",
-    "last_updated": "2025-12-20T20:34:54.176737",
+    "last_updated": "2025-12-22T21:42:05.225072",
     "mode": "production"
   },
   "summary": {
-    "total_entries": 0,
-    "data_sources": []
+    "total_entries": 8,
+    "data_sources": [
+      "Mining/Submission_Logs/submission_global.json",
+      "Mining/Submission_Logs/global_submission.json"
+    ]
   },
-  "aggregated_data": {},
+  "aggregated_data": {
+    "submissions": [
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-22T21:42:05.062963",
+        "mode": "staging",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Mining/Submission_Logs/submission_global.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-22T21:42:05.062963",
+        "mode": "staging",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Mining/Submission_Logs/submission_global.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-22T21:42:05.062963",
+        "mode": "staging",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Mining/Submission_Logs/global_submission.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-22T21:42:05.062963",
+        "mode": "staging",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Mining/Submission_Logs/global_submission.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-22T21:42:05.152456",
+        "mode": "live",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Mining/Submission_Logs/submission_global.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-22T21:42:05.152456",
+        "mode": "live",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Mining/Submission_Logs/submission_global.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-22T21:42:05.152456",
+        "mode": "live",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Mining/Submission_Logs/global_submission.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-22T21:42:05.152456",
+        "mode": "live",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Mining/Submission_Logs/global_submission.json"
+      }
+    ]
+  },
   "sub_levels": []
 }

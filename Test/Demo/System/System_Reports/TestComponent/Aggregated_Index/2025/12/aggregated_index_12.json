@@ -1,0 +1,42 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_month",
+    "component": "TestComponent",
+    "level": "month",
+    "scope": "Contains: Month 12 + all weeks/days/hours",
+    "created": "2025-12-22T21:42:04.923932",
+    "last_updated": "2025-12-22T21:42:04.923928",
+    "mode": "demo"
+  },
+  "summary": {
+    "total_entries": 2,
+    "data_sources": [
+      "Test/Demo/System/System_Reports/TestComponent/global_testcomponent_report.json"
+    ]
+  },
+  "aggregated_data": {
+    "entries": [
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-22T21:42:04.740215",
+        "mode": "demo",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Test/Demo/System/System_Reports/TestComponent/global_testcomponent_report.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-22T21:42:04.740215",
+        "mode": "demo",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Test/Demo/System/System_Reports/TestComponent/global_testcomponent_report.json"
+      }
+    ]
+  },
+  "sub_levels": []
+}

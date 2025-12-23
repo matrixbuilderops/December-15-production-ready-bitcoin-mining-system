@@ -1,0 +1,42 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_month",
+    "component": "TestComponent",
+    "level": "month",
+    "scope": "Contains: Month 12 + all weeks/days/hours",
+    "created": "2025-12-22T21:42:05.135625",
+    "last_updated": "2025-12-22T21:42:05.135621",
+    "mode": "staging"
+  },
+  "summary": {
+    "total_entries": 2,
+    "data_sources": [
+      "System/Error_Reports/TestComponent/global_testcomponent_error.json"
+    ]
+  },
+  "aggregated_data": {
+    "entries": [
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-22T21:42:05.062963",
+        "mode": "staging",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "System/Error_Reports/TestComponent/global_testcomponent_error.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-22T21:42:05.062963",
+        "mode": "staging",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "System/Error_Reports/TestComponent/global_testcomponent_error.json"
+      }
+    ]
+  },
+  "sub_levels": []
+}

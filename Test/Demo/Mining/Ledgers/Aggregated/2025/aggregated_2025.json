@@ -5,13 +5,14 @@
     "level": "year",
     "scope": "Contains: Year 2025 + all months/weeks/days/hours",
     "created": "2025-12-19T14:25:36.586105",
-    "last_updated": "2025-12-20T12:10:15.807208",
+    "last_updated": "2025-12-22T21:42:04.791920",
     "mode": "demo"
   },
   "summary": {
-    "total_entries": 24,
+    "total_entries": 2,
     "data_sources": [
-      "Test/Demo/Mining/Ledgers/ledger_global.json"
+      "Test/Demo/Mining/Ledgers/ledger_global.json",
+      "Test/Demo/Mining/Ledgers/math_proof_global.json"
     ]
   },
   "aggregated_data": {
@@ -615,6 +616,48 @@
           "actual_sha256_attempts": 0
         },
         "source_path": "Test/Demo/Mining/Ledgers/ledger_global.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-22T21:42:04.740215",
+        "mode": "demo",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Test/Demo/Mining/Ledgers/ledger_global.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-22T21:42:04.740215",
+        "mode": "demo",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Test/Demo/Mining/Ledgers/ledger_global.json"
+      }
+    ],
+    "proofs": [
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-22T21:42:04.740215",
+        "mode": "demo",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Test/Demo/Mining/Ledgers/math_proof_global.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-22T21:42:04.740215",
+        "mode": "demo",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Test/Demo/Mining/Ledgers/math_proof_global.json"
       }
     ]
   },

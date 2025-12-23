@@ -1,0 +1,18 @@
+{
+  "metadata": {
+    "component": "TestComponent",
+    "created": "2025-12-22T21:42:04.954485",
+    "last_updated": "2025-12-22T21:42:04.954485"
+  },
+  "errors": [
+    {
+      "test_id": "week_folder_test",
+      "timestamp": "2025-12-22T21:42:04.740215",
+      "mode": "demo",
+      "leading_zeros": 19,
+      "meets_difficulty": true,
+      "nonce": 123456789,
+      "block_hash": "0000000000000000000abcdef"
+    }
+  ]
+}

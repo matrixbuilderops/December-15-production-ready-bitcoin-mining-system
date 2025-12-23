@@ -3,13 +3,14 @@
     "file_type": "aggregated_index_level",
     "component": "Looping",
     "created": "2025-12-19T19:17:37.991281",
-    "last_updated": "2025-12-20T12:10:15.716331",
+    "last_updated": "2025-12-22T21:42:04.881237",
     "mode": "demo"
   },
   "summary": {
-    "total_entries": 20,
+    "total_entries": 24,
     "data_sources": [
-      "Test/Demo/Mining/Submission_Logs/submission_global.json"
+      "Test/Demo/Mining/Submission_Logs/submission_global.json",
+      "Test/Demo/Mining/Submission_Logs/global_submission.json"
     ]
   },
   "aggregated_data": {
@@ -613,6 +614,46 @@
           "block_submission": "Test/Demo/Mining/Submission_Logs/block_submission_999999_20251220T181015_713051_0000.json"
         },
         "source_path": "Test/Demo/Mining/Submission_Logs/submission_global.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-22T21:42:04.740215",
+        "mode": "demo",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Test/Demo/Mining/Submission_Logs/submission_global.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-22T21:42:04.740215",
+        "mode": "demo",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Test/Demo/Mining/Submission_Logs/submission_global.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-22T21:42:04.740215",
+        "mode": "demo",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Test/Demo/Mining/Submission_Logs/global_submission.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-22T21:42:04.740215",
+        "mode": "demo",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Test/Demo/Mining/Submission_Logs/global_submission.json"
       }
     ]
   }

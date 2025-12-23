@@ -1,0 +1,21 @@
+{
+  "submissions": [
+    {
+      "test_id": "week_folder_test",
+      "timestamp": "2025-12-22T21:42:04.740215",
+      "mode": "demo",
+      "leading_zeros": 19,
+      "meets_difficulty": true,
+      "nonce": 123456789,
+      "block_hash": "0000000000000000000abcdef"
+    }
+  ],
+  "metadata": {
+    "created": "2025-12-22T21:42:04.833522",
+    "level": "hour",
+    "component": "TestComponent",
+    "mode": "demo",
+    "last_updated": "2025-12-22T21:42:04.833522",
+    "total_entries": 1
+  }
+}

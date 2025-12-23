@@ -1,0 +1,163 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_day",
+    "component": "Brain",
+    "created": "2025-12-22T21:42:05.071540",
+    "last_updated": "2025-12-22T21:42:05.253475",
+    "mode": "staging"
+  },
+  "summary": {
+    "total_entries": 11,
+    "by_type": {
+      "ledger": 2,
+      "math_proof": 2,
+      "submission": 4,
+      "system_report": 2,
+      "error_report": 1
+    },
+    "data_sources": []
+  },
+  "aggregated_data": {
+    "ledger": {
+      "entries": [
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-22T21:42:05.062963",
+          "mode": "staging",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "ledger"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-22T21:42:05.152456",
+          "mode": "live",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "ledger"
+        }
+      ]
+    },
+    "math_proof": {
+      "proofs": [
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-22T21:42:05.062963",
+          "mode": "staging",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "math_proof"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-22T21:42:05.152456",
+          "mode": "live",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "math_proof"
+        }
+      ]
+    },
+    "submission": {
+      "submissions": [
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-22T21:42:05.062963",
+          "mode": "staging",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "submission"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-22T21:42:05.062963",
+          "mode": "staging",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "submission"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-22T21:42:05.152456",
+          "mode": "live",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "submission"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-22T21:42:05.152456",
+          "mode": "live",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "submission"
+        }
+      ]
+    },
+    "system_report": {
+      "entries": [
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-22T21:42:05.062963",
+          "mode": "staging",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "system_report"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-22T21:42:05.152456",
+          "mode": "live",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "system_report"
+        }
+      ]
+    },
+    "error_report": {
+      "entries": [
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-22T21:42:05.062963",
+          "mode": "staging",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "error_report"
+        }
+      ]
+    }
+  }
+}
