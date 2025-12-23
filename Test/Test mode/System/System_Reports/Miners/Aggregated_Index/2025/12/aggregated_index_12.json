@@ -1,0 +1,48 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_month",
+    "component": "Miners",
+    "level": "month",
+    "scope": "Contains: Month 12 + all weeks/days/hours",
+    "created": "2025-12-23T02:14:30.743445",
+    "last_updated": "2025-12-23T02:14:30.743439",
+    "mode": "test"
+  },
+  "summary": {
+    "total_entries": 2,
+    "data_sources": [
+      "Test/Test mode/System/System_Reports/Miners/global_miners_report.json"
+    ]
+  },
+  "aggregated_data": {
+    "entries": [
+      {
+        "timestamp": "2025-12-23T02:14:30.741883",
+        "component": "Miners",
+        "event": "initialization",
+        "miner_id": "MINER_ALPHA",
+        "process_id": "process_1",
+        "mode": "production",
+        "daemon_mode": false,
+        "brain_qtl_ready": false,
+        "brainstem_connected": true,
+        "status": "initialized",
+        "source_path": "Test/Test mode/System/System_Reports/Miners/global_miners_report.json"
+      },
+      {
+        "timestamp": "2025-12-23T02:14:30.741883",
+        "component": "Miners",
+        "event": "initialization",
+        "miner_id": "MINER_ALPHA",
+        "process_id": "process_1",
+        "mode": "production",
+        "daemon_mode": false,
+        "brain_qtl_ready": false,
+        "brainstem_connected": true,
+        "status": "initialized",
+        "source_path": "Test/Test mode/System/System_Reports/Miners/global_miners_report.json"
+      }
+    ]
+  },
+  "sub_levels": []
+}

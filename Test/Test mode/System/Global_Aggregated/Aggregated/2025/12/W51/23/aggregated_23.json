@@ -3,16 +3,16 @@
     "file_type": "aggregated_index_day",
     "component": "Brain",
     "created": "2025-12-23T01:35:58.046102",
-    "last_updated": "2025-12-23T01:37:31.135286",
+    "last_updated": "2025-12-23T02:14:30.751755",
     "mode": "test"
   },
   "summary": {
-    "total_entries": 11,
+    "total_entries": 14,
     "by_type": {
       "ledger": 2,
       "math_proof": 2,
       "submission": 4,
-      "system_report": 2,
+      "system_report": 5,
       "error_report": 1
     },
     "data_sources": []
@@ -140,6 +140,46 @@
           "nonce": 123456789,
           "block_hash": "0000000000000000000abcdef",
           "component": "TestComponent",
+          "file_type": "system_report"
+        },
+        {
+          "timestamp": "2025-12-23T02:14:26.638468",
+          "component": "Brainstem",
+          "event": "initialization_complete",
+          "mode": "test",
+          "base_path": "Test/Test mode/Mining",
+          "total_folders": 23,
+          "status": "success",
+          "file_type": "system_report"
+        },
+        {
+          "timestamp": "2025-12-23T02:14:26.654656",
+          "component": "Brain",
+          "event": "orchestration_complete",
+          "mode": "test",
+          "base_path": "Test/Test mode/Mining",
+          "components_initialized": [
+            "Brainstem",
+            "DTM",
+            "Looping",
+            "Miners"
+          ],
+          "total_folders_created": 23,
+          "brain_qtl_version": "3.2",
+          "status": "operational",
+          "file_type": "system_report"
+        },
+        {
+          "timestamp": "2025-12-23T02:14:30.741883",
+          "component": "Miners",
+          "event": "initialization",
+          "miner_id": "MINER_ALPHA",
+          "process_id": "process_1",
+          "mode": "production",
+          "daemon_mode": false,
+          "brain_qtl_ready": false,
+          "brainstem_connected": true,
+          "status": "initialized",
           "file_type": "system_report"
         }
       ]

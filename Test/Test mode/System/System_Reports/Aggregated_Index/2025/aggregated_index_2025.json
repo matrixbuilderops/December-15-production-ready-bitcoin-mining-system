@@ -1,0 +1,18 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_2025",
+    "component": "Looping",
+    "level": "year",
+    "created": "2025-12-23T02:14:26.628765",
+    "mode": "test",
+    "time_scope": {
+      "year": "2025",
+      "month": null,
+      "week": null,
+      "day": null,
+      "hour": null
+    },
+    "note": "Created from Brain.QTL pattern_levels - fallback structure"
+  },
+  "entries": []
+}

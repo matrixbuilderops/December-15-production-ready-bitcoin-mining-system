@@ -1,0 +1,44 @@
+{
+  "metadata": {
+    "file_type": "hourly_brain_report",
+    "component": "Brain",
+    "level": "hour",
+    "created": "2025-12-23T02:14:26.618415",
+    "mode": "test",
+    "time_scope": {
+      "year": "2025",
+      "month": "12",
+      "week": "W51",
+      "day": "23",
+      "hour": "02"
+    },
+    "note": "Created from Brain.QTL pattern_levels - fallback structure",
+    "last_updated": "2025-12-23T02:14:26.654688"
+  },
+  "entries": [
+    {
+      "timestamp": "2025-12-23T02:14:26.654656",
+      "component": "Brain",
+      "event": "orchestration_complete",
+      "mode": "test",
+      "base_path": "Test/Test mode/Mining",
+      "components_initialized": [
+        "Brainstem",
+        "DTM",
+        "Looping",
+        "Miners"
+      ],
+      "total_folders_created": 23,
+      "brain_qtl_version": "3.2",
+      "status": "operational"
+    }
+  ],
+  "hour": "2025-11-30_06",
+  "aggregations_performed": 1,
+  "components_status": {
+    "dtm": "healthy",
+    "looping": "healthy",
+    "miners": "healthy",
+    "brainstem": "healthy"
+  }
+}

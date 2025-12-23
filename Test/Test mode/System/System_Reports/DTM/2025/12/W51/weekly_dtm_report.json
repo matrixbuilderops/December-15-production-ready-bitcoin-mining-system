@@ -1,0 +1,18 @@
+{
+  "metadata": {
+    "file_type": "weekly_dtm_report",
+    "component": "DTM",
+    "level": "week",
+    "created": "2025-12-23T02:14:26.622350",
+    "mode": "test",
+    "time_scope": {
+      "year": "2025",
+      "month": "12",
+      "week": "W51",
+      "day": null,
+      "hour": null
+    },
+    "note": "Created from Brain.QTL pattern_levels - fallback structure"
+  },
+  "entries": []
+}

@@ -1,0 +1,23 @@
+{
+  "metadata": {
+    "created_by": "Brain",
+    "version": "1.0",
+    "created": "2025-12-23T02:14:26.632788-06:00",
+    "last_updated": "2025-12-23T02:14:26.632794-06:00"
+  },
+  "total_errors": 0,
+  "errors": [
+    {
+      "error_id": "brain_err_001",
+      "timestamp": "2025-11-30T06:00:00.000000Z",
+      "severity": "warning",
+      "component": "Brain",
+      "error_type": "aggregation_delay",
+      "message": "Component file not ready for aggregation",
+      "context": {
+        "file": "dtm_report.json",
+        "retry_count": 1
+      }
+    }
+  ]
+}

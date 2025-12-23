@@ -1,0 +1,24 @@
+{
+  "metadata": {
+    "created_by": "Looping",
+    "purpose": "Track submission results and network responses",
+    "version": "1.0",
+    "created": "2025-12-23T08:14:27.473148+00:00",
+    "last_updated": "2025-12-23T08:14:27.473148+00:00"
+  },
+  "total_submissions": 0,
+  "accepted": 0,
+  "rejected": 0,
+  "orphaned": 0,
+  "pending": 0,
+  "system_status": {
+    "status": "operational",
+    "last_update": "2025-12-23T08:14:27.473148+00:00",
+    "bitcoin_core_connected": true,
+    "bitcoin_core_version": "/Satoshi:26.0.0/",
+    "network_difficulty": 0,
+    "acceptance_rate": 0,
+    "issues": []
+  },
+  "submissions": []
+}

@@ -1,0 +1,42 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_hour",
+    "component": "Brainstem",
+    "level": "hour",
+    "scope": "Contains: Hour 02 only",
+    "created": "2025-12-23T02:14:26.639648",
+    "last_updated": "2025-12-23T02:14:26.639644",
+    "mode": "test"
+  },
+  "summary": {
+    "total_entries": 2,
+    "data_sources": [
+      "Test/Test mode/System/System_Reports/Brainstem/global_brainstem_report.json"
+    ]
+  },
+  "aggregated_data": {
+    "entries": [
+      {
+        "timestamp": "2025-12-23T02:14:26.638468",
+        "component": "Brainstem",
+        "event": "initialization_complete",
+        "mode": "test",
+        "base_path": "Test/Test mode/Mining",
+        "total_folders": 23,
+        "status": "success",
+        "source_path": "Test/Test mode/System/System_Reports/Brainstem/global_brainstem_report.json"
+      },
+      {
+        "timestamp": "2025-12-23T02:14:26.638468",
+        "component": "Brainstem",
+        "event": "initialization_complete",
+        "mode": "test",
+        "base_path": "Test/Test mode/Mining",
+        "total_folders": 23,
+        "status": "success",
+        "source_path": "Test/Test mode/System/System_Reports/Brainstem/global_brainstem_report.json"
+      }
+    ]
+  },
+  "sub_levels": []
+}
