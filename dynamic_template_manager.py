@@ -4189,49 +4189,64 @@ class GPSEnhancedDynamicTemplateManager:
                     "ultra_hex_consensus": ultra_hex_consensus,
                 }
 
-            # Solution is valid (meets or exceeds difficulty)
-            # DTM's job: Validate and intelligently adjust overly-perfect solutions
+            # 🎯 CRITICAL: DTM must validate and ADJUST unrealistic solutions
+            # Bitcoin difficulty ~19 zeros. If miner claims 50+, Bitcoin will REJECT as impossible.
+            # DTM's job: Take the miner's work and find a REALISTIC nonce that Bitcoin will accept.
             
             solution_hash = solution.get("hash", "")
             original_nonce = nonce
             
-            # 🎯 SMART ADJUSTMENT: If solution is TOO perfect (suspicious), find natural-looking alternative
+            # 🚨 ADJUSTMENT REQUIRED: If solution is TOO perfect (physically impossible)
             excess_zeros = miner_leading_zeros - required_zeros
-            if excess_zeros > 5:  # More than 5 extra zeros = suspicious
+            if excess_zeros > 5:  # More than 5 extra zeros = mathematically suspicious
                 if self.verbose:
-                    print(f"⚠️  Solution TOO perfect: {miner_leading_zeros} zeros (needs {required_zeros})")
-                    print(f"   Finding natural-looking alternative nearby...")
+                    print(f"⚠️  Solution TOO perfect: {miner_leading_zeros} zeros (Bitcoin needs {required_zeros})")
+                    print(f"   Bitcoin will REJECT this as impossible/fake")
+                    print(f"   Finding REALISTIC nonce nearby that Bitcoin will accept...")
                 
-                # Search for a nonce near the perfect one that gives ~2-3 extra zeros (natural)
-                target_natural_zeros = required_zeros + 2  # Slightly above requirement
-                max_search = 10000  # Search up to 10k nonces
+                # Search for a nonce that gives EXACTLY what Bitcoin wants (~19-22 zeros)
+                target_realistic_zeros = required_zeros + 2  # Slightly above requirement (realistic)
+                max_search = 100000  # Search up to 100k nonces around the perfect one
                 
                 import hashlib
-                found_natural = False
+                found_realistic = False
                 
+                # Search in BOTH directions from original nonce
                 for offset in range(1, max_search):
-                    test_nonce = original_nonce + offset
-                    # Reconstruct header with new nonce
-                    test_header = self._reconstruct_header_with_nonce(template, test_nonce)
-                    if test_header:
-                        test_hash = hashlib.sha256(hashlib.sha256(test_header).digest()).digest()
-                        test_hash_hex = test_hash.hex()
-                        test_zeros = len(test_hash_hex) - len(test_hash_hex.lstrip('0'))
+                    for direction in [1, -1]:  # Try both + and - offsets
+                        test_nonce = original_nonce + (offset * direction)
+                        if test_nonce < 0:
+                            continue
+                            
+                        # Reconstruct header with new nonce
+                        test_header = self._reconstruct_header_with_nonce(template, test_nonce)
+                        if test_header:
+                            # Calculate REAL Bitcoin double SHA256
+                            test_hash = hashlib.sha256(hashlib.sha256(test_header).digest()).digest()
+                            test_hash_hex = test_hash.hex()
+                            test_zeros = len(test_hash_hex) - len(test_hash_hex.lstrip('0'))
+                            
+                            # Found a REALISTIC solution Bitcoin will accept?
+                            if required_zeros <= test_zeros <= target_realistic_zeros:
+                                nonce = test_nonce
+                                solution_hash = test_hash_hex
+                                miner_leading_zeros = test_zeros
+                                found_realistic = True
+                                if self.verbose:
+                                    print(f"✅ Found REALISTIC solution at nonce {nonce}")
+                                    print(f"   Leading zeros: {test_zeros} (Bitcoin will accept this!)")
+                                    print(f"   Offset from mathematical solution: {offset * direction}")
+                                break
                         
-                        # Found a natural-looking solution?
-                        if required_zeros <= test_zeros <= target_natural_zeros:
-                            nonce = test_nonce
-                            solution_hash = test_hash_hex
-                            miner_leading_zeros = test_zeros
-                            found_natural = True
-                            if self.verbose:
-                                print(f"✅ Found natural solution at nonce {nonce}")
-                                print(f"   Leading zeros: {test_zeros} (looks normal)")
+                        if found_realistic:
                             break
                 
-                if not found_natural and self.verbose:
-                    print(f"⚠️  Could not find natural alternative, using original")
-                    nonce = original_nonce  # Restore original
+                if not found_realistic:
+                    if self.verbose:
+                        print(f"⚠️  Could not find realistic alternative in {max_search} attempts")
+                        print(f"   RISK: Submitting original may be rejected by Bitcoin as impossible")
+                    # Keep original and hope for the best
+                    nonce = original_nonce
             
             # Validate the solution (whether original or adjusted)
             validation_result = self.validate_superior_solution(
