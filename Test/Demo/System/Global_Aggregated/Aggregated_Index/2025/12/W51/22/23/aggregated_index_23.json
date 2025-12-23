@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_hour",
+    "component": "Brain",
+    "created": "2025-12-22T23:24:28.544553",
+    "last_updated": "2025-12-22T23:24:30.601290",
+    "mode": "demo"
+  },
+  "summary": {
+    "total_entries": 2,
+    "by_type": {
+      "ledger": 2
+    },
+    "data_sources": []
+  },
+  "aggregated_data": {
+    "ledger": {
+      "entries": [
+        {
+          "test_id": "hot_reload_test_v1",
+          "timestamp": "2025-12-22T23:24:28.510591",
+          "nonce": 111111,
+          "version": "v1",
+          "component": "HotReloadTest",
+          "file_type": "ledger"
+        },
+        {
+          "test_id": "hot_reload_test_v2",
+          "timestamp": "2025-12-22T23:24:30.577236",
+          "nonce": 222222,
+          "version": "v2",
+          "component": "HotReloadTest",
+          "file_type": "ledger"
+        }
+      ]
+    }
+  }
+}

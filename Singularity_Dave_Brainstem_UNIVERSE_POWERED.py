@@ -92,6 +92,124 @@ def _initialize_file_with_structure(filepath, example_filename):
         print(f"  ✓ Initialized: {filepath}")
 
 
+# ============================================================================
+# TEMPLATE HOT-RELOAD SYSTEM
+# ============================================================================
+# When System_File_Examples/ templates change, components auto-detect and use
+# the new structure on their next write operation.
+# ============================================================================
+
+class TemplateCache:
+    """
+    Global template cache with hot-reload capability.
+    Tracks modification times and automatically reloads changed templates.
+    """
+    _instance = None
+    _templates = {}
+    _mtimes = {}
+    _base_path = Path(__file__).parent / "System_File_Examples"
+    
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(TemplateCache, cls).__new__(cls)
+        return cls._instance
+    
+    def get_template(self, template_name):
+        """
+        Get template with automatic hot-reload.
+        
+        Args:
+            template_name: Name like "global_ledger.json" or "DTM/Global/global_ledger_example.json"
+        
+        Returns:
+            dict: Template structure or empty dict if not found
+        """
+        # Normalize path
+        template_path = self._base_path / template_name
+        
+        if not template_path.exists():
+            return {}
+        
+        # Check if template needs reload
+        current_mtime = template_path.stat().st_mtime
+        cached_mtime = self._mtimes.get(str(template_path))
+        
+        if cached_mtime is None or current_mtime > cached_mtime:
+            # Template is new or changed - reload it
+            try:
+                with open(template_path, 'r') as f:
+                    template = json.load(f)
+                
+                self._templates[str(template_path)] = template
+                self._mtimes[str(template_path)] = current_mtime
+                
+                if cached_mtime is not None:
+                    print(f"🔄 Template updated: {template_name}")
+                
+                return template
+            except Exception as e:
+                print(f"⚠️ Failed to load template {template_name}: {e}")
+                return {}
+        
+        # Return cached version
+        return self._templates.get(str(template_path), {})
+    
+    def check_for_updates(self):
+        """
+        Check all cached templates for updates.
+        Returns list of templates that changed.
+        """
+        changed = []
+        
+        for template_path_str, cached_mtime in list(self._mtimes.items()):
+            template_path = Path(template_path_str)
+            
+            if not template_path.exists():
+                # Template was deleted
+                del self._templates[template_path_str]
+                del self._mtimes[template_path_str]
+                changed.append(template_path_str)
+                continue
+            
+            current_mtime = template_path.stat().st_mtime
+            if current_mtime > cached_mtime:
+                # Template changed
+                changed.append(template_path_str)
+        
+        return changed
+    
+    def invalidate(self, template_name=None):
+        """
+        Force reload on next access.
+        If template_name is None, invalidates all templates.
+        """
+        if template_name is None:
+            self._templates.clear()
+            self._mtimes.clear()
+        else:
+            template_path = str(self._base_path / template_name)
+            if template_path in self._templates:
+                del self._templates[template_path]
+            if template_path in self._mtimes:
+                del self._mtimes[template_path]
+
+# Global template cache instance
+_TEMPLATE_CACHE = TemplateCache()
+
+def get_template(template_name):
+    """
+    Get template with automatic hot-reload.
+    This is the main function components should use.
+    
+    Args:
+        template_name: Template filename or path
+    
+    Returns:
+        dict: Template structure
+    """
+    return _TEMPLATE_CACHE.get_template(template_name)
+
+
 UNIVERSE_BITLOAD = int(
     (
         "208500855993373022767225770164375163068756085544106017996338881654"
@@ -11320,12 +11438,11 @@ def brain_save_ledger(entry_data, component_name="Unknown"):
         global_ledger_path = Path(base_dir) / "global_ledger.json"
         global_ledger_path.parent.mkdir(parents=True, exist_ok=True)
         
-        # ALWAYS load template for merging
-        template_path = Path("System_File_Examples/global_ledger.json")
-        template = None
-        if template_path.exists():
-            with open(template_path, 'r') as f:
-                template = json.load(f)
+        # ALWAYS load template with HOT-RELOAD capability
+        template = get_template("global_ledger.json")
+        if not template:
+            # Try alternate path
+            template = get_template("DTM/Global/global_ledger_example.json")
         
         # Load existing file or initialize from template
         if global_ledger_path.exists():
@@ -11406,12 +11523,11 @@ def brain_save_math_proof(proof_data, component_name="Unknown"):
         global_proof_path = Path(base_dir) / "global_math_proof.json"
         global_proof_path.parent.mkdir(parents=True, exist_ok=True)
         
-        # ALWAYS load template for merging
-        template_path = Path("System_File_Examples/DTM/Global/global_math_proof_example.json")
-        template = None
-        if template_path.exists():
-            with open(template_path, 'r') as f:
-                template = json.load(f)
+        # ALWAYS load template with HOT-RELOAD capability
+        template = get_template("DTM/Global/global_math_proof_example.json")
+        if not template:
+            # Try alternate path
+            template = get_template("global_math_proof.json")
         
         # Load existing file or initialize from template
         if global_proof_path.exists():
@@ -11485,12 +11601,11 @@ def brain_save_submission(submission_data, component_name="Unknown"):
         global_submission_path = Path(base_dir) / "global_submission.json"
         global_submission_path.parent.mkdir(parents=True, exist_ok=True)
         
-        # ALWAYS load template for merging
-        template_path = Path("System_File_Examples/Looping/Global/global_submission_example.json")
-        template = None
-        if template_path.exists():
-            with open(template_path, 'r') as f:
-                template = json.load(f)
+        # ALWAYS load template with HOT-RELOAD capability
+        template = get_template("Looping/Global/global_submission_example.json")
+        if not template:
+            # Try alternate path
+            template = get_template("global_submission.json")
         
         # Load existing file or initialize from template
         if global_submission_path.exists():

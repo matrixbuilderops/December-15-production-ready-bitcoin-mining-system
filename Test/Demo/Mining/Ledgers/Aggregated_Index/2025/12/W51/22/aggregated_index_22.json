@@ -5,11 +5,11 @@
     "level": "day",
     "scope": "Contains: Day 22 + all hours",
     "created": "2025-12-22T21:42:04.746236",
-    "last_updated": "2025-12-22T21:42:04.791920",
+    "last_updated": "2025-12-22T23:24:30.580058",
     "mode": "demo"
   },
   "summary": {
-    "total_entries": 2,
+    "total_entries": 6,
     "data_sources": [
       "Test/Demo/Mining/Ledgers/ledger_global.json",
       "Test/Demo/Mining/Ledgers/math_proof_global.json"
@@ -35,6 +35,34 @@
         "meets_difficulty": true,
         "nonce": 123456789,
         "block_hash": "0000000000000000000abcdef",
+        "source_path": "Test/Demo/Mining/Ledgers/ledger_global.json"
+      },
+      {
+        "test_id": "hot_reload_test_v1",
+        "timestamp": "2025-12-22T23:24:28.510591",
+        "nonce": 111111,
+        "version": "v1",
+        "source_path": "Test/Demo/Mining/Ledgers/ledger_global.json"
+      },
+      {
+        "test_id": "hot_reload_test_v1",
+        "timestamp": "2025-12-22T23:24:28.510591",
+        "nonce": 111111,
+        "version": "v1",
+        "source_path": "Test/Demo/Mining/Ledgers/ledger_global.json"
+      },
+      {
+        "test_id": "hot_reload_test_v2",
+        "timestamp": "2025-12-22T23:24:30.577236",
+        "nonce": 222222,
+        "version": "v2",
+        "source_path": "Test/Demo/Mining/Ledgers/ledger_global.json"
+      },
+      {
+        "test_id": "hot_reload_test_v2",
+        "timestamp": "2025-12-22T23:24:30.577236",
+        "nonce": 222222,
+        "version": "v2",
         "source_path": "Test/Demo/Mining/Ledgers/ledger_global.json"
       }
     ],

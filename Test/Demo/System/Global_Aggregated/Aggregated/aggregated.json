@@ -3,14 +3,14 @@
     "file_type": "aggregated_index_root",
     "component": "Brain",
     "created": "2025-12-19T14:25:36.599724",
-    "last_updated": "2025-12-22T21:42:04.964069",
+    "last_updated": "2025-12-22T23:24:30.601290",
     "mode": "demo"
   },
   "summary": {
-    "total_entries": 110,
+    "total_entries": 112,
     "by_type": {
       "system_report": 83,
-      "ledger": 13,
+      "ledger": 15,
       "submission_log": 10,
       "math_proof": 1,
       "submission": 2,
@@ -1425,6 +1425,22 @@
           "nonce": 123456789,
           "block_hash": "0000000000000000000abcdef",
           "component": "TestComponent",
+          "file_type": "ledger"
+        },
+        {
+          "test_id": "hot_reload_test_v1",
+          "timestamp": "2025-12-22T23:24:28.510591",
+          "nonce": 111111,
+          "version": "v1",
+          "component": "HotReloadTest",
+          "file_type": "ledger"
+        },
+        {
+          "test_id": "hot_reload_test_v2",
+          "timestamp": "2025-12-22T23:24:30.577236",
+          "nonce": 222222,
+          "version": "v2",
+          "component": "HotReloadTest",
           "file_type": "ledger"
         }
       ]

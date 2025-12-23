@@ -1,0 +1,50 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_hour",
+    "component": "HotReloadTest",
+    "level": "hour",
+    "scope": "Contains: Hour 23 only",
+    "created": "2025-12-22T23:24:28.514006",
+    "last_updated": "2025-12-22T23:24:30.580058",
+    "mode": "demo"
+  },
+  "summary": {
+    "total_entries": 4,
+    "data_sources": [
+      "Test/Demo/Mining/Ledgers/ledger_global.json"
+    ]
+  },
+  "aggregated_data": {
+    "entries": [
+      {
+        "test_id": "hot_reload_test_v1",
+        "timestamp": "2025-12-22T23:24:28.510591",
+        "nonce": 111111,
+        "version": "v1",
+        "source_path": "Test/Demo/Mining/Ledgers/ledger_global.json"
+      },
+      {
+        "test_id": "hot_reload_test_v1",
+        "timestamp": "2025-12-22T23:24:28.510591",
+        "nonce": 111111,
+        "version": "v1",
+        "source_path": "Test/Demo/Mining/Ledgers/ledger_global.json"
+      },
+      {
+        "test_id": "hot_reload_test_v2",
+        "timestamp": "2025-12-22T23:24:30.577236",
+        "nonce": 222222,
+        "version": "v2",
+        "source_path": "Test/Demo/Mining/Ledgers/ledger_global.json"
+      },
+      {
+        "test_id": "hot_reload_test_v2",
+        "timestamp": "2025-12-22T23:24:30.577236",
+        "nonce": 222222,
+        "version": "v2",
+        "source_path": "Test/Demo/Mining/Ledgers/ledger_global.json"
+      }
+    ]
+  },
+  "sub_levels": []
+}

@@ -1,0 +1,14 @@
+{
+  "metadata": {
+    "file_type": "global_ledger",
+    "created_by": "Brain",
+    "purpose": "Track mining attempts",
+    "version": "1.0",
+    "test_field_v1": "This is version 1",
+    "test_field_v2": "This is version 2 - HOT RELOADED!",
+    "hot_reload_test": "SUCCESS"
+  },
+  "total_attempts": 0,
+  "entries": [],
+  "new_top_level_field": "This field was added in v2"
+}
