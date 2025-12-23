@@ -3,16 +3,16 @@
     "file_type": "aggregated_index_day",
     "component": "Brain",
     "created": "2025-12-23T01:35:57.830470",
-    "last_updated": "2025-12-23T01:38:07.225202",
+    "last_updated": "2025-12-23T01:45:06.652352",
     "mode": "demo"
   },
   "summary": {
-    "total_entries": 13,
+    "total_entries": 16,
     "by_type": {
       "ledger": 4,
       "math_proof": 2,
       "submission": 4,
-      "system_report": 2,
+      "system_report": 5,
       "error_report": 1
     },
     "data_sources": []
@@ -156,6 +156,46 @@
           "nonce": 123456789,
           "block_hash": "0000000000000000000abcdef",
           "component": "TestComponent",
+          "file_type": "system_report"
+        },
+        {
+          "timestamp": "2025-12-23T01:45:04.821557",
+          "component": "Brainstem",
+          "event": "initialization_complete",
+          "mode": "demo",
+          "base_path": "Test/Demo/Mining",
+          "total_folders": 23,
+          "status": "success",
+          "file_type": "system_report"
+        },
+        {
+          "timestamp": "2025-12-23T01:45:04.868258",
+          "component": "Brain",
+          "event": "orchestration_complete",
+          "mode": "demo",
+          "base_path": "Test/Demo/Mining",
+          "components_initialized": [
+            "Brainstem",
+            "DTM",
+            "Looping",
+            "Miners"
+          ],
+          "total_folders_created": 23,
+          "brain_qtl_version": "3.2",
+          "status": "operational",
+          "file_type": "system_report"
+        },
+        {
+          "timestamp": "2025-12-23T01:45:06.635614",
+          "component": "Miners",
+          "event": "initialization",
+          "miner_id": "MINER_ALPHA",
+          "process_id": "process_1",
+          "mode": "production",
+          "daemon_mode": false,
+          "brain_qtl_ready": false,
+          "brainstem_connected": true,
+          "status": "initialized",
           "file_type": "system_report"
         }
       ]

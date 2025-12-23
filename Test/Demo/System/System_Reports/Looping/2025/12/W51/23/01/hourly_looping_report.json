@@ -1,0 +1,18 @@
+{
+  "metadata": {
+    "file_type": "hourly_looping_report",
+    "component": "Looping",
+    "level": "hour",
+    "created": "2025-12-23T01:45:04.813166",
+    "mode": "demo",
+    "time_scope": {
+      "year": "2025",
+      "month": "12",
+      "week": "W51",
+      "day": "23",
+      "hour": "01"
+    },
+    "note": "Created from Brain.QTL pattern_levels - fallback structure"
+  },
+  "entries": []
+}

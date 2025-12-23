@@ -5,11 +5,11 @@
     "level": "year",
     "scope": "Contains: Year 2025 + all months/weeks/days/hours",
     "created": "2025-12-19T14:34:00.597937",
-    "last_updated": "2025-12-20T20:59:42.295601",
+    "last_updated": "2025-12-23T01:45:06.637060",
     "mode": "demo"
   },
   "summary": {
-    "total_entries": 30,
+    "total_entries": 32,
     "data_sources": [
       "Test/Demo/System/System_Reports/Miners/global_miners_report.json"
     ]
@@ -395,6 +395,32 @@
       },
       {
         "timestamp": "2025-12-20T20:59:42.294022",
+        "component": "Miners",
+        "event": "initialization",
+        "miner_id": "MINER_ALPHA",
+        "process_id": "process_1",
+        "mode": "production",
+        "daemon_mode": false,
+        "brain_qtl_ready": false,
+        "brainstem_connected": true,
+        "status": "initialized",
+        "source_path": "Test/Demo/System/System_Reports/Miners/global_miners_report.json"
+      },
+      {
+        "timestamp": "2025-12-23T01:45:06.635614",
+        "component": "Miners",
+        "event": "initialization",
+        "miner_id": "MINER_ALPHA",
+        "process_id": "process_1",
+        "mode": "production",
+        "daemon_mode": false,
+        "brain_qtl_ready": false,
+        "brainstem_connected": true,
+        "status": "initialized",
+        "source_path": "Test/Demo/System/System_Reports/Miners/global_miners_report.json"
+      },
+      {
+        "timestamp": "2025-12-23T01:45:06.635614",
         "component": "Miners",
         "event": "initialization",
         "miner_id": "MINER_ALPHA",

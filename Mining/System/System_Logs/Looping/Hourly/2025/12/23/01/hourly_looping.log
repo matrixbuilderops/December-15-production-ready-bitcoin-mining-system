@@ -1,0 +1,19 @@
+2025-12-23 01:45:04,940 - INFO - ✅ Configuration loaded from /media/phantomcore/AI_DRIVE/AI_Shit_mining/new testing/December 15 production ready bitcoin mining system.worktrees/worktree-2025-12-23T00-51-20/config.json
+2025-12-23 01:45:04,941 - INFO - ✅ ZMQ configuration loaded from config.json: ['rawblock', 'hashblock']
+2025-12-23 01:45:05,808 - INFO - ✅ Brain.QTL file structure initialized via Brainstem
+2025-12-23 01:45:05,812 - INFO - 📁 Ensuring all essential Bitcoin mining files are created...
+2025-12-23 01:45:05,812 - INFO - ✅ CLEAN organized file structure initialization complete
+2025-12-23 01:45:05,812 - INFO - 📁 Structure: Mining/Ledgers/Year/Month/Day/Hour/, Mining/{Ledger,Template,System}/
+2025-12-23 01:45:05,813 - INFO - 🎮 Demo mode enabled - using simulated mining
+2025-12-23 01:45:05,813 - INFO - 🎮 Demo mode: Skipping ZMQ setup (not needed)
+2025-12-23 01:45:05,813 - INFO - 🚀 Running early Production Miner verification...
+2025-12-23 01:45:05,937 - INFO - ✅ Production Miner verification passed - ready for mining
+2025-12-23 01:45:05,938 - INFO - 🎯 Number mining: 1 blocks
+2025-12-23 01:45:05,938 - INFO - 🧠 Brain.QTL orchestration: STANDARD
+2025-12-23 01:45:05,938 - INFO - 🎯 ENHANCED NUMBER MINING: 1 blocks
+2025-12-23 01:45:05,938 - INFO - 🎮 TEST/DEMO MODE: Skipping production miner daemon (not needed for instant math)
+2025-12-23 01:45:05,938 - INFO - 🎮 Demo mode: Skipping ZMQ setup (not needed)
+2025-12-23 01:45:05,938 - INFO - 🎯 DEBUG: Starting mining loop - target=1, blocks_mined=0
+2025-12-23 01:45:05,938 - INFO - 🔄 DEBUG: Loop iteration #1 - blocks_mined=0, target=1
+2025-12-23 01:45:05,938 - INFO - 🎮 DEMO MODE: Running REAL dual-Knuth math on stock template
+2025-12-23 01:45:06,285 - INFO - ✅ Got stock template from Brain.QTL: height=999999

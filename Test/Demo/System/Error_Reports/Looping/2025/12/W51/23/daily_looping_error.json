@@ -1,0 +1,18 @@
+{
+  "metadata": {
+    "file_type": "daily_looping_error",
+    "component": "Looping",
+    "level": "day",
+    "created": "2025-12-23T01:45:04.813927",
+    "mode": "demo",
+    "time_scope": {
+      "year": "2025",
+      "month": "12",
+      "week": "W51",
+      "day": "23",
+      "hour": null
+    },
+    "note": "Created from Brain.QTL pattern_levels - fallback structure"
+  },
+  "entries": []
+}
