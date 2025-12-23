@@ -5,11 +5,11 @@
     "level": "month",
     "scope": "Contains: Month 12 + all weeks/days/hours",
     "created": "2025-12-22T21:42:05.049784",
-    "last_updated": "2025-12-22T21:42:05.049781",
+    "last_updated": "2025-12-23T01:37:31.127568",
     "mode": "test"
   },
   "summary": {
-    "total_entries": 2,
+    "total_entries": 4,
     "data_sources": [
       "Test/Test mode/System/Error_Reports/TestComponent/global_testcomponent_error.json"
     ]
@@ -29,6 +29,26 @@
       {
         "test_id": "week_folder_test",
         "timestamp": "2025-12-22T21:42:04.986295",
+        "mode": "test",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Test/Test mode/System/Error_Reports/TestComponent/global_testcomponent_error.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:37:31.043393",
+        "mode": "test",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Test/Test mode/System/Error_Reports/TestComponent/global_testcomponent_error.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:37:31.043393",
         "mode": "test",
         "leading_zeros": 19,
         "meets_difficulty": true,

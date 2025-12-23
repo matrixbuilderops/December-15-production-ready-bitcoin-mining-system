@@ -11861,6 +11861,13 @@ def brain_save_system_error(error_data, component_name):
         if template_path.exists():
             with open(template_path, 'r') as f:
                 template = json.load(f)
+        
+        # Determine array field name from template or default to 'errors'
+        array_field = 'errors'
+        if template and 'errors' in template:
+            array_field = 'errors'
+        elif template and 'entries' in template:
+            array_field = 'entries'
 
         if global_error_path.exists():
             with open(global_error_path, 'r') as f:
@@ -11875,7 +11882,6 @@ def brain_save_system_error(error_data, component_name):
                     for key, value in template['metadata'].items():
                         if key not in error_file['metadata']:
                             error_file['metadata'][key] = value
-                array_field = 'errors' if 'errors' in template else 'entries'
                 if array_field not in error_file:
                     error_file[array_field] = []
         else:
@@ -11886,7 +11892,6 @@ def brain_save_system_error(error_data, component_name):
                     error_file['metadata'] = {}
                 error_file['metadata']['component'] = component_name
                 error_file['metadata']['created'] = now.isoformat()
-                array_field = 'errors' if 'errors' in error_file else 'entries'
                 if array_field not in error_file:
                     error_file[array_field] = []
             else:

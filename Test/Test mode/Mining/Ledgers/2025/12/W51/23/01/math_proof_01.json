@@ -1,0 +1,30 @@
+{
+  "proofs": [
+    {
+      "test_id": "week_folder_test",
+      "timestamp": "2025-12-23T01:35:58.034544",
+      "mode": "test",
+      "leading_zeros": 19,
+      "meets_difficulty": true,
+      "nonce": 123456789,
+      "block_hash": "0000000000000000000abcdef"
+    },
+    {
+      "test_id": "week_folder_test",
+      "timestamp": "2025-12-23T01:37:31.043393",
+      "mode": "test",
+      "leading_zeros": 19,
+      "meets_difficulty": true,
+      "nonce": 123456789,
+      "block_hash": "0000000000000000000abcdef"
+    }
+  ],
+  "metadata": {
+    "created": "2025-12-23T01:35:58.051384",
+    "level": "hour",
+    "component": "TestComponent",
+    "mode": "test",
+    "last_updated": "2025-12-23T01:37:31.060416",
+    "total_entries": 2
+  }
+}

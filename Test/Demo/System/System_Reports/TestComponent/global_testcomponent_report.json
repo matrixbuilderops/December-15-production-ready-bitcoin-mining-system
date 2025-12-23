@@ -2,12 +2,30 @@
   "metadata": {
     "component": "TestComponent",
     "created": "2025-12-22T21:42:04.922871",
-    "last_updated": "2025-12-22T21:42:04.922871"
+    "last_updated": "2025-12-23T01:37:30.972890"
   },
   "reports": [
     {
       "test_id": "week_folder_test",
       "timestamp": "2025-12-22T21:42:04.740215",
+      "mode": "demo",
+      "leading_zeros": 19,
+      "meets_difficulty": true,
+      "nonce": 123456789,
+      "block_hash": "0000000000000000000abcdef"
+    },
+    {
+      "test_id": "week_folder_test",
+      "timestamp": "2025-12-23T01:35:57.802302",
+      "mode": "demo",
+      "leading_zeros": 19,
+      "meets_difficulty": true,
+      "nonce": 123456789,
+      "block_hash": "0000000000000000000abcdef"
+    },
+    {
+      "test_id": "week_folder_test",
+      "timestamp": "2025-12-23T01:37:30.764970",
       "mode": "demo",
       "leading_zeros": 19,
       "meets_difficulty": true,

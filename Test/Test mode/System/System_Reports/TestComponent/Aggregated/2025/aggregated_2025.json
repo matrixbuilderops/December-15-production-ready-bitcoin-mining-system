@@ -5,11 +5,11 @@
     "level": "year",
     "scope": "Contains: Year 2025 + all months/weeks/days/hours",
     "created": "2025-12-22T21:42:05.035929",
-    "last_updated": "2025-12-22T21:42:05.035921",
+    "last_updated": "2025-12-23T01:37:31.112429",
     "mode": "test"
   },
   "summary": {
-    "total_entries": 2,
+    "total_entries": 6,
     "data_sources": [
       "Test/Test mode/System/System_Reports/TestComponent/global_testcomponent_report.json"
     ]
@@ -29,6 +29,46 @@
       {
         "test_id": "week_folder_test",
         "timestamp": "2025-12-22T21:42:04.986295",
+        "mode": "test",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Test/Test mode/System/System_Reports/TestComponent/global_testcomponent_report.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:35:58.034544",
+        "mode": "test",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Test/Test mode/System/System_Reports/TestComponent/global_testcomponent_report.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:35:58.034544",
+        "mode": "test",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Test/Test mode/System/System_Reports/TestComponent/global_testcomponent_report.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:37:31.043393",
+        "mode": "test",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Test/Test mode/System/System_Reports/TestComponent/global_testcomponent_report.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:37:31.043393",
         "mode": "test",
         "leading_zeros": 19,
         "meets_difficulty": true,

@@ -1,0 +1,102 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_day",
+    "component": "TestComponent",
+    "level": "day",
+    "scope": "Contains: Day 23 + all hours",
+    "created": "2025-12-23T01:35:58.192178",
+    "last_updated": "2025-12-23T01:37:31.384282",
+    "mode": "staging"
+  },
+  "summary": {
+    "total_entries": 8,
+    "data_sources": [
+      "System/System_Reports/TestComponent/global_testcomponent_report.json"
+    ]
+  },
+  "aggregated_data": {
+    "entries": [
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:35:58.113982",
+        "mode": "staging",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "System/System_Reports/TestComponent/global_testcomponent_report.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:35:58.113982",
+        "mode": "staging",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "System/System_Reports/TestComponent/global_testcomponent_report.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:35:58.211786",
+        "mode": "live",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "System/System_Reports/TestComponent/global_testcomponent_report.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:35:58.211786",
+        "mode": "live",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "System/System_Reports/TestComponent/global_testcomponent_report.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:37:31.142201",
+        "mode": "staging",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "System/System_Reports/TestComponent/global_testcomponent_report.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:37:31.142201",
+        "mode": "staging",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "System/System_Reports/TestComponent/global_testcomponent_report.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:37:31.276433",
+        "mode": "live",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "System/System_Reports/TestComponent/global_testcomponent_report.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:37:31.276433",
+        "mode": "live",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "System/System_Reports/TestComponent/global_testcomponent_report.json"
+      }
+    ]
+  },
+  "sub_levels": []
+}

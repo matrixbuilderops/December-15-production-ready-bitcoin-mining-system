@@ -5,11 +5,11 @@
     "level": "year",
     "scope": "Contains: Year 2025 + all months/weeks/days/hours",
     "created": "2025-12-22T21:42:04.923932",
-    "last_updated": "2025-12-22T21:42:04.923928",
+    "last_updated": "2025-12-23T01:37:30.973874",
     "mode": "demo"
   },
   "summary": {
-    "total_entries": 2,
+    "total_entries": 6,
     "data_sources": [
       "Test/Demo/System/System_Reports/TestComponent/global_testcomponent_report.json"
     ]
@@ -29,6 +29,46 @@
       {
         "test_id": "week_folder_test",
         "timestamp": "2025-12-22T21:42:04.740215",
+        "mode": "demo",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Test/Demo/System/System_Reports/TestComponent/global_testcomponent_report.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:35:57.802302",
+        "mode": "demo",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Test/Demo/System/System_Reports/TestComponent/global_testcomponent_report.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:35:57.802302",
+        "mode": "demo",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Test/Demo/System/System_Reports/TestComponent/global_testcomponent_report.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:37:30.764970",
+        "mode": "demo",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Test/Demo/System/System_Reports/TestComponent/global_testcomponent_report.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:37:30.764970",
         "mode": "demo",
         "leading_zeros": 19,
         "meets_difficulty": true,

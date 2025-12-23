@@ -3,17 +3,17 @@
     "file_type": "aggregated_index_week",
     "component": "Brain",
     "created": "2025-12-22T21:42:04.767862",
-    "last_updated": "2025-12-22T23:24:30.601290",
+    "last_updated": "2025-12-23T01:38:07.225202",
     "mode": "demo"
   },
   "summary": {
-    "total_entries": 8,
+    "total_entries": 21,
     "by_type": {
-      "ledger": 3,
-      "math_proof": 1,
-      "submission": 2,
-      "system_report": 1,
-      "error_report": 1
+      "ledger": 7,
+      "math_proof": 3,
+      "submission": 6,
+      "system_report": 3,
+      "error_report": 2
     },
     "data_sources": []
   },
@@ -46,6 +46,44 @@
           "version": "v2",
           "component": "HotReloadTest",
           "file_type": "ledger"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-23T01:35:57.802302",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "ledger"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-23T01:37:30.764970",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "ledger"
+        },
+        {
+          "test_id": "hot_reload_test_v1",
+          "timestamp": "2025-12-23T01:38:05.136293",
+          "nonce": 111111,
+          "version": "v1",
+          "component": "HotReloadTest",
+          "file_type": "ledger"
+        },
+        {
+          "test_id": "hot_reload_test_v2",
+          "timestamp": "2025-12-23T01:38:07.194194",
+          "nonce": 222222,
+          "version": "v2",
+          "component": "HotReloadTest",
+          "file_type": "ledger"
         }
       ]
     },
@@ -54,6 +92,28 @@
         {
           "test_id": "week_folder_test",
           "timestamp": "2025-12-22T21:42:04.740215",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "math_proof"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-23T01:35:57.802302",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "math_proof"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-23T01:37:30.764970",
           "mode": "demo",
           "leading_zeros": 19,
           "meets_difficulty": true,
@@ -87,6 +147,50 @@
           "block_hash": "0000000000000000000abcdef",
           "component": "TestComponent",
           "file_type": "submission"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-23T01:35:57.802302",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "submission"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-23T01:35:57.802302",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "submission"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-23T01:37:30.764970",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "submission"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-23T01:37:30.764970",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "submission"
         }
       ]
     },
@@ -102,6 +206,28 @@
           "block_hash": "0000000000000000000abcdef",
           "component": "TestComponent",
           "file_type": "system_report"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-23T01:35:57.802302",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "system_report"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-23T01:37:30.764970",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "system_report"
         }
       ]
     },
@@ -110,6 +236,17 @@
         {
           "test_id": "week_folder_test",
           "timestamp": "2025-12-22T21:42:04.740215",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "error_report"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-23T01:37:30.764970",
           "mode": "demo",
           "leading_zeros": 19,
           "meets_difficulty": true,

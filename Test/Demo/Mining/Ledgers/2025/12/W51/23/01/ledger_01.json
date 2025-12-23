@@ -1,0 +1,42 @@
+{
+  "entries": [
+    {
+      "test_id": "week_folder_test",
+      "timestamp": "2025-12-23T01:35:57.802302",
+      "mode": "demo",
+      "leading_zeros": 19,
+      "meets_difficulty": true,
+      "nonce": 123456789,
+      "block_hash": "0000000000000000000abcdef"
+    },
+    {
+      "test_id": "week_folder_test",
+      "timestamp": "2025-12-23T01:37:30.764970",
+      "mode": "demo",
+      "leading_zeros": 19,
+      "meets_difficulty": true,
+      "nonce": 123456789,
+      "block_hash": "0000000000000000000abcdef"
+    },
+    {
+      "test_id": "hot_reload_test_v1",
+      "timestamp": "2025-12-23T01:38:05.136293",
+      "nonce": 111111,
+      "version": "v1"
+    },
+    {
+      "test_id": "hot_reload_test_v2",
+      "timestamp": "2025-12-23T01:38:07.194194",
+      "nonce": 222222,
+      "version": "v2"
+    }
+  ],
+  "metadata": {
+    "created": "2025-12-23T01:35:57.804076",
+    "level": "hour",
+    "component": "TestComponent",
+    "mode": "demo",
+    "last_updated": "2025-12-23T01:38:07.195473",
+    "total_entries": 4
+  }
+}

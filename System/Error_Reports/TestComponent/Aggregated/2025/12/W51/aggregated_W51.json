@@ -5,11 +5,11 @@
     "level": "week",
     "scope": "Contains: Week W51 + all days/hours",
     "created": "2025-12-22T21:42:05.135625",
-    "last_updated": "2025-12-22T21:42:05.135621",
+    "last_updated": "2025-12-23T01:37:31.407910",
     "mode": "staging"
   },
   "summary": {
-    "total_entries": 2,
+    "total_entries": 6,
     "data_sources": [
       "System/Error_Reports/TestComponent/global_testcomponent_error.json"
     ]
@@ -30,6 +30,46 @@
         "test_id": "week_folder_test",
         "timestamp": "2025-12-22T21:42:05.062963",
         "mode": "staging",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "System/Error_Reports/TestComponent/global_testcomponent_error.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:37:31.142201",
+        "mode": "staging",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "System/Error_Reports/TestComponent/global_testcomponent_error.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:37:31.142201",
+        "mode": "staging",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "System/Error_Reports/TestComponent/global_testcomponent_error.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:37:31.276433",
+        "mode": "live",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "System/Error_Reports/TestComponent/global_testcomponent_error.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:37:31.276433",
+        "mode": "live",
         "leading_zeros": 19,
         "meets_difficulty": true,
         "nonce": 123456789,

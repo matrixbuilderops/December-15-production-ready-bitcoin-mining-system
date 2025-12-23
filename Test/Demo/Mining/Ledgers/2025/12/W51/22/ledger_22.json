@@ -8,6 +8,18 @@
       "meets_difficulty": true,
       "nonce": 123456789,
       "block_hash": "0000000000000000000abcdef"
+    },
+    {
+      "test_id": "hot_reload_test_v1",
+      "timestamp": "2025-12-22T23:24:28.510591",
+      "nonce": 111111,
+      "version": "v1"
+    },
+    {
+      "test_id": "hot_reload_test_v2",
+      "timestamp": "2025-12-22T23:24:30.577236",
+      "nonce": 222222,
+      "version": "v2"
     }
   ],
   "metadata": {
@@ -15,7 +27,7 @@
     "level": "day",
     "component": "HotReloadTest",
     "mode": "demo",
-    "last_updated": "2025-12-22T23:24:28.511929",
-    "total_entries": 1
+    "last_updated": "2025-12-23T01:35:57.804076",
+    "total_entries": 3
   }
 }

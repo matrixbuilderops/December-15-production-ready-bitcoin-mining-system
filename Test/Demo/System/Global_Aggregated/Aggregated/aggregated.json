@@ -3,18 +3,18 @@
     "file_type": "aggregated_index_root",
     "component": "Brain",
     "created": "2025-12-19T14:25:36.599724",
-    "last_updated": "2025-12-22T23:24:30.601290",
+    "last_updated": "2025-12-23T01:38:07.225202",
     "mode": "demo"
   },
   "summary": {
-    "total_entries": 112,
+    "total_entries": 125,
     "by_type": {
-      "system_report": 83,
-      "ledger": 15,
+      "system_report": 85,
+      "ledger": 19,
       "submission_log": 10,
-      "math_proof": 1,
-      "submission": 2,
-      "error_report": 1
+      "math_proof": 3,
+      "submission": 6,
+      "error_report": 2
     },
     "data_sources": []
   },
@@ -1099,6 +1099,28 @@
           "block_hash": "0000000000000000000abcdef",
           "component": "TestComponent",
           "file_type": "system_report"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-23T01:35:57.802302",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "system_report"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-23T01:37:30.764970",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "system_report"
         }
       ]
     },
@@ -1442,6 +1464,44 @@
           "version": "v2",
           "component": "HotReloadTest",
           "file_type": "ledger"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-23T01:35:57.802302",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "ledger"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-23T01:37:30.764970",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "ledger"
+        },
+        {
+          "test_id": "hot_reload_test_v1",
+          "timestamp": "2025-12-23T01:38:05.136293",
+          "nonce": 111111,
+          "version": "v1",
+          "component": "HotReloadTest",
+          "file_type": "ledger"
+        },
+        {
+          "test_id": "hot_reload_test_v2",
+          "timestamp": "2025-12-23T01:38:07.194194",
+          "nonce": 222222,
+          "version": "v2",
+          "component": "HotReloadTest",
+          "file_type": "ledger"
         }
       ]
     },
@@ -1771,6 +1831,28 @@
           "block_hash": "0000000000000000000abcdef",
           "component": "TestComponent",
           "file_type": "math_proof"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-23T01:35:57.802302",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "math_proof"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-23T01:37:30.764970",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "math_proof"
         }
       ]
     },
@@ -1797,6 +1879,50 @@
           "block_hash": "0000000000000000000abcdef",
           "component": "TestComponent",
           "file_type": "submission"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-23T01:35:57.802302",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "submission"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-23T01:35:57.802302",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "submission"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-23T01:37:30.764970",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "submission"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-23T01:37:30.764970",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "submission"
         }
       ]
     },
@@ -1805,6 +1931,17 @@
         {
           "test_id": "week_folder_test",
           "timestamp": "2025-12-22T21:42:04.740215",
+          "mode": "demo",
+          "leading_zeros": 19,
+          "meets_difficulty": true,
+          "nonce": 123456789,
+          "block_hash": "0000000000000000000abcdef",
+          "component": "TestComponent",
+          "file_type": "error_report"
+        },
+        {
+          "test_id": "week_folder_test",
+          "timestamp": "2025-12-23T01:37:30.764970",
           "mode": "demo",
           "leading_zeros": 19,
           "meets_difficulty": true,

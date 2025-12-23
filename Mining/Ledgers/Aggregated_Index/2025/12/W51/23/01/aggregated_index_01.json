@@ -1,0 +1,185 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_hour",
+    "component": "TestComponent",
+    "level": "hour",
+    "scope": "Contains: Hour 01 only",
+    "created": "2025-12-23T01:35:58.116717",
+    "last_updated": "2025-12-23T01:37:31.304654",
+    "mode": "staging"
+  },
+  "summary": {
+    "total_entries": 8,
+    "data_sources": [
+      "Mining/Ledgers/ledger_global.json",
+      "Mining/Ledgers/math_proof_global.json"
+    ]
+  },
+  "aggregated_data": {
+    "entries": [
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:35:58.113982",
+        "mode": "staging",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Mining/Ledgers/ledger_global.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:35:58.113982",
+        "mode": "staging",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Mining/Ledgers/ledger_global.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:35:58.211786",
+        "mode": "live",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Mining/Ledgers/ledger_global.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:35:58.211786",
+        "mode": "live",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Mining/Ledgers/ledger_global.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:37:31.142201",
+        "mode": "staging",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Mining/Ledgers/ledger_global.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:37:31.142201",
+        "mode": "staging",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Mining/Ledgers/ledger_global.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:37:31.276433",
+        "mode": "live",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Mining/Ledgers/ledger_global.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:37:31.276433",
+        "mode": "live",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Mining/Ledgers/ledger_global.json"
+      }
+    ],
+    "proofs": [
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:35:58.113982",
+        "mode": "staging",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Mining/Ledgers/math_proof_global.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:35:58.113982",
+        "mode": "staging",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Mining/Ledgers/math_proof_global.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:35:58.211786",
+        "mode": "live",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Mining/Ledgers/math_proof_global.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:35:58.211786",
+        "mode": "live",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Mining/Ledgers/math_proof_global.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:37:31.142201",
+        "mode": "staging",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Mining/Ledgers/math_proof_global.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:37:31.142201",
+        "mode": "staging",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Mining/Ledgers/math_proof_global.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:37:31.276433",
+        "mode": "live",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Mining/Ledgers/math_proof_global.json"
+      },
+      {
+        "test_id": "week_folder_test",
+        "timestamp": "2025-12-23T01:37:31.276433",
+        "mode": "live",
+        "leading_zeros": 19,
+        "meets_difficulty": true,
+        "nonce": 123456789,
+        "block_hash": "0000000000000000000abcdef",
+        "source_path": "Mining/Ledgers/math_proof_global.json"
+      }
+    ]
+  },
+  "sub_levels": []
+}
