@@ -9637,13 +9637,7 @@ server=1
             status_updates = {
                 "global_submission": "not_submitted",
                 "hourly_submission": "not_submitted", 
-                "global_ledger": "not_submitted"
-            }
-            
-            logging.info(f"📝 Status updates for problem block: {status_updates}")
-            
-        except Exception as e:
-            logging.error(f"❌ Error updating status files for problem block: {e}")
+                "global_ledger": "not_submitted",
     
     def _save_failed_consensus_report(self, consensus_report: dict, mining_results: dict):
         """Save failed consensus report for analysis"""
