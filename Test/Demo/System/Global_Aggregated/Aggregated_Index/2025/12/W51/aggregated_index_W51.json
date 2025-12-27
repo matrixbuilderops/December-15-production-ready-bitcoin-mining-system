@@ -1,0 +1,49 @@
+{
+  "metadata": {
+    "file_type": "aggregated_index_week",
+    "component": "Brain",
+    "created": "2025-12-26T14:15:26.765428",
+    "last_updated": "2025-12-26T14:15:26.776424",
+    "mode": "demo"
+  },
+  "summary": {
+    "total_entries": 2,
+    "by_type": {
+      "system_report": 2
+    },
+    "data_sources": []
+  },
+  "aggregated_data": {
+    "system_report": {
+      "entries": [
+        {
+          "timestamp": "2025-12-26T14:15:26.757341",
+          "component": "Brainstem",
+          "event": "initialization_complete",
+          "mode": "demo",
+          "base_path": "Test/Demo/Mining",
+          "total_folders": 23,
+          "status": "success",
+          "file_type": "system_report"
+        },
+        {
+          "timestamp": "2025-12-26T14:15:26.767700",
+          "component": "Brain",
+          "event": "orchestration_complete",
+          "mode": "demo",
+          "base_path": "Test/Demo/Mining",
+          "components_initialized": [
+            "Brainstem",
+            "DTM",
+            "Looping",
+            "Miners"
+          ],
+          "total_folders_created": 23,
+          "brain_qtl_version": "3.2",
+          "status": "operational",
+          "file_type": "system_report"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "rpcuser": "SignalCoreBitcoin",
+  "rpcpassword": "B1tc0n4L1dz",
+  "rpc_host": "127.0.0.1",
+  "rpc_port": 8332,
+  "wallet_name": "SignalCoreBitcoinWallet",
+  "payout_address": "bc1qrqk4qwwy37xtpcvxs7ayeufld07tja652ka2wv",
+  "bitcoin_rpc": {
+    "host": "127.0.0.1",
+    "port": 8332,
+    "username": "SignalCoreBitcoin",
+    "password": "B1tc0n4L1dz",
+    "wallet_name": "SignalCoreBitcoinWallet",
+    "timeout": 30
+  },
+  "bitcoin_node": {
+    "auto_configure": false,
+    "conf_file_path": "bitcoin.conf"
+  },
+  "pool_config": {
+    "enabled": false,
+    "pool_url": "",
+    "pool_username": "",
+    "pool_password": "",
+    "solo_mining": true
+  },
+  "zmq": {
+    "enabled": true,
+    "host": "127.0.0.1",
+    "rawblock_port": 28333,
+    "hashblock_port": 28335,
+    "rawblock_endpoint": "tcp://127.0.0.1:28333",
+    "hashblock_endpoint": "tcp://127.0.0.1:28335"
+  },
+  "hardware": {
+    "auto_detect": true,
+    "miner_processes": "auto",
+    "cpu_cores_reserved": 2,
+    "max_memory_gb": 60
+  }
+}

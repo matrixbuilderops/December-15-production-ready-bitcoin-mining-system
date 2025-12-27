@@ -2,8 +2,8 @@
   "metadata": {
     "created_by": "Looping",
     "version": "1.0",
-    "created": "2025-12-19T14:25:36.584480-06:00",
-    "last_updated": "2025-12-20T15:14:11.811311"
+    "created": "2025-12-26T14:15:26.750099-06:00",
+    "last_updated": "2025-12-26T14:15:26.750104-06:00"
   },
   "total_mining_sessions": 50,
   "total_templates_distributed": 150,
@@ -15,62 +15,6 @@
       "templates_distributed": 1,
       "miners_active": 5,
       "submissions_sent": 1
-    },
-    {
-      "timestamp": "2025-12-20T19:15:35.002280+00:00",
-      "component": "Looping",
-      "event": "startup",
-      "mode": "demo",
-      "blocks_target": 1,
-      "status": "initialized"
-    },
-    {
-      "timestamp": "2025-12-20T19:16:04.768661+00:00",
-      "component": "Looping",
-      "event": "startup",
-      "mode": "demo",
-      "blocks_target": 1,
-      "status": "initialized"
-    },
-    {
-      "timestamp": "2025-12-20T19:17:01.704753+00:00",
-      "component": "Looping",
-      "event": "startup",
-      "mode": "demo",
-      "blocks_target": 1,
-      "status": "initialized"
-    },
-    {
-      "timestamp": "2025-12-20T19:21:03.158094+00:00",
-      "component": "Looping",
-      "event": "startup",
-      "mode": "demo",
-      "blocks_target": 1,
-      "status": "initialized"
-    },
-    {
-      "timestamp": "2025-12-20T19:45:46.151301+00:00",
-      "component": "Looping",
-      "event": "startup",
-      "mode": "demo",
-      "blocks_target": 1,
-      "status": "initialized"
-    },
-    {
-      "timestamp": "2025-12-20T19:46:29.096797+00:00",
-      "component": "Looping",
-      "event": "startup",
-      "mode": "demo",
-      "blocks_target": 1,
-      "status": "initialized"
-    },
-    {
-      "timestamp": "2025-12-20T21:14:11.811275+00:00",
-      "component": "Looping",
-      "event": "startup",
-      "mode": "demo",
-      "blocks_target": 1,
-      "status": "initialized"
     }
   ]
 }

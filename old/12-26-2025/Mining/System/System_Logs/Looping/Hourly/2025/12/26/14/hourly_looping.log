@@ -1,0 +1,11 @@
+2025-12-26 14:14:44,091 - INFO - ✅ Configuration loaded from /media/phantomcore/AI_DRIVE/AI_Shit_mining/new testing/December 15 production ready bitcoin mining system/config.json
+2025-12-26 14:14:44,091 - INFO - ✅ ZMQ configuration loaded from config.json: ['rawblock', 'hashblock']
+2025-12-26 14:14:45,111 - INFO - ✅ Brain.QTL file structure initialized via Brainstem
+2025-12-26 14:14:45,116 - INFO - 📁 Ensuring all essential Bitcoin mining files are created...
+2025-12-26 14:14:45,116 - INFO - ✅ CLEAN organized file structure initialization complete
+2025-12-26 14:14:45,116 - INFO - 📁 Structure: Mining/Ledgers/Year/Month/Day/Hour/, Mining/{Ledger,Template,System}/
+2025-12-26 14:14:45,117 - INFO - 🎮 Demo mode enabled - using simulated mining
+2025-12-26 14:14:45,117 - INFO - 🎮 Demo mode: Skipping ZMQ setup (not needed)
+2025-12-26 14:14:45,117 - INFO - 🚀 Running early Production Miner verification...
+2025-12-26 14:14:45,124 - INFO - ✅ Production Miner verification passed - ready for mining
+2025-12-26 14:14:45,124 - ERROR - ❌ No mining mode specified.
