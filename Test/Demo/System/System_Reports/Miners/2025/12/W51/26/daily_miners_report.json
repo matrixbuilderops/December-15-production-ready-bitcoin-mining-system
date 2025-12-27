@@ -1,0 +1,18 @@
+{
+  "metadata": {
+    "file_type": "daily_miners_report",
+    "component": "Miners",
+    "level": "day",
+    "created": "2025-12-26T14:15:26.742818",
+    "mode": "demo",
+    "time_scope": {
+      "year": "2025",
+      "month": "12",
+      "week": "W51",
+      "day": "26",
+      "hour": null
+    },
+    "note": "Created from Brain.QTL pattern_levels - fallback structure"
+  },
+  "entries": []
+}
