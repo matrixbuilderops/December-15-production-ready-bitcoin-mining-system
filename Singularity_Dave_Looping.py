@@ -33,34 +33,116 @@ HAS_CONFIRMATION_MONITOR = False
 # File structure management - handled by Brain.QTL
 HAS_HIERARCHICAL = True
 
-def write_hierarchical_ledger(data, base_path="Mining", component="Looping", file_type="ledger"):
-    """Brain.QTL-driven hierarchical file management"""
+def write_hierarchical_ledger(entry_data, base_path="Mining", ledger_type="Looping", ledger_name="ledger", mode="production"):
+    """
+    Brain.QTL-driven hierarchical file management
+    Writes data to global, year, month, week, day, and hour files.
+    """
     import os
+    import json
     from datetime import datetime
-    
+    from pathlib import Path
+
+    # Alias for backward compatibility if needed
+    data = entry_data
+    component = ledger_type
+    file_type = ledger_name
+
     now = datetime.now()
     year = now.strftime("%Y")
     month = now.strftime("%m") 
     day = now.strftime("%d")
     hour = now.strftime("%H")
+    week = f"W{now.strftime('%W')}"
     
-    # Create hierarchical path based on Brain.QTL folder_management structure
+    # Determine base directory based on file type and component
     if file_type == "ledger":
-        hierarchy_path = f"{base_path}/Ledgers/{year}/{month}/{day}/{hour}"
+        base_dir = f"{base_path}/Ledgers"
     elif file_type == "submission":
-        hierarchy_path = f"{base_path}/Submissions/{year}/{month}/{day}/{hour}"
+        base_dir = f"{base_path}/Submission_Logs" # Corrected from Submissions
     elif file_type == "system_report":
-        hierarchy_path = f"{base_path}/System/System_Reports/{component}/Hourly/{year}/{month}/{day}/{hour}"
+        base_dir = f"{base_path}/System/System_Reports/{component}"
     elif file_type == "system_log":
-        hierarchy_path = f"{base_path}/System/System_Logs/{component}/Hourly/{year}/{month}/{day}/{hour}"
+        base_dir = f"{base_path}/System/System_Logs/{component}"
     elif file_type == "error_report":
-        hierarchy_path = f"{base_path}/System/Error_Reports/{component}/Hourly/{year}/{month}/{day}/{hour}"
+        base_dir = f"{base_path}/System/Error_Reports/{component}"
     else:
-        hierarchy_path = f"{base_path}/{component}/{year}/{month}/{day}/{hour}"
+        base_dir = f"{base_path}/{component}"
+
+    bp = Path(base_dir)
+    yd = bp / year
+    md = yd / month
+    wd = md / week
+    dd = md / day
+    hd = dd / hour
     
-    # Ensure directory exists
-    os.makedirs(hierarchy_path, exist_ok=True)
-    return hierarchy_path
+    results = {}
+    
+    # Create all directories
+    for d in [bp, yd, md, wd, dd, hd]:
+        d.mkdir(parents=True, exist_ok=True)
+    
+    # Define file names for each level
+    # Using standard naming convention: global_{level}_{file_type}.json
+    # e.g. global_year_ledger.json, global_month_submission.json
+    
+    levels = [
+        ("global", bp, f"global_{file_type}.json"),
+        ("year", yd, f"global_{file_type}_{year}.json"),
+        ("month", md, f"global_{file_type}_{month}.json"),
+        ("week", wd, f"global_{file_type}_{week}.json"),
+        ("day", dd, f"global_{file_type}_{day}.json"),
+        ("hour", hd, f"hourly_{file_type}.json") # Hour is usually "hourly_"
+    ]
+    
+    for level_name, dir_path, filename in levels:
+        file_path = dir_path / filename
+        try:
+            file_data = {
+                "metadata": {
+                    "file_type": f"{level_name}_{file_type}",
+                    "level": level_name,
+                    "component": component,
+                    "created": now.isoformat(),
+                    "last_updated": now.isoformat(),
+                    "mode": mode
+                },
+                "entries": []
+            }
+            
+            # Load existing data if file exists
+            if file_path.exists():
+                try:
+                    with open(file_path, 'r') as f:
+                        existing_data = json.load(f)
+                        if isinstance(existing_data, dict):
+                            file_data = existing_data
+                            # Ensure entries list exists
+                            if "entries" not in file_data:
+                                file_data["entries"] = []
+                except json.JSONDecodeError:
+                    pass # Overwrite corrupt file
+            
+            # Append new entry
+            file_data["entries"].append(entry_data)
+            
+            # Update metadata
+            if "metadata" not in file_data:
+                file_data["metadata"] = {}
+            file_data["metadata"]["last_updated"] = now.isoformat()
+            file_data["metadata"]["total_entries"] = len(file_data["entries"])
+            
+            # Write back
+            with open(file_path, 'w') as f:
+                json.dump(file_data, f, indent=2)
+                
+            results[level_name] = {"success": True, "path": str(file_path)}
+            
+        except Exception as e:
+            results[level_name] = {"success": False, "error": str(e)}
+            print(f"❌ Failed to write {level_name} ledger: {e}")
+
+    return results
 
 class HierarchicalFileManager:
     """Brain.QTL-based hierarchical file management"""
@@ -156,9 +238,19 @@ except ImportError:
 import os
 from datetime import datetime
 
-def setup_brain_coordinated_logging(component_name, base_dir="Mining/System"):
+def setup_brain_coordinated_logging(component_name, base_dir=None):
     """Setup logging according to Brain.QTL component-based structure"""
-    # Component-based: Mining/System/System_Logs/Looping/Global/ and System_Logs/Looping/Hourly/
+    # Determine base_dir dynamically if not provided
+    if base_dir is None:
+        # Try to detect mode from sys.argv
+        if "--demo" in sys.argv:
+            base_dir = "Test/Demo/System"
+        elif "--test-mode" in sys.argv or "--test" in sys.argv:
+            base_dir = "Test/Test mode/System"
+        else:
+            base_dir = "System" # Root System folder for production
+            
+    # Component-based: System/System_Logs/Looping/Global/ and System_Logs/Looping/Hourly/
     log_dir = os.path.join(base_dir, "System_Logs", "Looping", "Global")
     os.makedirs(log_dir, exist_ok=True)
     
@@ -800,8 +892,8 @@ class BitcoinLoopingSystem:
         self.mining_dir = self.base_dir / "Mining"
         self.ledger_dir = self.mining_dir / "Ledgers"  # PROPER: Mining/Ledgers/
         self.submission_dir = self.mining_dir / "Submissions"  # PROPER: Mining/Submissions/
-        self.template_dir = self.mining_dir / "Temporary Template"
-        self.temporary_template_dir = self.mining_dir / "Temporary Template"  # FIX: Missing temporary_template_dir
+        self.template_dir = self.mining_dir / "Temporary/Template"
+        self.temporary_template_dir = self.mining_dir / "Temporary/Template"  # FIX: Missing temporary_template_dir
         # NOTE: centralized_template_file will be set AFTER mode-specific path setup
 
         # Main submission log path - SPEC COMPLIANCE: Use Submissions
@@ -889,9 +981,9 @@ class BitcoinLoopingSystem:
     def get_temporary_template_dir(self):
         """Get correct temporary template directory based on mode."""
         if self.demo_mode:
-            return Path("Test/Demo/Mining/Temporary Template")
+            return Path("Test/Demo/Mining/Temporary/Template")
         else:
-            return Path("Mining/Temporary Template")
+            return Path("Mining/Temporary/Template")
 
         # NOTE: Dynamic daemon folders will be created after mode-specific paths are set
 
@@ -933,7 +1025,7 @@ class BitcoinLoopingSystem:
         self.miner_command_queue = []
         # Miner control files - USE TEMPORARY TEMPLATE, NOT SHARED_STATE
         # Communication happens through Temporary Template folders (process_1, process_2, etc.)
-        base_temp_path = "Test/Demo/Mining/Temporary Template" if self.demo_mode else "Mining/Temporary Template"
+        base_temp_path = "Test/Demo/Mining/Temporary/Template" if self.demo_mode else "Mining/Temporary/Template"
         self.miner_status_file = Path(f"{base_temp_path}/miner_status.json")
         self.miner_control_file = Path(f"{base_temp_path}/miner_control.json")
 
@@ -1107,7 +1199,8 @@ class BitcoinLoopingSystem:
             # SPECIFICATION COMPLIANCE: Only create Temporary Template and Ledgers folders
             # Per System folders Root System.txt - Hourly files in YYYY/MM/DD/HH structure
             enhanced_dirs = [
-                self.mining_dir / "Temporary Template",
+                self.mining_dir / "Temporary/Template",
+                self.mining_dir / "Temporary/User_Look_At",
             ]
             
             for dir_path in enhanced_dirs:
@@ -1137,7 +1230,7 @@ class BitcoinLoopingSystem:
                 return hourly_dir / f"looping_final_submission_{time_str}.json"
             elif submission_type == "coordination":
                 # Use Temporary Template for coordination files
-                temp_dir = self.mining_dir / "Temporary Template"
+                temp_dir = self.mining_dir / "Temporary/Template"
                 temp_dir.mkdir(parents=True, exist_ok=True) 
                 return temp_dir / f"looping_coordination_{time_str}.json"
             else:
@@ -15608,6 +15701,85 @@ def determine_days_from_period_flags(args):
     return 1
 
 
+def load_dynamic_flags():
+    """Load dynamic flags from System_File_Examples/flags.json"""
+    try:
+        # Try multiple locations for robustness
+        possible_paths = [
+            Path("System_File_Examples/flags.json"),
+            Path(__file__).parent / "System_File_Examples/flags.json",
+            Path("Mining/System/System_File_Examples/flags.json")
+        ]
+        
+        for flags_path in possible_paths:
+            if flags_path.exists():
+                with open(flags_path, 'r') as f:
+                    return json.load(f)
+    except Exception as e:
+        # Silent failure is okay here, fallback to hardcoded
+        pass
+    return {}
+
+def preprocess_natural_language_args(argv):
+    """
+    Convert natural language arguments to flags.
+    e.g. "2 blocks" -> "--block 2"
+    e.g. "blocks 2" -> "--block 2"
+    """
+    dynamic_config = load_dynamic_flags()
+    mappings = dynamic_config.get("natural_language_mappings", {
+        "blocks": "--block",
+        "block": "--block",
+        "days": "--day",
+        "day": "--day"
+    })
+    
+    # Skip script name
+    if not argv:
+        return argv
+        
+    script_name = argv[0]
+    args = argv[1:]
+    new_args = []
+    
+    i = 0
+    while i < len(args):
+        arg = args[i]
+        
+        # Check for "N blocks" pattern (number followed by keyword)
+        if arg.isdigit() and i + 1 < len(args):
+            next_arg = args[i+1].lower()
+            # Handle plural/singular variations
+            if next_arg in mappings or next_arg.rstrip('s') in mappings:
+                key = next_arg if next_arg in mappings else next_arg.rstrip('s')
+                flag = mappings.get(key, mappings.get(key + 's'))
+                if flag:
+                    new_args.append(flag)
+                    new_args.append(arg)
+                    i += 2
+                    continue
+        
+        # Check for "blocks N" pattern (keyword followed by number)
+        lower_arg = arg.lower()
+        if lower_arg in mappings or lower_arg.rstrip('s') in mappings:
+            key = lower_arg if lower_arg in mappings else lower_arg.rstrip('s')
+            flag = mappings.get(key, mappings.get(key + 's'))
+            
+            if flag:
+                # Check if next arg is a number
+                if i + 1 < len(args) and args[i+1].isdigit():
+                    new_args.append(flag)
+                    new_args.append(args[i+1])
+                    i += 2
+                    continue
+                # Or just a flag switch if no number follows (though blocks usually needs N)
+                # But for things like "demo mode", it might be just a switch
+        
+        new_args.append(arg)
+        i += 1
+        
+    return [script_name] + new_args
+
 def create_parser():
     """Create comprehensive argument parser with all flags including smoke tests."""
     parser = argparse.ArgumentParser(
@@ -15616,12 +15788,18 @@ def create_parser():
         epilog="""
 Examples:
   python3 Singularity_Dave_Looping.py --block 6             # Mine 6 blocks
+  python3 Singularity_Dave_Looping.py 6 blocks              # Natural language: Mine 6 blocks
+  python3 Singularity_Dave_Looping.py blocks 6              # Natural language: Mine 6 blocks
   python3 Singularity_Dave_Looping.py --smoke-test          # Run individual smoke test
   python3 Singularity_Dave_Looping.py --smoke-network       # Run comprehensive network smoke test
   python3 Singularity_Dave_Looping.py --block-random        # Random mine blocks
   python3 Singularity_Dave_Looping.py --block-all --day 7   # Mine continuously for 7 days
 """
     )
+
+    # Load dynamic flags
+    dynamic_config = load_dynamic_flags()
+    system_flags = dynamic_config.get("system_flags", {})
 
     # Mining modes
     parser.add_argument('--block', type=int, help='Number of blocks to mine (1-144 per day)')
@@ -15647,6 +15825,22 @@ Examples:
     parser.add_argument('--sandbox', action='store_true', help='Run production code without network submission')
     parser.add_argument('--staging', action='store_true', help='Run in staging mode for pre-production testing')
     parser.add_argument('--verbose', action='store_true', help='Enable verbose logging')
+    
+    # Dynamic flags injection (if not already defined)
+    existing_actions = {a.dest for a in parser._actions}
+    for flag_name, flag_data in system_flags.items():
+        dest = flag_name.lstrip('-').replace('-', '_')
+        if dest not in existing_actions:
+            kwargs = {'help': flag_data.get('description', '')}
+            if flag_data.get('type') == 'boolean':
+                kwargs['action'] = 'store_true'
+            elif flag_data.get('type') == 'integer':
+                kwargs['type'] = int
+            
+            if 'default' in flag_data:
+                kwargs['default'] = flag_data['default']
+                
+            parser.add_argument(flag_name, **kwargs)
 
     # Emergency controls
     parser.add_argument('--kill-all-miners', action='store_true', help='Emergency: Kill all production miner processes')
@@ -15663,11 +15857,12 @@ async def main():
     """Main entry point for the looping system."""
     parser = create_parser()
 
-    # Parse arguments with proper error handling
-
-    # Parse arguments with proper error handling
+    # Parse arguments with proper error handling and natural language support
     try:
-        args = parser.parse_args()
+        # Preprocess arguments for natural language support (e.g. "2 blocks")
+        processed_args = preprocess_natural_language_args(sys.argv)
+        # Pass arguments excluding script name
+        args = parser.parse_args(processed_args[1:])
     except SystemExit as e:
         if e.code == 2:  # argparse error code for invalid arguments
             print("\n❌ INVALID ARGUMENTS ERROR")

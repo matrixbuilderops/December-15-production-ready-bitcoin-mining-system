@@ -54,6 +54,82 @@ except Exception:
 
 
 # ============================================================================
+# BRAIN.QTL PATH RESOLVER - Single Source of Truth
+# ============================================================================
+def _load_brain_qtl():
+    """Load Brain.QTL configuration"""
+    try:
+        brain_path = Path(__file__).parent / "Singularity_Dave_Brain.QTL"
+        if brain_path.exists():
+            with open(brain_path, 'r') as f:
+                return yaml.safe_load(f)
+    except Exception as e:
+        print(f"⚠️ Could not load Brain.QTL: {e}")
+    return {}
+
+def _get_mode_base_path(mode):
+    """Get base path from Brain.QTL for given mode"""
+    brain = _load_brain_qtl()
+    flag_mapping = brain.get("flag_mode_mapping", {})
+    
+    if mode == "demo":
+        return flag_mapping.get("demo_mode", {}).get("base_path", "Test/Demo")
+    elif mode == "test":
+        return flag_mapping.get("test_mode", {}).get("base_path", "Test/Test mode")
+    else:  # staging or live (both use root)
+        return ""  # Root level - Mining/ and System/ at root
+
+def _build_path(mode, path_type, component=None):
+    """Build path dynamically from Brain.QTL structure
+    
+    Args:
+        mode: demo, test, staging, live
+        path_type: ledger, submission, system_report, error_report, global_aggregated
+        component: Brain, Brainstem, DTM, Looping, production_miners (for system paths)
+    """
+    base = _get_mode_base_path(mode)
+    
+    # Build full path
+    if base:
+        prefix = f"{base}/"
+    else:
+        prefix = ""
+    
+    # Mining paths (only staging/live create root Mining/)
+    if path_type == "ledger":
+        return f"{prefix}Mining/Ledgers"
+    elif path_type == "ledger_aggregated":
+        return f"{prefix}Mining/Ledgers/Aggregated"
+    elif path_type == "ledger_aggregated_index":
+        return f"{prefix}Mining/Ledgers/Aggregated_Index"
+    elif path_type == "submission":
+        return f"{prefix}Mining/Submission_Logs"
+    elif path_type == "temp_template":
+        return f"{prefix}Mining/Temporary/Template"
+    elif path_type == "user_look_at":
+        return f"{prefix}Mining/Temporary/User_Look_At"
+    
+    # System paths
+    elif path_type == "system_report" and component:
+        return f"{prefix}System/System_Reports/{component}"
+    elif path_type == "system_aggregated":
+        return f"{prefix}System/System_Reports/Aggregated"
+    elif path_type == "system_aggregated_index":
+        return f"{prefix}System/System_Reports/Aggregated_Index"
+    elif path_type == "error_report" and component:
+        return f"{prefix}System/Error_Reports/{component}"
+    elif path_type == "error_aggregated":
+        return f"{prefix}System/Error_Reports/Aggregated"
+    elif path_type == "error_aggregated_index":
+        return f"{prefix}System/Error_Reports/Aggregated_Index"
+    elif path_type == "global_aggregated":
+        return f"{prefix}System/Global_Aggregated/Aggregated"
+    elif path_type == "global_aggregated_index":
+        return f"{prefix}System/Global_Aggregated/Aggregated_Index"
+    else:
+        return base if base else "."
+
+# ============================================================================
 # SYSTEM EXAMPLE FILE READER
 # ============================================================================
 def _read_example_file(filename):
@@ -68,16 +144,17 @@ def _read_example_file(filename):
     return {}
 
 def _create_dynamic_hourly_path(base_dir):
-    """Create dynamic YYYY/MM/DD/HH folder structure"""
+    """Create dynamic YYYY/MM/WXX/DD/HH folder structure"""
     now = datetime.now()
     year = f"{now.year:04d}"
     month = f"{now.month:02d}"
+    week = f"W{now.strftime('%W')}"
     day = f"{now.day:02d}"
     hour = f"{now.hour:02d}"
     
-    hourly_path = Path(base_dir) / year / month / day / hour
+    hourly_path = Path(base_dir) / year / month / week / day / hour
     hourly_path.mkdir(parents=True, exist_ok=True)
-    return hourly_path, f"{year}/{month}/{day}/{hour}"
+    return hourly_path, f"{year}/{month}/{week}/{day}/{hour}"
 
 def _initialize_file_with_structure(filepath, example_filename):
     """Initialize file with structure from example"""
@@ -216,431 +293,97 @@ def brain_get_math_config(mode="live"):
 
 
 # =====================================================
-# ENVIRONMENT LAYOUT DEFINITIONS
+# ENVIRONMENT LAYOUT - DYNAMIC FROM BRAIN.QTL
 # =====================================================
 
-ENVIRONMENT_LAYOUTS = {
-    "Mining": {
-        "base": "Mining",
-        "output_dir": "Mining",
-        "temporary_template_dir": "Mining/Temporary Template",
+def get_environment_layout(mode="live"):
+    """
+    Dynamically generate environment layout from Brain.QTL.
+    Replaces hardcoded ENVIRONMENT_LAYOUTS dictionary.
+    
+    Args:
+        mode: One of "demo", "test", "staging", "live"
+    
+    Returns:
+        dict: Complete environment layout for the requested mode
+    """
+    # Get base path from Brain.QTL
+    if mode == "demo":
+        base = "Test/Demo"
+        mining_base = f"{base}/Mining"
+    elif mode == "test":
+        base = "Test/Test mode"
+        mining_base = f"{base}/Mining"
+    else:  # staging, live
+        base = "."
+        mining_base = "Mining"
+    
+    # Build layout structure
+    layout = {
+        "base": mining_base,
+        "output_dir": mining_base,
+        "temporary_template_dir": f"{mining_base}/Temporary/Template",
+        "user_look_at_dir": f"{mining_base}/Temporary/User_Look_At",
         "ledgers": {
-            "base_dir": "Mining/Ledgers",
-            "global_dir": "Mining/Ledgers",
+            "base_dir": f"{mining_base}/Ledgers",
+            "global_dir": f"{mining_base}/Ledgers",
             "global_files": {
                 "ledger": "global_ledger.json",
                 "math_proof": "global_math_proof.json",
             },
-            "hourly_dir_template": (
-                "Mining/Ledgers/{year}/{month}/{day}/{hour}"
-            ),
+            "hourly_dir_template": f"{mining_base}/Ledgers/{{year}}/{{month}}/W{{week}}/{{day}}/{{hour}}",
             "hourly_files": {
                 "ledger": "hourly_ledger.json",
                 "math_proof": "hourly_math_proof.json",
             },
         },
         "submissions": {
-            "base_dir": "Mining/Submission_Logs",
-            "global_dir": "Mining/Submission_Logs",
+            "base_dir": f"{mining_base}/Submission_Logs",
+            "global_dir": f"{mining_base}/Submission_Logs",
             "global_file": "global_submission.json",
-            "hourly_dir_template": (
-                "Mining/Submission_Logs/{year}/{month}/W{week}/{day}/{hour}"
-            ),
+            "hourly_dir_template": f"{mining_base}/Submission_Logs/{{year}}/{{month}}/W{{week}}/{{day}}/{{hour}}",
             "hourly_file": "hourly_submission.json",
         },
         "system": {
-            "base_dir": "Mining/System",
-            # Component-based System folder structure
-            "brain": {
-                "global_dir": "Mining/System/Brain/Global",
-                "hourly_dir_template": "Mining/System/Brain/Hourly/{year}/{month}/{week}/{day}/{hour}",
-                "files": {
-                    "report": "global_brain_report.json",
-                    "error": "global_brain_error.json",
-                    "log": "global_brain.log",
-                    "hourly_report": "hourly_brain_report.json",
-                    "hourly_error": "hourly_brain_error.json",
-                    "hourly_log": "hourly_brain.log",
-                },
+            "base_dir": f"{base}/System" if base != "." else "System",
+        }
+    }
+    
+    # Add component-specific system folders
+    components = ["Brain", "Brainstem", "DTM", "Looping", "Miners"]
+    system_base = f"{base}/System" if base != "." else "System"
+    
+    for comp in components:
+        comp_lower = comp.lower()
+        layout["system"][comp_lower] = {
+            "global_dir": f"{system_base}/System_Reports/{comp}/Global",
+            "hourly_dir_template": f"{system_base}/System_Reports/{comp}/Hourly/{{year}}/{{month}}/W{{week}}/{{day}}/{{hour}}",
+            "files": {
+                "report": f"global_{comp_lower}_report.json",
+                "error": f"global_{comp_lower}_error.json",
+                "log": f"global_{comp_lower}.log",
+                "hourly_report": f"hourly_{comp_lower}_report.json",
+                "hourly_error": f"hourly_{comp_lower}_error.json",
+                "hourly_log": f"hourly_{comp_lower}.log",
             },
-            "brainstem": {
-                "global_dir": "Mining/System/Brainstem/Global",
-                "hourly_dir_template": "Mining/System/Brainstem/Hourly/{year}/{month}/{week}/{day}/{hour}",
-                "files": {
-                    "report": "global_brainstem_report.json",
-                    "error": "global_brainstem_error.json",
-                    "log": "global_brainstem.log",
-                    "hourly_report": "hourly_brainstem_report.json",
-                    "hourly_error": "hourly_brainstem_error.json",
-                    "hourly_log": "hourly_brainstem.log",
-                },
-            },
-            "dtm": {
-                "global_dir": "Mining/System/DTM/Global",
-                "hourly_dir_template": "Mining/System/DTM/Hourly/{year}/{month}/{week}/{day}/{hour}",
-                "files": {
-                    "report": "global_dtm_report.json",
-                    "error": "global_dtm_error.json",
-                    "log": "global_dtm.log",
-                    "hourly_report": "hourly_dtm_report.json",
-                    "hourly_error": "hourly_dtm_error.json",
-                    "hourly_log": "hourly_dtm.log",
-                },
-            },
-            "looping": {
-                "global_dir": "Mining/System/Looping/Global",
-                "hourly_dir_template": "Mining/System/Looping/Hourly/{year}/{month}/{week}/{day}/{hour}",
-                "files": {
-                    "report": "global_looping_report.json",
-                    "error": "global_looping_error.json",
-                    "log": "global_looping.log",
-                    "hourly_report": "hourly_looping_report.json",
-                    "hourly_error": "hourly_looping_error.json",
-                    "hourly_log": "hourly_looping.log",
-                },
-            },
-            "miners": {
-                "global_dir": "Mining/System/Miners/Global",
-                "hourly_dir_template": "Mining/System/Miners/Hourly/{year}/{month}/{week}/{day}/{hour}",
-                "files": {
-                    "report": "global_miners_report.json",
-                    "error": "global_miners_error.json",
-                    "log": "global_miners.log",
-                    "hourly_report": "hourly_miners_report.json",
-                    "hourly_error": "hourly_miners_error.json",
-                    "hourly_log": "hourly_miners.log",
-                },
-            },
-        },
-        "system_reports": {
-            "global_dir": "Mining/System/System_Reports/Aggregated/Global",
-            "hourly_dir_template": "Mining/System/System_Reports/Aggregated/Hourly/{year}/{month}/{week}/{day}/{hour}",
-            "global_file": "global_system_report.json",
-            "hourly_file": "hourly_system_report.json",
-        },
-        "system_errors": {
-            "global_dir": "Mining/System/System_Errors/Aggregated/Global",
-            "hourly_dir_template": "Mining/System/System_Errors/Aggregated/Hourly/{year}/{month}/{week}/{day}/{hour}",
-            "global_file": "global_system_error.json",
-            "hourly_file": "hourly_system_error.json",
-        },
-    },
-    "Testing/Demo": {
-        "base": "Test/Demo",
-        "output_dir": "Test/Demo/Mining",
-        "temporary_template_dir": "Test/Demo/Mining/Temporary Template",
-        "ledgers": {
-            "base_dir": "Test/Demo/Mining/Ledgers",
-            "global_dir": "Test/Demo/Mining/Ledgers",
-            "global_files": {
-                "ledger": "global_ledger.json",
-                "math_proof": "global_math_proof.json",
-            },
-            "hourly_dir_template": (
-                "Test/Demo/Mining/Ledgers/{year}/{month}/{day}/{hour}"
-            ),
-            "hourly_files": {
-                "ledger": "hourly_ledger.json",
-                "math_proof": "hourly_math_proof.json",
-            },
-        },
-        "submissions": {
-            "base_dir": "Test/Demo/Mining/Submission_Logs",
-            "global_dir": "Test/Demo/Mining/Submission_Logs",
-            "global_file": "global_submission.json",
-            "hourly_dir_template": (
-                "Test/Demo/Mining/Submission_Logs/{year}/{month}/W{week}/{day}/{hour}"
-            ),
-            "hourly_file": "hourly_submission.json",
-        },
-        "system": {
-            "base_dir": "Test/Demo/Mining/System",
-            # Component-based System folder structure
-            "brain": {
-                "global_dir": "Test/Demo/Mining/System/Brain/Global",
-                "hourly_dir_template": "Test/Demo/Mining/System/Brain/Hourly/{year}/{month}/{week}/{day}/{hour}",
-                "files": {
-                    "report": "global_brain_report.json",
-                    "error": "global_brain_error.json",
-                    "log": "global_brain.log",
-                    "hourly_report": "hourly_brain_report.json",
-                    "hourly_error": "hourly_brain_error.json",
-                    "hourly_log": "hourly_brain.log",
-                },
-            },
-            "brainstem": {
-                "global_dir": "Test/Demo/Mining/System/Brainstem/Global",
-                "hourly_dir_template": "Test/Demo/Mining/System/Brainstem/Hourly/{year}/{month}/{week}/{day}/{hour}",
-                "files": {
-                    "report": "global_brainstem_report.json",
-                    "error": "global_brainstem_error.json",
-                    "log": "global_brainstem.log",
-                    "hourly_report": "hourly_brainstem_report.json",
-                    "hourly_error": "hourly_brainstem_error.json",
-                    "hourly_log": "hourly_brainstem.log",
-                },
-            },
-            "dtm": {
-                "global_dir": "Test/Demo/Mining/System/DTM/Global",
-                "hourly_dir_template": "Test/Demo/Mining/System/DTM/Hourly/{year}/{month}/{week}/{day}/{hour}",
-                "files": {
-                    "report": "global_dtm_report.json",
-                    "error": "global_dtm_error.json",
-                    "log": "global_dtm.log",
-                    "hourly_report": "hourly_dtm_report.json",
-                    "hourly_error": "hourly_dtm_error.json",
-                    "hourly_log": "hourly_dtm.log",
-                },
-            },
-            "looping": {
-                "global_dir": "Test/Demo/Mining/System/Looping/Global",
-                "hourly_dir_template": "Test/Demo/Mining/System/Looping/Hourly/{year}/{month}/{week}/{day}/{hour}",
-                "files": {
-                    "report": "global_looping_report.json",
-                    "error": "global_looping_error.json",
-                    "log": "global_looping.log",
-                    "hourly_report": "hourly_looping_report.json",
-                    "hourly_error": "hourly_looping_error.json",
-                    "hourly_log": "hourly_looping.log",
-                },
-            },
-            "miners": {
-                "global_dir": "Test/Demo/Mining/System/Miners/Global",
-                "hourly_dir_template": "Test/Demo/Mining/System/Miners/Hourly/{year}/{month}/{week}/{day}/{hour}",
-                "files": {
-                    "report": "global_miners_report.json",
-                    "error": "global_miners_error.json",
-                    "log": "global_miners.log",
-                    "hourly_report": "hourly_miners_report.json",
-                    "hourly_error": "hourly_miners_error.json",
-                    "hourly_log": "hourly_miners.log",
-                },
-            },
-        },
-        "system_reports": {
-            "global_dir": "Test/Demo/Mining/System/System_Reports/Aggregated/Global",
-            "hourly_dir_template": "Test/Demo/Mining/System/System_Reports/Aggregated/Hourly/{year}/{month}/{week}/{day}/{hour}",
-            "global_file": "global_system_report.json",
-            "hourly_file": "hourly_system_report.json",
-        },
-        "system_errors": {
-            "global_dir": "Test/Demo/Mining/System/System_Errors/Aggregated/Global",
-            "hourly_dir_template": "Test/Demo/Mining/System/System_Errors/Aggregated/Hourly/{year}/{month}/{week}/{day}/{hour}",
-            "global_file": "global_system_error.json",
-            "hourly_file": "hourly_system_error.json",
-        },
-    },
-    "Testing/Test mode": {
-        "base": "Test/Test mode",
-        "output_dir": "Test/Test mode/Mining",
-        "temporary_template_dir": "Test/Test mode/Mining/Temporary Template",
-        "ledgers": {
-            "base_dir": "Test/Test mode/Mining/Ledgers",
-            "global_dir": "Test/Test mode/Mining/Ledgers",
-            "global_files": {
-                "ledger": "global_ledger.json",
-                "math_proof": "global_math_proof.json",
-            },
-            "hourly_dir_template": (
-                "Test/Test mode/Mining/Ledgers/{year}/{month}/{day}/{hour}"
-            ),
-            "hourly_files": {
-                "ledger": "hourly_ledger.json",
-                "math_proof": "hourly_math_proof.json",
-            },
-        },
-        "submissions": {
-            "base_dir": "Test/Test mode/Mining/Submission_Logs",
-            "global_dir": "Test/Test mode/Mining/Submission_Logs",
-            "global_file": "global_submission.json",
-            "hourly_dir_template": (
-                "Test/Test mode/Mining/Submission_Logs/{year}/{month}/W{week}/{day}/{hour}"
-            ),
-            "hourly_file": "hourly_submission.json",
-        },
-        "system": {
-            "base_dir": "Test/Test mode/Mining/System",
-            # Component-based System folder structure
-            "brain": {
-                "global_dir": "Test/Test mode/Mining/System/Brain/Global",
-                "hourly_dir_template": "Test/Test mode/Mining/System/Brain/Hourly/{year}/{month}/{week}/{day}/{hour}",
-                "files": {
-                    "report": "global_brain_report.json",
-                    "error": "global_brain_error.json",
-                    "log": "global_brain.log",
-                    "hourly_report": "hourly_brain_report.json",
-                    "hourly_error": "hourly_brain_error.json",
-                    "hourly_log": "hourly_brain.log",
-                },
-            },
-            "brainstem": {
-                "global_dir": "Test/Test mode/Mining/System/Brainstem/Global",
-                "hourly_dir_template": "Test/Test mode/Mining/System/Brainstem/Hourly/{year}/{month}/{week}/{day}/{hour}",
-                "files": {
-                    "report": "global_brainstem_report.json",
-                    "error": "global_brainstem_error.json",
-                    "log": "global_brainstem.log",
-                    "hourly_report": "hourly_brainstem_report.json",
-                    "hourly_error": "hourly_brainstem_error.json",
-                    "hourly_log": "hourly_brainstem.log",
-                },
-            },
-            "dtm": {
-                "global_dir": "Test/Test mode/Mining/System/DTM/Global",
-                "hourly_dir_template": "Test/Test mode/Mining/System/DTM/Hourly/{year}/{month}/{week}/{day}/{hour}",
-                "files": {
-                    "report": "global_dtm_report.json",
-                    "error": "global_dtm_error.json",
-                    "log": "global_dtm.log",
-                    "hourly_report": "hourly_dtm_report.json",
-                    "hourly_error": "hourly_dtm_error.json",
-                    "hourly_log": "hourly_dtm.log",
-                },
-            },
-            "looping": {
-                "global_dir": "Test/Test mode/Mining/System/Looping/Global",
-                "hourly_dir_template": "Test/Test mode/Mining/System/Looping/Hourly/{year}/{month}/{week}/{day}/{hour}",
-                "files": {
-                    "report": "global_looping_report.json",
-                    "error": "global_looping_error.json",
-                    "log": "global_looping.log",
-                    "hourly_report": "hourly_looping_report.json",
-                    "hourly_error": "hourly_looping_error.json",
-                    "hourly_log": "hourly_looping.log",
-                },
-            },
-            "miners": {
-                "global_dir": "Test/Test mode/Mining/System/Miners/Global",
-                "hourly_dir_template": "Test/Test mode/Mining/System/Miners/Hourly/{year}/{month}/{week}/{day}/{hour}",
-                "files": {
-                    "report": "global_miners_report.json",
-                    "error": "global_miners_error.json",
-                    "log": "global_miners.log",
-                    "hourly_report": "hourly_miners_report.json",
-                    "hourly_error": "hourly_miners_error.json",
-                    "hourly_log": "hourly_miners.log",
-                },
-            },
-        },
-        "system_reports": {
-            "global_dir": "Test/Test mode/Mining/System/System_Reports/Aggregated/Global",
-            "hourly_dir_template": "Test/Test mode/Mining/System/System_Reports/Aggregated/Hourly/{year}/{month}/{week}/{day}/{hour}",
-            "global_file": "global_system_report.json",
-            "hourly_file": "hourly_system_report.json",
-        },
-        "system_errors": {
-            "global_dir": "Test/Test mode/Mining/System/System_Errors/Aggregated/Global",
-            "hourly_dir_template": "Test/Test mode/Mining/System/System_Errors/Aggregated/Hourly/{year}/{month}/{week}/{day}/{hour}",
-            "global_file": "global_system_error.json",
-            "hourly_file": "hourly_system_error.json",
-        },
-    },
-    "Sandbox": {
-        "base": "Mining",
-        "output_dir": "Mining",
-        "temporary_template_dir": "Mining/Temporary Template",
-        "ledgers": {
-            "base_dir": "Mining/Ledgers",
-            "global_dir": "Mining/Ledgers",
-            "global_files": {
-                "ledger": "global_ledger.json",
-                "math_proof": "global_math_proof.json",
-            },
-            "hourly_dir_template": (
-                "Mining/Ledgers/{year}/{month}/{day}/{hour}"
-            ),
-            "hourly_files": {
-                "ledger": "hourly_ledger.json",
-                "math_proof": "hourly_math_proof.json",
-            },
-        },
-        "submissions": {
-            "base_dir": "Mining/Submission_Logs",
-            "global_dir": "Mining/Submission_Logs",
-            "global_file": "global_submission.json",
-            "hourly_dir_template": (
-                "Mining/Submission_Logs/{year}/{month}/W{week}/{day}/{hour}"
-            ),
-            "hourly_file": "hourly_submission.json",
-        },
-        "system": {
-            "base_dir": "Mining/System",
-            # Component-based System folder structure
-            "brain": {
-                "global_dir": "Mining/System/Brain/Global",
-                "hourly_dir_template": "Mining/System/Brain/Hourly/{year}/{month}/{day}/{hour}",
-                "files": {
-                    "report": "global_brain_report.json",
-                    "error": "global_brain_error.json",
-                    "log": "global_brain.log",
-                    "hourly_report": "hourly_brain_report.json",
-                    "hourly_error": "hourly_brain_error.json",
-                    "hourly_log": "hourly_brain.log",
-                },
-            },
-            "brainstem": {
-                "global_dir": "Mining/System/Brainstem/Global",
-                "hourly_dir_template": "Mining/System/Brainstem/Hourly/{year}/{month}/{day}/{hour}",
-                "files": {
-                    "report": "global_brainstem_report.json",
-                    "error": "global_brainstem_error.json",
-                    "log": "global_brainstem.log",
-                    "hourly_report": "hourly_brainstem_report.json",
-                    "hourly_error": "hourly_brainstem_error.json",
-                    "hourly_log": "hourly_brainstem.log",
-                },
-            },
-            "dtm": {
-                "global_dir": "Mining/System/DTM/Global",
-                "hourly_dir_template": "Mining/System/DTM/Hourly/{year}/{month}/{day}/{hour}",
-                "files": {
-                    "report": "global_dtm_report.json",
-                    "error": "global_dtm_error.json",
-                    "log": "global_dtm.log",
-                    "hourly_report": "hourly_dtm_report.json",
-                    "hourly_error": "hourly_dtm_error.json",
-                    "hourly_log": "hourly_dtm.log",
-                },
-            },
-            "looping": {
-                "global_dir": "Mining/System/Looping/Global",
-                "hourly_dir_template": "Mining/System/Looping/Hourly/{year}/{month}/{day}/{hour}",
-                "files": {
-                    "report": "global_looping_report.json",
-                    "error": "global_looping_error.json",
-                    "log": "global_looping.log",
-                    "hourly_report": "hourly_looping_report.json",
-                    "hourly_error": "hourly_looping_error.json",
-                    "hourly_log": "hourly_looping.log",
-                },
-            },
-            "miners": {
-                "global_dir": "Mining/System/Miners/Global",
-                "hourly_dir_template": "Mining/System/Miners/Hourly/{year}/{month}/{day}/{hour}",
-                "files": {
-                    "report": "global_miners_report.json",
-                    "error": "global_miners_error.json",
-                    "log": "global_miners.log",
-                    "hourly_report": "hourly_miners_report.json",
-                    "hourly_error": "hourly_miners_error.json",
-                    "hourly_log": "hourly_miners.log",
-                },
-            },
-        },
-        "system_reports": {
-            "global_dir": "Mining/System/System_Reports/Aggregated/Global",
-            "hourly_dir_template": "Mining/System/System_Reports/Aggregated/Hourly/{year}/{month}/{day}/{hour}",
-            "global_file": "global_system_report.json",
-            "hourly_file": "hourly_system_report.json",
-        },
-        "system_errors": {
-            "global_dir": "Mining/System/System_Errors/Aggregated/Global",
-            "hourly_dir_template": "Mining/System/System_Errors/Aggregated/Hourly/{year}/{month}/{day}/{hour}",
-            "global_file": "global_system_error.json",
-            "hourly_file": "hourly_system_error.json",
-        },
-    },
-}
+        }
+    
+    # Add aggregated folders
+    layout["system"]["aggregated"] = {
+        "global_dir": f"{system_base}/System_Reports/Aggregated/Global",
+        "hourly_dir_template": f"{system_base}/System_Reports/Aggregated/Hourly/{{year}}/{{month}}/W{{week}}/{{day}}/{{hour}}",
+    }
+    
+    layout["system"]["aggregated_errors"] = {
+        "global_dir": f"{system_base}/Error_Reports/Aggregated/Global",
+        "hourly_dir_template": f"{system_base}/Error_Reports/Aggregated/Hourly/{{year}}/{{month}}/W{{week}}/{{day}}/{{hour}}",
+    }
+    
+    return layout
+
+# OLD HARDCODED ENVIRONMENT_LAYOUTS - DEPRECATED
+# Replaced by dynamic get_environment_layout() function
+
 
 SYSTEM_FILE_EXAMPLE_DIRS = [
     "System_File_Examples",
@@ -717,36 +460,26 @@ def defensive_write_json(filepath, data, operation_name="write", component="syst
 
 
 def _normalize_environment_key(environment):
-    """Map shorthand environment names to canonical layout keys."""
+    """Map shorthand environment names to mode (demo, test, staging, live)."""
     if not environment:
-        return "Mining"
+        return "live"
 
     env = environment.strip().lower()
 
     if env in {"mining", "production", "live"}:
-        return "Mining"
+        return "live"
     if env in {"staging"}:
-        return "Mining"
+        return "staging"
     if env in {"demo", "sandbox_demo", "testing/demo", "global/testing/demo"}:
-        return "Testing/Demo"
+        return "demo"
     if env in {"test", "testing", "testing/test", "global/testing/test"}:
-        return "Testing/Test"
+        return "test"
 
-    # Allow direct use of canonical keys if provided
-    for key in ENVIRONMENT_LAYOUTS.keys():
-        if key.lower() == "sandbox":
-            continue
-        if env == key.lower():
-            return key
-
-    return "Mining"
+    return "live"
 
 
-def get_environment_layout(environment="Mining"):
-    """Return a safe copy of the requested environment layout."""
-    key = _normalize_environment_key(environment)
-    layout = ENVIRONMENT_LAYOUTS.get(key) or ENVIRONMENT_LAYOUTS["Mining"]
-    return copy.deepcopy(layout)
+# Note: get_environment_layout() is defined earlier in the file and uses Brain.QTL
+# This section is for backward compatibility only
 
 # =====================================================
 # MATHEMATICAL PARAMETERS FROM INTERATION 3.YAML
@@ -2015,8 +1748,12 @@ def get_brain_qtl_folder_structure():
     structures = {}
     expected_files = {}
 
-    for env_key, layout in ENVIRONMENT_LAYOUTS.items():
-        label = env_key
+    # Iterate over supported modes using dynamic layout
+    modes = ["live", "demo", "test", "staging"]
+    
+    for mode in modes:
+        layout = get_environment_layout(mode)
+        label = mode
         env_dirs = {}
 
         def record(path_value, description):
@@ -8497,7 +8234,6 @@ def create_initial_tracking_files_from_brain(base_path):
     # Read all examples (aligned to Brain.QTL templates)
     system_report_template = read_example("System_Reports/Aggregated/Global/global_aggregated_report_example.json")
     system_error_template = read_example("Error_Reports/Aggregated/Global/global_aggregated_error_example.json")
-    system_log_template = read_example("System_Logs/Aggregated/Global/global_aggregated_log_example.json")
     
     # Update timestamps to current time
     timestamp = datetime.now(ZoneInfo("America/Chicago")).isoformat()
@@ -8505,8 +8241,6 @@ def create_initial_tracking_files_from_brain(base_path):
         system_report_template["metadata"]["created"] = timestamp
     if system_error_template and "metadata" in system_error_template:
         system_error_template["metadata"]["created"] = timestamp
-    if system_log_template and "metadata" in system_log_template:
-        system_log_template["metadata"]["created"] = timestamp
     
     # BRAIN ONLY CREATES:
     # 1. Global aggregated files in Aggregated/Global/ (Brain combines all components)
@@ -8535,9 +8269,7 @@ def create_initial_tracking_files_from_brain(base_path):
                 "aggregated_from": "all_components"
             },
             "entries": []
-        },
-        # Global Aggregated Log - Brain aggregates all component log summaries
-        f"{base_path}/System/System_Logs/Aggregated/Global/global_aggregated.log": system_log_template or ""
+        }
     }
     
     # Create hourly directory structure for Aggregated (Brain will write hourly aggregates here)
@@ -8545,9 +8277,6 @@ def create_initial_tracking_files_from_brain(base_path):
     
     reports_hourly_dir = Path(f"{base_path}/System/System_Reports/Aggregated/Hourly/{now.year}/{now.month:02d}/{now.day:02d}/{now.hour:02d}")
     reports_hourly_dir.mkdir(parents=True, exist_ok=True)
-    
-    logs_hourly_dir = Path(f"{base_path}/System/System_Logs/Aggregated/Hourly/{now.year}/{now.month:02d}/{now.day:02d}/{now.hour:02d}")
-    logs_hourly_dir.mkdir(parents=True, exist_ok=True)
     
     # Create global files only
     for filepath, content in tracking_files.items():
@@ -8601,13 +8330,11 @@ def initialize_component_files(component_name, base_path="Mining"):
     now = datetime.now(ZoneInfo("America/Chicago"))
     timestamp = now.isoformat()
     
-    # File paths
+    # File paths - ONLY System_Reports, no System_Logs folder
     global_report = Path(f"{base_path}/System/System_Reports/{component_name}/Global/global_{component_name.lower()}_report.json")
-    global_log = Path(f"{base_path}/System/System_Logs/{component_name}/Global/global_{component_name.lower()}.log")
     
     hourly_dir = f"{now.year}/{now.month:02d}/{now.day:02d}/{now.hour:02d}"
     hourly_report = Path(f"{base_path}/System/System_Reports/{component_name}/Hourly/{hourly_dir}/hourly_{component_name.lower()}_report.json")
-    hourly_log = Path(f"{base_path}/System/System_Logs/{component_name}/Hourly/{hourly_dir}/hourly_{component_name.lower()}.log")
     
     # LOAD TEMPLATE for global report
     template_path = Path(f"System_File_Examples/{component_name}/Global/global_{component_name.lower()}_report_example.json")
@@ -8736,25 +8463,9 @@ def initialize_component_files(component_name, base_path="Mining"):
     with open(hourly_report, 'w') as f:
         json.dump(hourly_data, f, indent=2)
     
-    # Initialize global log (append if exists)
-    if not global_log.exists():
-        global_log.parent.mkdir(parents=True, exist_ok=True)
-        with open(global_log, 'w') as f:
-            f.write(f"# {component_name} Global Log\n")
-            f.write(f"# Created: {timestamp}\n\n")
-    
-    # Initialize hourly log (append if exists in current hour)
-    if not hourly_log.exists():
-        hourly_log.parent.mkdir(parents=True, exist_ok=True)
-        with open(hourly_log, 'w') as f:
-            f.write(f"# {component_name} Hourly Log - {hourly_dir}\n")
-            f.write(f"# Created: {timestamp}\n\n")
-    
     return {
         "global_report": str(global_report),
-        "global_log": str(global_log),
-        "hourly_report": str(hourly_report),
-        "hourly_log": str(hourly_log)
+        "hourly_report": str(hourly_report)
     }
 
 
@@ -8966,8 +8677,11 @@ def get_stock_template_from_brain():
 # BRAIN ERROR ACKNOWLEDGMENT AND AGGREGATION SYSTEM
 # ============================================================================
 
-def acknowledge_component_error(component: str, error_data: dict, base_dir: str = "Mining/System"):
+def acknowledge_component_error(component: str, error_data: dict, base_dir: str = None):
     """Brain acknowledges component errors and logs them"""
+    if base_dir is None:
+        base_path = brain_get_base_path()
+        base_dir = f"{base_path}/System" if base_path != "." else "System"
     try:
         ack_file = os.path.join(base_dir, "brain_error_acknowledgments.json")
         os.makedirs(base_dir, exist_ok=True)
@@ -9004,8 +8718,11 @@ def acknowledge_component_error(component: str, error_data: dict, base_dir: str 
         print(f"⚠️ Brain failed to acknowledge error: {e}")
 
 
-def aggregate_component_errors(base_dir: str = "Mining/System"):
+def aggregate_component_errors(base_dir: str = None):
     """Brain aggregates all component errors into System_Errors"""
+    if base_dir is None:
+        base_path = brain_get_base_path()
+        base_dir = f"{base_path}/System" if base_path != "." else "System"
     try:
         components = ["Looping", "DTM", "Miner", "Brainstem"]
         all_errors = []
@@ -9079,8 +8796,11 @@ def aggregate_component_errors(base_dir: str = "Mining/System"):
         print(f"⚠️ Brain failed to aggregate errors: {e}")
 
 
-def generate_system_report(base_dir: str = "Mining/System"):
+def generate_system_report(base_dir: str = None):
     """Brain generates comprehensive system report from ALL components"""
+    if base_dir is None:
+        base_path = brain_get_base_path()
+        base_dir = f"{base_path}/System" if base_path != "." else "System"
     try:
         now = datetime.now()
         
@@ -9313,12 +9033,15 @@ def generate_system_report(base_dir: str = "Mining/System"):
         import traceback
         traceback.print_exc()
 
-def aggregate_all_component_reports(base_dir="Mining/System"):
+def aggregate_all_component_reports(base_dir=None):
     """
     Brain's master orchestration function.
     Reads ALL component reports and combines them into aggregated report.
     USES TEMPLATE MERGE - aggregated output follows template structure!
     """
+    if base_dir is None:
+        base_path = brain_get_base_path()
+        base_dir = f"{base_path}/System" if base_path != "." else "System"
     from datetime import datetime
     from zoneinfo import ZoneInfo
     import json
@@ -9478,11 +9201,14 @@ def aggregate_all_component_reports(base_dir="Mining/System"):
         return False
 
 
-def aggregate_all_component_errors(base_dir="Mining/System"):
+def aggregate_all_component_errors(base_dir=None):
     """
     Brain's error aggregation function.
     Reads ALL component errors and combines them.
     """
+    if base_dir is None:
+        base_path = brain_get_base_path()
+        base_dir = f"{base_path}/System" if base_path != "." else "System"
     from datetime import datetime
     from zoneinfo import ZoneInfo
     import json
@@ -10567,7 +10293,8 @@ def brain_get_folder_structure():
         "Submission_Logs": {"reports": ["submission_log"], "errors": False},
         "Submission_Logs/Aggregated": {"reports": ["aggregated"], "errors": False},
         "Submission_Logs/Aggregated_Index": {"reports": ["aggregated_index"], "errors": False},
-        "Temporary Template": {"reports": [], "errors": False},
+        "Temporary/Template": {"reports": [], "errors": False},
+        "Temporary/User_Look_At": {"reports": [], "errors": False},
         "System/System_Reports/Brain": {
             "reports": ["brain_report", "system_report"],
             "errors": ["brain_error", "system_error"],
@@ -11818,7 +11545,7 @@ def brain_save_submission_log(submission_log_data, component_name="Looping"):
     - Network response time
     - Rejection reasons if any
     
-    Path: Mining/System/Submission_Logs/Looping/... (driven by brain_get_path)
+    Path: [Base]/Mining/Submission_Logs/Looping/... (driven by brain_get_path)
     """
     try:
         base_dir = brain_get_path("submission_log", component_name)
@@ -11947,10 +11674,11 @@ def brain_log_error(error_message, component_name="Unknown", error_type="general
         error_type: Type of error (validation, network, mining, etc.)
         error_details: Optional dict with additional error context
     
-    Path: Mining/System/System_Errors/[Component]/...
+    Path: System/Error_Reports/[Component]/...
     """
     try:
-        base_dir = f"Mining/System/System_Errors/{component_name}"
+        base_path = brain_get_base_path()
+        base_dir = f"{base_path}/System/Error_Reports/{component_name}"
         now = datetime.now()
         
         # Global error log
