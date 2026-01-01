@@ -557,8 +557,8 @@ def get_brain_qtl_paths_dtm(flags: list = None) -> dict:
     if not brain_data:
         # Defensive fallback
         return {
-            'temporary_template': 'Mining/Temporary Template',
-            'ledgers': 'Mining',  # Per architecture: files go in Mining/ root
+            'temporary_template': 'Mining/Temporary Template' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System/Temporary Template',
+            'ledgers': 'Mining' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System',  # Per architecture: files go in Mining/ root
             'base_path': 'Mining'
         }
     
@@ -570,9 +570,9 @@ def get_brain_qtl_paths_dtm(flags: list = None) -> dict:
         mode_config = flag_mapping.get('production_mode', {})
     
     return {
-        'temporary_template': mode_config.get('temporary_template', 'Mining/Temporary/Template'),
-        'user_look_at': mode_config.get('user_look_at', 'Mining/Temporary/User_Look_At'),
-        'ledgers': mode_config.get('ledgers', 'Mining'),  # Per architecture: files go in Mining/ root
+        'temporary_template': mode_config.get('temporary_template', 'Mining/Temporary/Template' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System/Temporary/Template'),
+        'user_look_at': mode_config.get('user_look_at', 'Mining/Temporary/User_Look_At' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System/Temporary/User_Look_At'),
+        'ledgers': mode_config.get('ledgers', 'Mining' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System'),  # Per architecture: files go in Mining/ root
         'base_path': mode_config.get('base_path', 'Mining')
     }
 
@@ -1043,20 +1043,20 @@ except (ImportError, SyntaxError, Exception) as e:
 class GPSEnhancedDynamicTemplateManager:
     # Mapping between logical file keys and their static example references
     EXAMPLE_FILE_MAP: Dict[str, Path] = {
-        "global_ledger": Path("System_File_Examples/System/global_ledger_example.json"),
-        "global_math_proof": Path("System_File_Examples/System/global_math_proof_example.json"),
-        "global_submission": Path("System_File_Examples/System/global_submission_example.json"),
+        "global_ledger": Path(f"System_File_Examples/{('Test/Demo' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System')}/global_ledger_example.json"),
+        "global_math_proof": Path(f"System_File_Examples/{('Test/Demo' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System')}/global_math_proof_example.json"),
+        "global_submission": Path(f"System_File_Examples/{('Test/Demo' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System')}/global_submission_example.json"),
         "hourly_ledger": Path("System_File_Examples/Hourly/hourly_ledger_example.json"),
         "hourly_math_proof": Path("System_File_Examples/Hourly/hourly_math_proof_example.json"),
         "hourly_submission": Path("System_File_Examples/Hourly/hourly_submission_example.json"),
         "global_system_report": Path(
-            "System_File_Examples/System/global_system_report_example.json"
+            f"System_File_Examples/{('Test/Demo' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System')}/global_system_report_example.json"
         ),
         "hourly_system_report": Path(
             "System_File_Examples/Hourly/hourly_system_report_example.json"
         ),
         "global_system_error": Path(
-            "System_File_Examples/System/global_system_error_example.json"
+            f"System_File_Examples/{('Test/Demo' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System')}/global_system_error_example.json"
         ),
         "hourly_system_error": Path(
             "System_File_Examples/Hourly/hourly_system_error_example.json"

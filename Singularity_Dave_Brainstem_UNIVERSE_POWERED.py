@@ -73,9 +73,9 @@ def _get_mode_base_path(mode):
     flag_mapping = brain.get("flag_mode_mapping", {})
     
     if mode == "demo":
-        return flag_mapping.get("demo_mode", {}).get("base_path", "Test/Demo")
+        return flag_mapping.get("demo_mode", {}).get("base_path", "Test/Demo" if os.getenv('DEMO_MODE', '').lower() == 'true' else "Mining")
     elif mode == "test":
-        return flag_mapping.get("test_mode", {}).get("base_path", "Test/Test mode")
+        return flag_mapping.get("test_mode", {}).get("base_path", "Test/Test mode" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System")
     else:  # staging or live (both use root)
         return ""  # Root level - Mining/ and System/ at root
 
@@ -97,35 +97,49 @@ def _build_path(mode, path_type, component=None):
     
     # Mining paths (only staging/live create root Mining/)
     if path_type == "ledger":
-        return f"{prefix}Mining/Ledgers"
+        demo_path = "Mining/Ledgers" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System/Ledgers"
+        return f"{prefix}{demo_path}"
     elif path_type == "ledger_aggregated":
-        return f"{prefix}Mining/Ledgers/Aggregated"
+        demo_path = "Mining/Ledgers/Aggregated" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System/Ledgers/Aggregated"
+        return f"{prefix}{demo_path}"
     elif path_type == "ledger_aggregated_index":
-        return f"{prefix}Mining/Ledgers/Aggregated_Index"
+        demo_path = "Mining/Ledgers/Aggregated_Index" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System/Ledgers/Aggregated_Index"
+        return f"{prefix}{demo_path}"
     elif path_type == "submission":
-        return f"{prefix}Mining/Submission_Logs"
+        demo_path = "Mining/Submission_Logs" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System/Submission_Logs"
+        return f"{prefix}{demo_path}"
     elif path_type == "temp_template":
-        return f"{prefix}Mining/Temporary/Template"
+        demo_path = "Mining/Temporary/Template" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System/Temporary/Template"
+        return f"{prefix}{demo_path}"
     elif path_type == "user_look_at":
-        return f"{prefix}Mining/Temporary/User_Look_At"
+        demo_path = "Mining/Temporary/User_Look_At" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System/Temporary/User_Look_At"
+        return f"{prefix}{demo_path}"
     
     # System paths
     elif path_type == "system_report" and component:
-        return f"{prefix}System/System_Reports/{component}"
+        demo_base = "Test/Demo/System" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System"
+        return f"{prefix}{demo_base}/System_Reports/{component}"
     elif path_type == "system_aggregated":
-        return f"{prefix}System/System_Reports/Aggregated"
+        demo_base = "Test/Demo/System" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System"
+        return f"{prefix}{demo_base}/System_Reports/Aggregated"
     elif path_type == "system_aggregated_index":
-        return f"{prefix}System/System_Reports/Aggregated_Index"
+        demo_base = "Test/Demo/System" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System"
+        return f"{prefix}{demo_base}/System_Reports/Aggregated_Index"
     elif path_type == "error_report" and component:
-        return f"{prefix}System/Error_Reports/{component}"
+        demo_base = "Test/Demo/System" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System"
+        return f"{prefix}{demo_base}/Error_Reports/{component}"
     elif path_type == "error_aggregated":
-        return f"{prefix}System/Error_Reports/Aggregated"
+        demo_base = "Test/Demo/System" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System"
+        return f"{prefix}{demo_base}/Error_Reports/Aggregated"
     elif path_type == "error_aggregated_index":
-        return f"{prefix}System/Error_Reports/Aggregated_Index"
+        demo_base = "Test/Demo/System" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System"
+        return f"{prefix}{demo_base}/Error_Reports/Aggregated_Index"
     elif path_type == "global_aggregated":
-        return f"{prefix}System/Global_Aggregated/Aggregated"
+        demo_base = "Test/Demo/System" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System"
+        return f"{prefix}{demo_base}/Global_Aggregated/Aggregated"
     elif path_type == "global_aggregated_index":
-        return f"{prefix}System/Global_Aggregated/Aggregated_Index"
+        demo_base = "Test/Demo/System" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System"
+        return f"{prefix}{demo_base}/Global_Aggregated/Aggregated_Index"
     else:
         return base if base else "."
 
@@ -239,14 +253,14 @@ MINING_MATH_CONFIG = {
             "use_real_template": True,  # Template pulled from Brain
             "create_hierarchical_files": True,
             "submit_to_network": False,
-            "output_folder": "Test/Demo/Mining",
+            "output_folder": "Test/Demo/Mining" if os.getenv('DEMO_MODE', '').lower() == 'true' else "Mining",
         },
         "test": {
             "use_real_math": True,  # Test connects to Bitcoin node and uses real math
             "use_real_template": True,  # Real template from Bitcoin node
             "create_hierarchical_files": True,
             "submit_to_network": False,  # Does NOT submit (testing only)
-            "output_folder": "Test/Test mode/Mining",
+            "output_folder": "Test/Test mode/Mining" if os.getenv('DEMO_MODE', '').lower() == 'true' else "Mining",
         },
         "staging": {
             "use_real_math": True,  # Staging mirrors production math
@@ -309,10 +323,10 @@ def get_environment_layout(mode="live"):
     """
     # Get base path from Brain.QTL
     if mode == "demo":
-        base = "Test/Demo"
+        base = "Test/Demo" if os.getenv('DEMO_MODE', '').lower() == 'true' else ""
         mining_base = f"{base}/Mining"
     elif mode == "test":
-        base = "Test/Test mode"
+        base = "Test/Test mode" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System"
         mining_base = f"{base}/Mining"
     else:  # staging, live
         base = "."
@@ -4853,9 +4867,10 @@ def derive_symbolic_candidate(*args, **kwargs):
             # ARCHITECTURAL FIX: Correct folder structure per System folders Root System.txt
             if self.environment == "Testing/Demo":
                 # Demo mode: ONLY create Test/Demo structure with proper Mining hierarchy
+                demo_base = "Test/Demo" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System"
                 demo_folders = [
-                    "Test/Demo/Mining/Temporary Template",
-                    "Test/Demo/Mining"
+                    f"{demo_base}/Mining/Temporary Template",
+                    f"{demo_base}/Mining"
                 ]
                 
                 for folder in demo_folders:
@@ -4864,9 +4879,10 @@ def derive_symbolic_candidate(*args, **kwargs):
                     
             elif self.environment.startswith("Test") or "test" in self.environment.lower():
                 # Test mode: ONLY create Test/Test mode structure  
+                test_base = "Test/Test mode" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System"
                 test_folders = [
-                    "Test/Test mode/Mining/Temporary Template",
-                    "Test/Test mode/Mining"
+                    f"{test_base}/Mining/Temporary Template",
+                    f"{test_base}/Mining"
                 ]
                 
                 for folder in test_folders:
@@ -4876,7 +4892,7 @@ def derive_symbolic_candidate(*args, **kwargs):
             else:
                 # Production mode: Create root Mining structure
                 production_folders = [
-                    "Mining/Temporary Template",
+                    "Mining/Temporary Template" if not os.getenv('DEMO_MODE', '').lower() == 'true' else "Test/Demo/Mining/Temporary Template",
                     "Mining"
                 ]
                 
@@ -8249,7 +8265,7 @@ def create_initial_tracking_files_from_brain(base_path):
     
     tracking_files = {
         # Global Aggregated Report - Brain aggregates all component reports
-        f"{base_path}/System/System_Reports/Aggregated/Global/global_aggregated_report.json": system_report_template or {
+        f"{base_path}/{('Test/Demo' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System')}/System_Reports/Aggregated/Global/global_aggregated_report.json": system_report_template or {
             "metadata": {
                 "file_type": "global_aggregated_report", 
                 "component": "Aggregated",
@@ -8260,7 +8276,7 @@ def create_initial_tracking_files_from_brain(base_path):
             "entries": []
         },
         # Global Aggregated Error Report
-        f"{base_path}/System/Error_Reports/Aggregated/Global/global_aggregated_error.json": system_error_template or {
+        f"{base_path}/{('Test/Demo' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System')}/Error_Reports/Aggregated/Global/global_aggregated_error.json": system_error_template or {
             "metadata": {
                 "file_type": "global_aggregated_error", 
                 "component": "Aggregated",
@@ -8331,10 +8347,11 @@ def initialize_component_files(component_name, base_path="Mining"):
     timestamp = now.isoformat()
     
     # File paths - ONLY System_Reports, no System_Logs folder
-    global_report = Path(f"{base_path}/System/System_Reports/{component_name}/Global/global_{component_name.lower()}_report.json")
+    system_base = "Test/Demo" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System"
+    global_report = Path(f"{base_path}/{system_base}/System_Reports/{component_name}/Global/global_{component_name.lower()}_report.json")
     
     hourly_dir = f"{now.year}/{now.month:02d}/{now.day:02d}/{now.hour:02d}"
-    hourly_report = Path(f"{base_path}/System/System_Reports/{component_name}/Hourly/{hourly_dir}/hourly_{component_name.lower()}_report.json")
+    hourly_report = Path(f"{base_path}/{system_base}/System_Reports/{component_name}/Hourly/{hourly_dir}/hourly_{component_name.lower()}_report.json")
     
     # LOAD TEMPLATE for global report
     template_path = Path(f"System_File_Examples/{component_name}/Global/global_{component_name.lower()}_report_example.json")
@@ -9634,12 +9651,12 @@ def brain_get_path(file_type, component=None):
         "network_submission": f"{base}/Network_Submissions",
         "math_proof": f"{base}/Ledgers",
         "rejection": f"{base}/Rejections",
-        "system_report": f"{root}/System/System_Reports/{comp}",
-        "error_report": f"{root}/System/Error_Reports/{comp}",
-        "system_report_aggregated": f"{root}/System/System_Reports",
-        "system_report_aggregated_index": f"{root}/System/System_Reports",
-        "error_report_aggregated": f"{root}/System/Error_Reports",
-        "error_report_aggregated_index": f"{root}/System/Error_Reports",
+        "system_report": f"{root}/{('Test/Demo' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System')}/System_Reports/{comp}",
+        "error_report": f"{root}/{('Test/Demo' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System')}/Error_Reports/{comp}",
+        "system_report_aggregated": f"{root}/{('Test/Demo' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System')}/System_Reports",
+        "system_report_aggregated_index": f"{root}/{('Test/Demo' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System')}/System_Reports",
+        "error_report_aggregated": f"{root}/{('Test/Demo' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System')}/Error_Reports",
+        "error_report_aggregated_index": f"{root}/{('Test/Demo' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System')}/Error_Reports",
         "template": f"{base}/Temporary Template"
     }
     return path_map.get(file_type, f"{base}/Unknown")
@@ -9684,11 +9701,11 @@ def brain_init_hierarchical_structure(file_type="ledger", component=None):
     # Each pattern defines path template and file(s) to create
     pattern_map = {
         "global_aggregated": {
-            "year": (f"{system_base}/System/Global_Aggregated/Aggregated/{year}", [f"aggregated_{year}.json"]),
-            "month": (f"{system_base}/System/Global_Aggregated/Aggregated/{year}/{month}", [f"aggregated_{month}.json"]),
-            "week": (f"{system_base}/System/Global_Aggregated/Aggregated/{year}/{month}/{week_label}", [f"aggregated_{week_label}.json"]),
-            "day": (f"{system_base}/System/Global_Aggregated/Aggregated/{year}/{month}/{week_label}/{day}", [f"aggregated_{day}.json"]),
-            "hour": (f"{system_base}/System/Global_Aggregated/Aggregated/{year}/{month}/{week_label}/{day}/{hour}", [f"aggregated_{hour}.json"])
+            "year": (f"{system_base}/{('Test/Demo' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System')}/Global_Aggregated/Aggregated/{year}", [f"aggregated_{year}.json"]),
+            "month": (f"{system_base}/{('Test/Demo' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System')}/Global_Aggregated/Aggregated/{year}/{month}", [f"aggregated_{month}.json"]),
+            "week": (f"{system_base}/{('Test/Demo' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System')}/Global_Aggregated/Aggregated/{year}/{month}/{week_label}", [f"aggregated_{week_label}.json"]),
+            "day": (f"{system_base}/{('Test/Demo' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System')}/Global_Aggregated/Aggregated/{year}/{month}/{week_label}/{day}", [f"aggregated_{day}.json"]),
+            "hour": (f"{system_base}/{('Test/Demo' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System')}/Global_Aggregated/Aggregated/{year}/{month}/{week_label}/{day}/{hour}", [f"aggregated_{hour}.json"])
         },
         "global_index": {
             "year": (f"{system_base}/System/Global_Aggregated/Aggregated_Index/{year}", [f"aggregated_index_{year}.json"]),

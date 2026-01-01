@@ -86,7 +86,8 @@ def report_miner_error(error_type, severity, message, context=None, recovery_act
         }
         
         base = brain_get_base_path()
-        global_error_file = os.path.join(base, "System/Error_Reports/Miners", "Global", "global_miners_error.json")
+        system_base = "Test/Demo" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System"
+        global_error_file = os.path.join(base, f"{system_base}/Error_Reports/Miners", "Global", "global_miners_error.json")
         if os.path.exists(global_error_file):
             try:
                 with open(global_error_file, 'r') as f:
@@ -134,7 +135,8 @@ def report_miner_status(miner_id="unknown", total_hashes=0, blocks_found=0, aver
         }
         
         base = brain_get_base_path()
-        global_report_file = os.path.join(base, "System/System_Reports/Miners", "Global", "global_miners_report.json")
+        system_base = "Test/Demo" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System"
+        global_report_file = os.path.join(base, f"{system_base}/System_Reports/Miners", "Global", "global_miners_report.json")
         if os.path.exists(global_report_file):
             try:
                 with open(global_report_file, 'r') as f:
@@ -643,7 +645,8 @@ class ProductionBitcoinMiner:
 
         # Looping system coordination - ALWAYS ENABLED in daemon mode
         self.looping_control_enabled = daemon_mode  # Enable in daemon mode by default
-        self.control_file = normalized_path(f"{brain_get_base_path()}/System/shared_state/miner_control.json")
+        system_base = "Test/Demo" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System"
+        self.control_file = normalized_path(f"{brain_get_base_path()}/{system_base}/shared_state/miner_control.json")
         
         # Initialize control files and command listening
         self._init_control_files()
@@ -1820,7 +1823,8 @@ class ProductionBitcoinMiner:
     def read_looping_system_control(self):
         """Read control commands from looping system"""
         try:
-            control_file = normalized_path(f"{brain_get_base_path()}/System/shared_state/miner_control.json")
+            system_base = "Test/Demo" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System"
+            control_file = normalized_path(f"{brain_get_base_path()}/{system_base}/shared_state/miner_control.json")
             if control_file.exists():
                 try:
                     with open(control_file, "r") as f:
@@ -3883,7 +3887,8 @@ class ProductionBitcoinMiner:
             from pathlib import Path
             
             # DTM consensus directory
-            consensus_dir = Path(f"{brain_get_base_path()}/System/DTM_Consensus")
+            system_base = "Test/Demo" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System"
+            consensus_dir = Path(f"{brain_get_base_path()}/{system_base}/DTM_Consensus")
             consensus_dir.mkdir(parents=True, exist_ok=True)
             
             # Save achievement with timestamp
@@ -4750,30 +4755,30 @@ class ProductionBitcoinMiner:
             if self.max_attempts and self.global_attempt_counter > self.max_attempts:
                 if not self.daemon_mode:
                     print(f"\n⏰ Reached maximum attempts ({self.max_attempts})")
-                break
+                return None
 
             # Check for shutdown request
             if self.shutdown_requested:
                 print("🛑 Shutdown requested, stopping mining...")
-                break
+                return None
 
             # Check for looping system commands
             looping_command = self.check_looping_commands()
             if looping_command == "stop":
                 print("🛑 Mining stopped by looping system command")
-                break
+                return None
             elif looping_command == "pause":
                 print("⏸️ Mining paused by looping system command")
                 gc.collect()
                 time.sleep(5)
-                continue
+                return None
             elif looping_command == "restart_fresh_template":
                 print("🔄 Restarting with fresh template as requested by looping system")
                 self.get_block_template()  # Get fresh template
             elif looping_command == "sustain_target_zeros":
                 print("🎯 Sustaining target leading zeros - continuing continuous mining")
                 # Don't break, just continue mining to maintain target level
-                continue
+                return None
             elif looping_command == "mine_with_gps":
                 print("🚀 FRESH TEMPLATE RECEIVED - ACTIVATING INSTANT SOLVE MODE!")
                 print("💥 Quintillion - scale mathematical power engaged for instant solution!")
@@ -4784,7 +4789,7 @@ class ProductionBitcoinMiner:
                     return fresh_template_result
                 else:
                     print("⚠️  Instant solve failed, continuing normal mining...")
-                    continue
+                    pass  # Continue with normal flow
 
             # Universe-scale mining continues indefinitely until solution found!
 
