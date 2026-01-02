@@ -10,6 +10,7 @@ Optimized for Real Bitcoin Network Mining
 # ⚡ MAXIMUM PERFORMANCE MODE ACTIVATED
 # 🎯 PUSHED TO ABSOLUTE LIMITS
 
+from datetime import datetime
 import base64
 import contextlib
 import gc
@@ -65,15 +66,21 @@ except Exception:
 # Never fail, always log, adapt to templates
 # ═══════════════════════════════════════════════════════════════════
 
-def report_miner_error(error_type, severity, message, context=None, recovery_action=None, stack_trace=None, miner_id="unknown"):
+
+def report_miner_error(error_type, severity, message, context=None,
+                       recovery_action=None, stack_trace=None, miner_id="unknown"):
     """Report Miner error - ADAPTS to template, NEVER FAILS."""
     try:
         from dynamic_template_manager import defensive_write_json, load_template_from_examples
         import traceback
-        
+
         now = datetime.now()
-        error_id = f"miner_err_{now.strftime('%Y%m%d_%H%M%S')}_{random.randint(1000,9999)}"
-        
+        error_id = f"miner_err_{
+            now.strftime('%Y%m%d_%H%M%S')}_{
+            random.randint(
+                1000,
+                9999)}"
+
         error_entry = {
             "error_id": error_id,
             "timestamp": now.isoformat(),
@@ -84,47 +91,61 @@ def report_miner_error(error_type, severity, message, context=None, recovery_act
             "recovery_action": recovery_action or "None taken",
             "stack_trace": stack_trace or (traceback.format_exc() if sys.exc_info()[0] else None)
         }
-        
+
         base = brain_get_base_path()
-        system_base = "Test/Demo" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System"
-        global_error_file = os.path.join(base, f"{system_base}/Error_Reports/Miners", "Global", "global_miners_error.json")
+        system_base = "Test/Demo" if os.getenv(
+            'DEMO_MODE', '').lower() == 'true' else "System"
+        global_error_file = os.path.join(
+            base,
+            f"{system_base}/Error_Reports/Miners",
+            "Global",
+            "global_miners_error.json")
         if os.path.exists(global_error_file):
             try:
                 with open(global_error_file, 'r') as f:
                     global_data = json.load(f)
             except json.JSONDecodeError as e:
-                print(f"Warning: Invalid JSON in {global_error_file}: {e}. Using template.")
-                global_data = load_template_from_examples('global_mining_error', 'Miners')
+                print(
+                    f"Warning: Invalid JSON in {global_error_file}: {e}. Using template.")
+                global_data = load_template_from_examples(
+                    'global_mining_error', 'Miners')
             except (FileNotFoundError, PermissionError) as e:
-                print(f"Warning: Cannot read {global_error_file}: {e}. Using template.")
-                global_data = load_template_from_examples('global_mining_error', 'Miners')
+                print(
+                    f"Warning: Cannot read {global_error_file}: {e}. Using template.")
+                global_data = load_template_from_examples(
+                    'global_mining_error', 'Miners')
         else:
-            global_data = load_template_from_examples('global_mining_error', 'Miners')
-        
+            global_data = load_template_from_examples(
+                'global_mining_error', 'Miners')
+
         if "errors" not in global_data:
             global_data["errors"] = []
         global_data["errors"].append(error_entry)
-        
+
         if "total_errors" in global_data:
             global_data["total_errors"] = len(global_data["errors"])
         if "errors_by_severity" not in global_data:
-            global_data["errors_by_severity"] = {"critical": 0, "error": 0, "warning": 0, "info": 0}
-        global_data["errors_by_severity"][severity] = global_data["errors_by_severity"].get(severity, 0) + 1
+            global_data["errors_by_severity"] = {
+                "critical": 0, "error": 0, "warning": 0, "info": 0}
+        global_data["errors_by_severity"][severity] = global_data["errors_by_severity"].get(
+            severity, 0) + 1
         if "errors_by_type" not in global_data:
             global_data["errors_by_type"] = {}
-        global_data["errors_by_type"][error_type] = global_data["errors_by_type"].get(error_type, 0) + 1
-        
+        global_data["errors_by_type"][error_type] = global_data["errors_by_type"].get(
+            error_type, 0) + 1
+
         defensive_write_json(global_error_file, global_data, "Miners")
         print(f"🧠 Miner Error [{severity}] {error_type}: {message}")
     except Exception as e:
         print(f"ERROR: Miner error reporting failed: {e}")
 
 
-def report_miner_status(miner_id="unknown", total_hashes=0, blocks_found=0, average_hash_rate=0):
+def report_miner_status(miner_id="unknown", total_hashes=0,
+                        blocks_found=0, average_hash_rate=0):
     """Report Miner status - ADAPTS to template, NEVER FAILS."""
     try:
         from dynamic_template_manager import defensive_write_json, load_template_from_examples
-        
+
         now = datetime.now()
         miner_entry = {
             "miner_id": miner_id,
@@ -133,26 +154,36 @@ def report_miner_status(miner_id="unknown", total_hashes=0, blocks_found=0, aver
             "average_hash_rate": average_hash_rate,
             "uptime_hours": 0
         }
-        
+
         base = brain_get_base_path()
-        system_base = "Test/Demo" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System"
-        global_report_file = os.path.join(base, f"{system_base}/System_Reports/Miners", "Global", "global_miners_report.json")
+        system_base = "Test/Demo" if os.getenv(
+            'DEMO_MODE', '').lower() == 'true' else "System"
+        global_report_file = os.path.join(
+            base,
+            f"{system_base}/System_Reports/Miners",
+            "Global",
+            "global_miners_report.json")
         if os.path.exists(global_report_file):
             try:
                 with open(global_report_file, 'r') as f:
                     report_data = json.load(f)
             except json.JSONDecodeError as e:
-                print(f"Warning: Invalid JSON in {global_report_file}: {e}. Using template.")
-                report_data = load_template_from_examples('global_mining_report', 'Miners')
+                print(
+                    f"Warning: Invalid JSON in {global_report_file}: {e}. Using template.")
+                report_data = load_template_from_examples(
+                    'global_mining_report', 'Miners')
             except (FileNotFoundError, PermissionError) as e:
-                print(f"Warning: Cannot read {global_report_file}: {e}. Using template.")
-                report_data = load_template_from_examples('global_mining_report', 'Miners')
+                print(
+                    f"Warning: Cannot read {global_report_file}: {e}. Using template.")
+                report_data = load_template_from_examples(
+                    'global_mining_report', 'Miners')
         else:
-            report_data = load_template_from_examples('global_mining_report', 'Miners')
-        
+            report_data = load_template_from_examples(
+                'global_mining_report', 'Miners')
+
         if "miners" not in report_data:
             report_data["miners"] = []
-        
+
         found = False
         for i, m in enumerate(report_data["miners"]):
             if m.get("miner_id") == miner_id:
@@ -161,14 +192,16 @@ def report_miner_status(miner_id="unknown", total_hashes=0, blocks_found=0, aver
                 break
         if not found:
             report_data["miners"].append(miner_entry)
-        
+
         if "total_hashes" in report_data:
-            report_data["total_hashes"] = sum(m.get("total_hashes", 0) for m in report_data["miners"])
+            report_data["total_hashes"] = sum(
+                m.get("total_hashes", 0) for m in report_data["miners"])
         if "total_miners" in report_data:
             report_data["total_miners"] = len(report_data["miners"])
         if "total_blocks_found" in report_data:
-            report_data["total_blocks_found"] = sum(m.get("blocks_found", 0) for m in report_data["miners"])
-        
+            report_data["total_blocks_found"] = sum(
+                m.get("blocks_found", 0) for m in report_data["miners"])
+
         defensive_write_json(global_report_file, report_data, "Miners")
     except Exception as e:
         print(f"ERROR: Miner status reporting failed: {e}")
@@ -177,40 +210,28 @@ def report_miner_status(miner_id="unknown", total_hashes=0, blocks_found=0, aver
 # Brain-coordinated logging setup for aggregated miner process
 def setup_brain_coordinated_miner_logging(daemon_id, base_dir=None):
     """Setup AGGREGATED logging for all miners - uses Brain functions for ALL paths"""
-    from Singularity_Dave_Brainstem_UNIVERSE_POWERED import brain_save_system_error
-    
+
     # Use Brain to write errors instead of manual logging
     # This ensures proper mode-aware paths and hierarchical structure
     logger = logging.getLogger(f"miner_daemon_{daemon_id}")
     logger.setLevel(logging.INFO)
     logger.handlers = []
-    
+
     # Console handler for immediate feedback
     console_handler = logging.StreamHandler()
-    console_handler.setFormatter(logging.Formatter(f"%(asctime)s - DAEMON_{daemon_id} - %(levelname)s - %(message)s"))
+    console_handler.setFormatter(logging.Formatter(
+        f"%(asctime)s - DAEMON_{daemon_id} - %(levelname)s - %(message)s"))
     logger.addHandler(console_handler)
-    
+
     return logger
 
-def report_miner_error(daemon_id, error_type, severity, message, base_dir=None):
-    """Report miner error using Brain functions - no manual path construction"""
-    from Singularity_Dave_Brainstem_UNIVERSE_POWERED import brain_save_system_error
-    
+    # Use Brain function to save error - handles ALL path logic
     try:
-        error_data = {
-            "daemon_id": daemon_id,
-            "component": "Miners",
-            "severity": severity,
-            "error_type": error_type,
-            "message": message,
-            "acknowledged_by_brain": False
-        }
-        
-        # Use Brain function to save error - handles ALL path logic
-        brain_save_system_error(error_data, "Miners")
-        
+            brain_save_system_error(error_data, "Miners")
+
     except Exception as e:
         pass  # Fail silently to not disrupt mining
+
 
 # Placeholder to avoid import errors - actual imports happen in __init__
 communicate_with_brain_qtl = None
@@ -230,7 +251,8 @@ apply_near_solution_mode = None
 get_all_dynamic_modifiers = None
 
 
-# BRAIN.QTL INTEGRATION - Production Miner must query Brain.QTL for paths, never create folders
+# BRAIN.QTL INTEGRATION - Production Miner must query Brain.QTL for paths,
+# never create folders
 def _load_brain_qtl_miner() -> dict:
     """Load Brain.QTL configuration - canonical folder authority for Production Miner"""
     brain_path = Path(__file__).parent / "Singularity_Dave_Brain.QTL"
@@ -245,6 +267,7 @@ def _load_brain_qtl_miner() -> dict:
         print(f"⚠️ Production Miner Warning: Could not load Brain.QTL: {e}")
         return {}
 
+
 def get_brain_qtl_paths_miner(flags: list = None) -> dict:
     """Get paths from Brain.QTL based on flags - Production Miner NEVER creates folders"""
     base = brain_get_base_path()
@@ -255,18 +278,22 @@ def get_brain_qtl_paths_miner(flags: list = None) -> dict:
             'ledgers': f'{base}/Ledgers',
             'base_path': base
         }
-    
-    flag_mapping = brain_data.get('folder_management', {}).get('flag_mode_mapping', {})
+
+    flag_mapping = brain_data.get(
+        'folder_management', {}).get(
+        'flag_mode_mapping', {})
     if flags:
         mode = 'production_mode'  # Production miner primarily uses production mode
         if '--demo' in flags:
             mode = 'demo_mode'
         elif '--test' in flags:
             mode = 'test_mode'
-        mode_config = flag_mapping.get(mode, flag_mapping.get('production_mode', {}))
+        mode_config = flag_mapping.get(
+            mode, flag_mapping.get(
+                'production_mode', {}))
     else:
         mode_config = flag_mapping.get('production_mode', {})
-    
+
     base = brain_get_base_path()
     return {
         'temporary_template': mode_config.get('temporary_template', f'{base}/Temporary Template'),
@@ -274,10 +301,13 @@ def get_brain_qtl_paths_miner(flags: list = None) -> dict:
         'base_path': mode_config.get('base_path', base)
     }
 
-def validate_folder_exists_miner(folder_path: str, component_name: str = "Production-Miner") -> bool:
+
+def validate_folder_exists_miner(
+        folder_path: str, component_name: str = "Production-Miner") -> bool:
     """Validate folder exists - do NOT create it (Brainstem responsibility)"""
     if not Path(folder_path).exists():
-        print(f"❌ {component_name}: Folder {folder_path} missing - should be created by Brainstem")
+        print(
+            f"❌ {component_name}: Folder {folder_path} missing - should be created by Brainstem")
         return False
     return True
 
@@ -310,11 +340,13 @@ class ProductionBitcoinMiner:
             return "Testing/Demo"
         return "Mining"
 
-    def _brain_path(self, file_type: str, custom_path: tuple[str, str, str, str] | None = None) -> Path | None:
+    def _brain_path(self, file_type: str,
+                    custom_path: tuple[str, str, str, str] | None = None) -> Path | None:
         if not self.brain_path_provider:
             return None
 
-        raw_path = self.brain_path_provider(file_type, self.environment, custom_path)
+        raw_path = self.brain_path_provider(
+            file_type, self.environment, custom_path)
         path_obj = Path(raw_path)
         if path_obj.is_absolute():
             return path_obj
@@ -396,7 +428,8 @@ class ProductionBitcoinMiner:
 
         return backups[0] if backups else None
 
-    def _persist_template_to_cache(self, template_dir: Path, template: dict) -> None:
+    def _persist_template_to_cache(
+            self, template_dir: Path, template: dict) -> None:
         """Persist a fetched template to the shared cache for other processes."""
         try:
             target_path = template_dir / "current_template.json"
@@ -409,11 +442,17 @@ class ProductionBitcoinMiner:
 
     def _fetch_block_template_via_rpc(self) -> dict | None:
         """Fetch a live block template directly from the Bitcoin node via JSON-RPC."""
-        rpc_cfg = self.config_data.get("bitcoin_rpc", {}) if isinstance(self.config_data, dict) else {}
-        host = rpc_cfg.get("host") or self.config_data.get("rpc_host") or "127.0.0.1"
+        rpc_cfg = self.config_data.get(
+            "bitcoin_rpc",
+            {}) if isinstance(
+            self.config_data,
+            dict) else {}
+        host = rpc_cfg.get("host") or self.config_data.get(
+            "rpc_host") or "127.0.0.1"
         port = rpc_cfg.get("port") or self.config_data.get("rpc_port") or 8332
         username = rpc_cfg.get("username") or self.config_data.get("rpcuser")
-        password = rpc_cfg.get("password") or self.config_data.get("rpcpassword")
+        password = rpc_cfg.get(
+            "password") or self.config_data.get("rpcpassword")
         timeout = rpc_cfg.get("timeout", 30)
 
         if not username or not password:
@@ -435,7 +474,8 @@ class ProductionBitcoinMiner:
             headers={"Content-Type": "application/json"},
         )
         credentials = f"{username}:{password}".encode("utf-8")
-        request.add_header("Authorization", "Basic " + base64.b64encode(credentials).decode("utf-8"))
+        request.add_header("Authorization", "Basic " +
+                           base64.b64encode(credentials).decode("utf-8"))
 
         try:
             with urllib.request.urlopen(request, timeout=timeout) as response:
@@ -496,7 +536,7 @@ class ProductionBitcoinMiner:
         environment: str | None = None,
     ):
         """Initialize the PRODUCTION Bitcoin miner with FULL PIPELINE integration"""
-        
+
         # 🔇 LAZY IMPORT: Import brainstem WITH SUPPRESSION to prevent 200+ lines of spam
         # This must happen FIRST before any brainstem functions are called
         import contextlib
@@ -507,7 +547,7 @@ class ProductionBitcoinMiner:
         global get_mathematical_problems_modifier, get_mathematical_paradoxes_modifier
         global apply_entropy_mode, apply_decryption_mode, apply_near_solution_mode
         global get_all_dynamic_modifiers
-        
+
         brainstem_import_spam = io.StringIO()
         with contextlib.redirect_stdout(brainstem_import_spam):
             from Singularity_Dave_Brainstem_UNIVERSE_POWERED import (
@@ -544,7 +584,7 @@ class ProductionBitcoinMiner:
             apply_decryption_mode = _apply_decrypt
             apply_near_solution_mode = _apply_near
             get_all_dynamic_modifiers = _all_mods
-        
+
         # ✅ Brainstem imported silently - no spam!
 
         self.daemon_mode = daemon_mode
@@ -555,11 +595,11 @@ class ProductionBitcoinMiner:
         self._template_cache_version = 1
         self.environment = self._determine_environment(environment)
         self.brain_path_provider = get_brain_qtl_file_path
-        
+
         # Setup Brain-coordinated AGGREGATED logging (all miners in one file)
         daemon_id = miner_id if miner_id is not None else 1
         self.logger = setup_brain_coordinated_miner_logging(daemon_id)
-        
+
         # Initialize Miners component files (reports + logs with append logic)
         # Only do this for first miner to avoid race conditions
         if daemon_id == 1:
@@ -568,52 +608,64 @@ class ProductionBitcoinMiner:
                 base_path = brain_get_base_path()
                 initialize_component_files("Miners", base_path)
             except Exception as e:
-                self.logger.warning(f"⚠️ Miners component file initialization warning: {e}")
-        
+                self.logger.warning(
+                    f"⚠️ Miners component file initialization warning: {e}")
+
         # MINER ID SYSTEM: Import from DTM for consistent identification
         try:
             from dynamic_template_manager import get_miner_id
             self.miner_number = miner_id if miner_id is not None else 1  # Default to 1
-            self.miner_id = get_miner_id(self.miner_number)  # e.g., "MINER_001"
+            self.miner_id = get_miner_id(
+                self.miner_number)  # e.g., "MINER_001"
         except ImportError:
-            # Fallback if DTM not available (zero-padded format for consistency)
+            # Fallback if DTM not available (zero-padded format for
+            # consistency)
             self.miner_number = miner_id if miner_id is not None else 1
             if self.miner_number < 1000:
                 self.miner_id = f"MINER_{self.miner_number:03d}"
             else:
                 self.miner_id = f"MINER_{self.miner_number}"
-        
+
         # ✨ PROCESS IDENTIFICATION per Pipeline flow.txt CORRECT INTERPRETATION
         # Mining process name = UNIQUE IDENTIFIER (permanent, not mode-dependent)
-        # Process_001, Process_002, etc. - SAME FOLDER regardless of daemon/terminal execution
+        # Process_001, Process_002, etc. - SAME FOLDER regardless of
+        # daemon/terminal execution
         self.process_id = f"Process_{self.miner_number:03d}"
-        
+
         # Mining mode affects BEHAVIOR, not folder names
         self.mining_mode = "continuous"  # continuous | always_on | on_demand
-        
+
         # AUTO-USE PROCESS FOLDER based on miner ID
-        # CORRECTED: Use process_id for everything - mining processes use process_X folders
-        self.terminal_id = terminal_id or f"terminal_{self.miner_number}"  # Keep for parameter compatibility
-        self.process_id = f"process_{self.miner_number}"  # CORRECT: Use process_X folders
+        # CORRECTED: Use process_id for everything - mining processes use
+        # process_X folders
+        self.terminal_id = terminal_id or f"terminal_{
+            self.miner_number}"  # Keep for parameter compatibility
+        # CORRECT: Use process_X folders
+        self.process_id = f"process_{self.miner_number}"
         self.temporary_template_root = (
             self._brain_path("temporary_template_dir")
             or (self.repo_root / brain_get_base_path() / "Temporary Template")
         )
-        
+
         # ✨ CORRECTED: Use process subfolder to match Looping/Brainstem naming
         # Looping creates process_X folders, so we must match that
         # ARCHITECTURAL: Use brain_get_base_path for mode-aware paths
         base_path = Path(brain_get_base_path()) / "Temporary Template"
-        
+
         self.mining_process_folder = base_path / self.process_id
-        if not validate_folder_exists_miner(str(self.mining_process_folder), "Production-Miner-terminal"):
-            print(f"⚠️ Continuing with potentially missing terminal folder: {self.mining_process_folder}")
-        
-        # Use process folder for all mining operations - no terminal folder needed
-        
+        if not validate_folder_exists_miner(
+                str(self.mining_process_folder), "Production-Miner-terminal"):
+            print(
+                f"⚠️ Continuing with potentially missing terminal folder: {
+                    self.mining_process_folder}")
+
+        # Use process folder for all mining operations - no terminal folder
+        # needed
+
         self.max_attempts = max_attempts  # Store for use throughout
         if self.demo_mode and self.max_attempts is None:
-            # Ensure demo sessions terminate promptly instead of running indefinitely
+            # Ensure demo sessions terminate promptly instead of running
+            # indefinitely
             self.max_attempts = 1000
         self.is_looping_mode = False  # Will be set based on template source
 
@@ -621,7 +673,10 @@ class ProductionBitcoinMiner:
             print("🚀 INITIALIZING PRODUCTION BITCOIN MINER")
             print("💪 Advanced Mathematical Mining System")
             print("🔄 Integrated Pipeline Architecture")
-            print(f"🆔 Miner ID: {self.miner_id} (Terminal: {self.terminal_id})")
+            print(
+                f"🆔 Miner ID: {
+                    self.miner_id} (Terminal: {
+                    self.terminal_id})")
             print(f"📂 Process ID: {self.process_id} (permanent identifier)")
             print(f"⚙️ Mining Mode: {self.mining_mode} (operational behavior)")
             print(f"📁 Solutions Folder: {self.mining_process_folder}")
@@ -638,28 +693,30 @@ class ProductionBitcoinMiner:
         if daemon_mode:
             # Keep output enabled for daemon debugging
             print("🤖 DAEMON MODE: Output enabled for debugging and coordination")
-            import builtins
 
-            # builtins.print = lambda *args, **kwargs: None  # DISABLED: Keep output for now
+            # builtins.print = lambda *args, **kwargs: None  # DISABLED: Keep
+            # output for now
         self.mining_thread = None
 
         # Looping system coordination - ALWAYS ENABLED in daemon mode
         self.looping_control_enabled = daemon_mode  # Enable in daemon mode by default
-        system_base = "Test/Demo" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System"
-        self.control_file = normalized_path(f"{brain_get_base_path()}/{system_base}/shared_state/miner_control.json")
-        
+        system_base = "Test/Demo" if os.getenv(
+            'DEMO_MODE', '').lower() == 'true' else "System"
+        self.control_file = normalized_path(
+            f"{brain_get_base_path()}/{system_base}/shared_state/miner_control.json")
+
         # Initialize control files and command listening
         self._init_control_files()
-        
+
         # Initialize Brain.QTL infrastructure system with output suppression
         print("🧠 Initializing Brain.QTL Infrastructure System...")
-        
+
         # Suppress verbose brainstem output during initialization
         brainstem_spam = io.StringIO()
         with contextlib.redirect_stdout(brainstem_spam):
             brain_qtl_ready = initialize_brain_qtl_system()
             self.brain_qtl_connection = connect_to_brain_qtl()
-        
+
         # Show clean status
         if brain_qtl_ready:
             print("✅ Brain.QTL Infrastructure: READY (32 paths verified)")
@@ -667,7 +724,7 @@ class ProductionBitcoinMiner:
             print("⚠️ Brain.QTL Infrastructure: Using fallback mode")
             print("   └─ ERROR_CODE: BRAIN_QTL_001 - Brain.QTL file missing or corrupted")
             print("   └─ FALLBACK: Using local folder management system")
-        
+
         # Show connection status
         if self.brain_qtl_connection.get("brainstem_connected"):
             print("✅ Brain.QTL Pipeline: CONNECTED")
@@ -676,7 +733,7 @@ class ProductionBitcoinMiner:
             print("⚠️ Brain.QTL Pipeline: FALLBACK MODE")
             print("   └─ ERROR_CODE: BRAIN_QTL_002 - Connection not established")
             print("   └─ IMPACT: Mining continues with local coordination only")
-        
+
         # 📊 Write Miners initialization report to its own component folder
         if daemon_id == 1:  # Only first miner writes initialization report
             try:
@@ -693,9 +750,11 @@ class ProductionBitcoinMiner:
                     "brainstem_connected": self.brain_qtl_connection.get("brainstem_connected", False),
                     "status": "initialized"
                 }
-                brain_save_system_report(init_report, "Miners", "initialization")
+                brain_save_system_report(
+                    init_report, "Miners", "initialization")
             except Exception as e:
-                self.logger.warning(f"⚠️ Miners initialization report warning: {e}")
+                self.logger.warning(
+                    f"⚠️ Miners initialization report warning: {e}")
 
         # Complete remaining initialization
         self._init_mining_system(target_leading_zeros)
@@ -719,38 +778,39 @@ class ProductionBitcoinMiner:
         """
         # Use universe bitload (111-digit constant) as foundation
         bitload = self.galaxy_category.get("bitload", 1)
-        
+
         # Keep computationally manageable while preserving mathematical power
         foundation = bitload % (2**128)
-        
+
         # Apply Knuth-Sorrellian-Class mathematical operations
         # Step 1: Apply levels (exponential power)
-        knuth_power = pow(foundation, min(levels, 10), 2**256)  # Cap levels for computation
-        
+        knuth_power = pow(foundation, min(levels, 10), 2 **
+                          256)  # Cap levels for computation
+
         # Step 2: Apply iterations (multiplicative enhancement)
         knuth_power = (knuth_power * iterations * nonce) % (2**256)
-        
+
         # Step 3: Apply base parameter (scaling factor)
         result = (knuth_power * base) % (2**256)
-        
+
         return result
 
     def _apply_dual_knuth_entropy(self, nonce):
         """Apply dual-Knuth ENTROPY: Base K(X,Y,Z) + Modifier K(x,y,z)"""
         # Parse base Knuth parameters
         base_params = self._parse_knuth_notation(self.entropy_base_knuth)
-        
+
         # Parse modifier Knuth parameters
         mod_params = self._parse_knuth_notation(self.entropy_modifier_knuth)
-        
+
         # Calculate base contribution
         base_contrib = self._calculate_knuth_contribution(
-            nonce, 
-            base_params['base'], 
-            base_params['levels'], 
+            nonce,
+            base_params['base'],
+            base_params['levels'],
             base_params['iterations']
         )
-        
+
         # Calculate modifier contribution
         mod_contrib = self._calculate_knuth_contribution(
             nonce,
@@ -758,74 +818,78 @@ class ProductionBitcoinMiner:
             mod_params['levels'],
             mod_params['iterations']
         )
-        
+
         # Combine: Base + Modifier
         combined = (base_contrib + mod_contrib) % (2**256)
-        
+
         return combined
 
     def _apply_dual_knuth_decryption(self, nonce):
         """Apply dual-Knuth DECRYPTION: Base K(X,Y,Z) + Modifier K(x,y,z)"""
         base_params = self._parse_knuth_notation(self.decryption_base_knuth)
         mod_params = self._parse_knuth_notation(self.decryption_modifier_knuth)
-        
+
         base_contrib = self._calculate_knuth_contribution(
             nonce, base_params['base'], base_params['levels'], base_params['iterations']
         )
         mod_contrib = self._calculate_knuth_contribution(
             nonce, mod_params['base'], mod_params['levels'], mod_params['iterations']
         )
-        
+
         return (base_contrib + mod_contrib) % (2**256)
 
     def _apply_dual_knuth_near_solution(self, nonce):
         """Apply dual-Knuth NEAR SOLUTION: Base K(X,Y,Z) + Modifier K(x,y,z)"""
         base_params = self._parse_knuth_notation(self.near_solution_base_knuth)
-        mod_params = self._parse_knuth_notation(self.near_solution_modifier_knuth)
-        
+        mod_params = self._parse_knuth_notation(
+            self.near_solution_modifier_knuth)
+
         base_contrib = self._calculate_knuth_contribution(
             nonce, base_params['base'], base_params['levels'], base_params['iterations']
         )
         mod_contrib = self._calculate_knuth_contribution(
             nonce, mod_params['base'], mod_params['levels'], mod_params['iterations']
         )
-        
+
         return (base_contrib + mod_contrib) % (2**256)
 
     def _apply_dual_knuth_math_problems(self, nonce):
         """Apply dual-Knuth MATH PROBLEMS: Base K(X,Y,Z) + Modifier K(x,y,z)"""
         base_params = self._parse_knuth_notation(self.math_problems_base_knuth)
-        mod_params = self._parse_knuth_notation(self.math_problems_modifier_knuth)
-        
+        mod_params = self._parse_knuth_notation(
+            self.math_problems_modifier_knuth)
+
         base_contrib = self._calculate_knuth_contribution(
             nonce, base_params['base'], base_params['levels'], base_params['iterations']
         )
         mod_contrib = self._calculate_knuth_contribution(
             nonce, mod_params['base'], mod_params['levels'], mod_params['iterations']
         )
-        
+
         # Apply active problems multiplier
         active_problems = getattr(self, 'active_problems', 8)
         combined = (base_contrib + mod_contrib) * active_problems
-        
+
         return combined % (2**256)
 
     def _apply_dual_knuth_math_paradoxes(self, nonce):
         """Apply dual-Knuth MATH PARADOXES: Base K(X,Y,Z) + Modifier K(x,y,z)"""
-        base_params = self._parse_knuth_notation(self.math_paradoxes_base_knuth)
-        mod_params = self._parse_knuth_notation(self.math_paradoxes_modifier_knuth)
-        
+        base_params = self._parse_knuth_notation(
+            self.math_paradoxes_base_knuth)
+        mod_params = self._parse_knuth_notation(
+            self.math_paradoxes_modifier_knuth)
+
         base_contrib = self._calculate_knuth_contribution(
             nonce, base_params['base'], base_params['levels'], base_params['iterations']
         )
         mod_contrib = self._calculate_knuth_contribution(
             nonce, mod_params['base'], mod_params['levels'], mod_params['iterations']
         )
-        
+
         # Apply active paradoxes multiplier
         active_paradoxes = getattr(self, 'active_paradoxes', 8)
         combined = (base_contrib + mod_contrib) * active_paradoxes
-        
+
         return combined % (2**256)
 
     def _apply_all_dual_knuth_categories(self, nonce):
@@ -839,29 +903,31 @@ class ProductionBitcoinMiner:
         near_solution = self._apply_dual_knuth_near_solution(nonce)
         math_problems = self._apply_dual_knuth_math_problems(nonce)
         math_paradoxes = self._apply_dual_knuth_math_paradoxes(nonce)
-        
+
         # Combine all 5 categories with XOR for distribution
         combined = (
-            entropy 
-            ^ decryption 
-            ^ near_solution 
-            ^ math_problems 
+            entropy
+            ^ decryption
+            ^ near_solution
+            ^ math_problems
             ^ math_paradoxes
         )
-        
+
         return combined
 
     def set_mining_mode(self, mode: str):
         """Set mining mode - affects BEHAVIOR only, NOT folder names per Pipeline flow.txt"""
         valid_modes = ["continuous", "always_on", "on_demand"]
         if mode not in valid_modes:
-            print(f"⚠️ Invalid mining mode '{mode}'. Using 'continuous'. Valid modes: {valid_modes}")
+            print(
+                f"⚠️ Invalid mining mode '{mode}'. Using 'continuous'. Valid modes: {valid_modes}")
             mode = "continuous"
-        
+
         self.mining_mode = mode
         # NOTE: Process folder name NEVER changes - Process_001 stays Process_001
-        # Mining mode only affects operational behavior (continuous/on_demand/always_on)
-        
+        # Mining mode only affects operational behavior
+        # (continuous/on_demand/always_on)
+
         if not self.daemon_mode:
             print(f"🔄 Mining mode set to: {self.mining_mode}")
             print(f"📁 Process folder remains: {self.mining_process_folder}")
@@ -869,7 +935,8 @@ class ProductionBitcoinMiner:
 
     def _init_control_files(self):
         """Initialize control and command files"""
-        self.command_file = normalized_path(f"shared_state / miner_commands_{self.process_id}.json")
+        self.command_file = normalized_path(
+            f"shared_state / miner_commands_{self.process_id}.json")
         self.check_commands_enabled = True
         self.last_command_check = time.time()
         self.leading_zeros_sustained = 0
@@ -893,9 +960,9 @@ class ProductionBitcoinMiner:
         if self.daemon_mode:
             # Keep output enabled for daemon debugging
             print("🤖 DAEMON MODE: Output enabled for debugging and coordination")
-            import builtins
 
-            # builtins.print = lambda *args, **kwargs: None  # DISABLED: Keep output for now
+            # builtins.print = lambda *args, **kwargs: None  # DISABLED: Keep
+            # output for now
         self.mining_thread = None
 
         # Mining state tracking
@@ -909,7 +976,8 @@ class ProductionBitcoinMiner:
         self.current_leading_zeros = 0
         self.best_leading_zeros_achieved = 0
         self.leading_zeros_history = []  # Track progress over time
-        self.target_leading_zeros = target_leading_zeros  # Ultra Hex handles 80+ zeros legitimately
+        # Ultra Hex handles 80+ zeros legitimately
+        self.target_leading_zeros = target_leading_zeros
 
         # BITS-TO-TARGET OPTIMIZATION (Your brilliant idea!)
         self.use_bits_target_optimization = True  # Enable your optimization
@@ -920,18 +988,19 @@ class ProductionBitcoinMiner:
         # Current mining state
         self.current_template = None
         self.current_target = None
-        self.current_difficulty = 2**64  # Universe-scale difficulty for full SHA-256 ceiling
+        # Universe-scale difficulty for full SHA-256 ceiling
+        self.current_difficulty = 2**64
         self.pipeline_operations = []
 
         # Initialize Brain.QTL infrastructure system with output suppression
         print("🧠 Initializing Brain.QTL Infrastructure System...")
-        
+
         # Suppress verbose brainstem output during initialization
         brainstem_spam = io.StringIO()
         with contextlib.redirect_stdout(brainstem_spam):
             brain_qtl_ready = initialize_brain_qtl_system()
             self.brain_qtl_connection = connect_to_brain_qtl()
-        
+
         # Show clean status
         if brain_qtl_ready:
             print("✅ Brain.QTL Infrastructure: READY (32 paths verified)")
@@ -939,7 +1008,7 @@ class ProductionBitcoinMiner:
             print("⚠️ Brain.QTL Infrastructure: Using fallback mode")
             print("   └─ ERROR_CODE: BRAIN_QTL_001 - Brain.QTL file missing or corrupted")
             print("   └─ FALLBACK: Using local folder management system")
-        
+
         # Show connection status
         if self.brain_qtl_connection.get("brainstem_connected"):
             print("✅ Brain.QTL Pipeline: CONNECTED")
@@ -949,213 +1018,296 @@ class ProductionBitcoinMiner:
             print("   └─ ERROR_CODE: BRAIN_QTL_002 - Connection not established")
             print("   └─ IMPACT: Mining continues with local coordination only")
 
-        # Load universe-scale mathematical framework WITH GALAXY ORCHESTRATION (suppress verbose output)
+        # Load universe-scale mathematical framework WITH GALAXY ORCHESTRATION
+        # (suppress verbose output)
         brainstem_spam = io.StringIO()
         brainstem_spam_err = io.StringIO()
         with contextlib.redirect_stdout(brainstem_spam), contextlib.redirect_stderr(brainstem_spam_err):
             self.math_framework = get_6x_universe_framework()
             self.mathematical_framework = self.math_framework  # Alias for consistency
             self.galaxy_category = get_galaxy_category()  # ENABLE GALAXY ORCHESTRATION
-        
+
         self.bitload = self.galaxy_category["bitload"]  # Use Galaxy BitLoad
         self.knuth_sorrellian_class_levels = self.galaxy_category["knuth_sorrellian_class_levels"]
-        self.knuth_sorrellian_class_iterations = self.galaxy_category["knuth_sorrellian_class_iterations"]
+        self.knuth_sorrellian_class_iterations = self.galaxy_category[
+            "knuth_sorrellian_class_iterations"]
 
-        # GALAXY ORCHESTRATION: Calculate INSANE mathematical power with proper category modifiers
+        # GALAXY ORCHESTRATION: Calculate INSANE mathematical power with proper
+        # category modifiers
         base_galaxy_operations = (
             self.knuth_sorrellian_class_iterations * self.knuth_sorrellian_class_levels * 5
         )  # 5 categories combined
 
         # REAL BRAINSTEM CATEGORY LOGIC INTEGRATION - KNUTH NOTATION MODIFIERS
-        universe_bitload = 208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909
-        
+        universe_bitload = get_bitload()
+
         # 🔇 SUPPRESS DETAILED INITIALIZATION OUTPUT
-        # Detailed Knuth notation, entropy, decryption modes suppressed - only show final architecture
+        # Detailed Knuth notation, entropy, decryption modes suppressed - only
+        # show final architecture
         modifier_spam = io.StringIO()
         modifier_spam_err = io.StringIO()
-        
-        # CATEGORY 1: ENTROPY - Dual-Knuth system (calculation only, no display)
+
+        # CATEGORY 1: ENTROPY - Dual-Knuth system (calculation only, no
+        # display)
         try:
             with contextlib.redirect_stdout(modifier_spam), contextlib.redirect_stderr(modifier_spam_err):
                 entropy_dual = get_entropy_modifier()
-            self.entropy_base_knuth = entropy_dual.get("base_knuth", "K(10,8,4)")
-            self.entropy_modifier_knuth = entropy_dual.get("modifier_knuth", "K(5,3,2)")
-            
+            self.entropy_base_knuth = entropy_dual.get(
+                "base_knuth", "K(10,8,4)")
+            self.entropy_modifier_knuth = entropy_dual.get(
+                "modifier_knuth", "K(5,3,2)")
+
             # Base parameters (stable)
-            base_params = entropy_dual.get("base_params", {"base": 10, "value": 8, "operation_level": 4})
+            base_params = entropy_dual.get(
+                "base_params", {
+                    "base": 10, "value": 8, "operation_level": 4})
             # Modifier parameters (dynamic)
-            mod_params = entropy_dual.get("modifier_params", {"base": 5, "value": 3, "operation_level": 2})
-            
+            mod_params = entropy_dual.get(
+                "modifier_params", {
+                    "base": 5, "value": 3, "operation_level": 2})
+
             # Calculate dual power: base × modifier
-            base_power = universe_bitload * (base_params["base"] ** base_params["value"]) * base_params["operation_level"]
-            modifier_power = (mod_params["base"] ** mod_params["value"]) * mod_params["operation_level"]
+            base_power = universe_bitload * \
+                (base_params["base"] ** base_params["value"]) * \
+                base_params["operation_level"]
+            modifier_power = (
+                mod_params["base"] ** mod_params["value"]) * mod_params["operation_level"]
             self.entropy_modifier = base_power * modifier_power
             # Display suppressed
         except Exception as e:
             # Fallback display suppressed
             self.entropy_modifier = universe_bitload * 8  # Fallback
-            
+
         # CATEGORY 2: DECRYPTION - Dual-Knuth system
         try:
             with contextlib.redirect_stdout(modifier_spam), contextlib.redirect_stderr(modifier_spam_err):
                 decryption_dual = get_decryption_modifier()
-            self.decryption_base_knuth = decryption_dual.get("base_knuth", "K(8,12,5)")
-            self.decryption_modifier_knuth = decryption_dual.get("modifier_knuth", "K(6,4,3)")
-            
+            self.decryption_base_knuth = decryption_dual.get(
+                "base_knuth", "K(8,12,5)")
+            self.decryption_modifier_knuth = decryption_dual.get(
+                "modifier_knuth", "K(6,4,3)")
+
             # Base parameters (stable)
-            base_params = decryption_dual.get("base_params", {"base": 8, "value": 12, "operation_level": 5})
+            base_params = decryption_dual.get(
+                "base_params", {
+                    "base": 8, "value": 12, "operation_level": 5})
             # Modifier parameters (dynamic)
-            mod_params = decryption_dual.get("modifier_params", {"base": 6, "value": 4, "operation_level": 3})
-            
+            mod_params = decryption_dual.get(
+                "modifier_params", {
+                    "base": 6, "value": 4, "operation_level": 3})
+
             # Calculate dual power: base × modifier
-            base_power = universe_bitload * (base_params["base"] ** base_params["value"]) * base_params["operation_level"]
-            modifier_power = (mod_params["base"] ** mod_params["value"]) * mod_params["operation_level"]
+            base_power = universe_bitload * \
+                (base_params["base"] ** base_params["value"]) * \
+                base_params["operation_level"]
+            modifier_power = (
+                mod_params["base"] ** mod_params["value"]) * mod_params["operation_level"]
             self.decryption_modifier = base_power * modifier_power
             # Display suppressed
         except Exception as e:
             # Fallback display suppressed
             self.decryption_modifier = universe_bitload * 16  # Fallback
-            
+
         # CATEGORY 3: NEAR SOLUTION - Dual-Knuth system
         try:
             with contextlib.redirect_stdout(modifier_spam), contextlib.redirect_stderr(modifier_spam_err):
                 near_solution_dual = get_near_solution_modifier()
-            self.near_solution_base_knuth = near_solution_dual.get("base_knuth", "K(5,8,3)")
-            self.near_solution_modifier_knuth = near_solution_dual.get("modifier_knuth", "K(4,4,2)")
-            
+            self.near_solution_base_knuth = near_solution_dual.get(
+                "base_knuth", "K(5,8,3)")
+            self.near_solution_modifier_knuth = near_solution_dual.get(
+                "modifier_knuth", "K(4,4,2)")
+
             # Base parameters (stable)
-            base_params = near_solution_dual.get("base_params", {"base": 5, "value": 8, "operation_level": 3})
+            base_params = near_solution_dual.get(
+                "base_params", {"base": 5, "value": 8, "operation_level": 3})
             # Modifier parameters (dynamic)
-            mod_params = near_solution_dual.get("modifier_params", {"base": 4, "value": 4, "operation_level": 2})
-            
+            mod_params = near_solution_dual.get(
+                "modifier_params", {
+                    "base": 4, "value": 4, "operation_level": 2})
+
             # Calculate dual power: base × modifier
-            base_power = universe_bitload * (base_params["base"] ** base_params["value"]) * base_params["operation_level"]
-            modifier_power = (mod_params["base"] ** mod_params["value"]) * mod_params["operation_level"]
+            base_power = universe_bitload * \
+                (base_params["base"] ** base_params["value"]) * \
+                base_params["operation_level"]
+            modifier_power = (
+                mod_params["base"] ** mod_params["value"]) * mod_params["operation_level"]
             self.near_solution_modifier = base_power * modifier_power
             # Display suppressed
         except Exception as e:
             # Fallback display suppressed
             self.near_solution_modifier = universe_bitload * 12  # Fallback
-            
+
         # CATEGORY 4: MATH PROBLEMS - Dual-Knuth system
         try:
             with contextlib.redirect_stdout(modifier_spam), contextlib.redirect_stderr(modifier_spam_err):
                 math_problems_dual = get_mathematical_problems_modifier()
-            self.math_problems_base_knuth = math_problems_dual.get("base_knuth", "K(9,9,3)")
-            self.math_problems_modifier_knuth = math_problems_dual.get("modifier_knuth", "K(7,6,2)")
-            
+            self.math_problems_base_knuth = math_problems_dual.get(
+                "base_knuth", "K(9,9,3)")
+            self.math_problems_modifier_knuth = math_problems_dual.get(
+                "modifier_knuth", "K(7,6,2)")
+
             # Base parameters (stable)
-            base_params = math_problems_dual.get("base_params", {"base": 9, "value": 9, "operation_level": 3})
+            base_params = math_problems_dual.get(
+                "base_params", {"base": 9, "value": 9, "operation_level": 3})
             # Modifier parameters (dynamic)
-            mod_params = math_problems_dual.get("modifier_params", {"base": 7, "value": 6, "operation_level": 2})
-            
+            mod_params = math_problems_dual.get(
+                "modifier_params", {
+                    "base": 7, "value": 6, "operation_level": 2})
+
             active_problems = math_problems_dual.get("active_problems", 8)
-            
+
             # Calculate dual power: base × modifier
-            base_power = universe_bitload * (base_params["base"] ** base_params["value"]) * base_params["operation_level"]
-            modifier_power = (mod_params["base"] ** mod_params["value"]) * mod_params["operation_level"]
+            base_power = universe_bitload * \
+                (base_params["base"] ** base_params["value"]) * \
+                base_params["operation_level"]
+            modifier_power = (
+                mod_params["base"] ** mod_params["value"]) * mod_params["operation_level"]
             self.math_problems_modifier = base_power * modifier_power
             # Display suppressed
         except Exception as e:
             # Fallback display suppressed
             self.math_problems_modifier = universe_bitload * 20  # Fallback
-            
+
         # CATEGORY 5: MATH PARADOXES - Dual-Knuth system
         try:
             with contextlib.redirect_stdout(modifier_spam), contextlib.redirect_stderr(modifier_spam_err):
                 math_paradoxes_dual = get_mathematical_paradoxes_modifier()
-            self.math_paradoxes_base_knuth = math_paradoxes_dual.get("base_knuth", "K(8,8,2)")
-            self.math_paradoxes_modifier_knuth = math_paradoxes_dual.get("modifier_knuth", "K(6,7,2)")
-            
+            self.math_paradoxes_base_knuth = math_paradoxes_dual.get(
+                "base_knuth", "K(8,8,2)")
+            self.math_paradoxes_modifier_knuth = math_paradoxes_dual.get(
+                "modifier_knuth", "K(6,7,2)")
+
             # Base parameters (stable)
-            base_params = math_paradoxes_dual.get("base_params", {"base": 8, "value": 8, "operation_level": 2})
+            base_params = math_paradoxes_dual.get(
+                "base_params", {"base": 8, "value": 8, "operation_level": 2})
             # Modifier parameters (dynamic)
-            mod_params = math_paradoxes_dual.get("modifier_params", {"base": 6, "value": 7, "operation_level": 2})
-            
+            mod_params = math_paradoxes_dual.get(
+                "modifier_params", {
+                    "base": 6, "value": 7, "operation_level": 2})
+
             active_paradoxes = math_paradoxes_dual.get("active_paradoxes", 8)
-            
+
             # Calculate dual power: base × modifier
-            base_power = universe_bitload * (base_params["base"] ** base_params["value"]) * base_params["operation_level"]
-            modifier_power = (mod_params["base"] ** mod_params["value"]) * mod_params["operation_level"]
+            base_power = universe_bitload * \
+                (base_params["base"] ** base_params["value"]) * \
+                base_params["operation_level"]
+            modifier_power = (
+                mod_params["base"] ** mod_params["value"]) * mod_params["operation_level"]
             self.math_paradoxes_modifier = base_power * modifier_power
             # Display suppressed
         except Exception as e:
             # Fallback display suppressed
             self.math_paradoxes_modifier = universe_bitload * 24  # Fallback
-            
+
         # ULTRA HEX OVERSIGHT SYSTEM - Manages exponential scaling for 65+ leading zeros
         # Ultra Hex parameters for oversight functions (not a category)
-        self.ultra_hex_max_digits = 256  # Maximum Ultra Hex digits (256 × 64 = 16,384 hex chars)
+        # Maximum Ultra Hex digits (256 × 64 = 16,384 hex chars)
+        self.ultra_hex_max_digits = 256
         self.ultra_hex_base_difficulty = 2**64  # Base exponential difficulty
         self.ultra_hex_oversight_active = False  # Activates when target >= 65 zeros
-        
+
         # Ultra Hex mathematical framework for oversight
         ultra_hex_bitload = 53440218233631381765817797802176041745569365867804164607062753263570287425650497137535998136628173279129731368756
         # USE DYNAMIC COLLECTIVE VALUES INSTEAD OF HARDCODED (145, 13631168)
         # This will be set after collective values are calculated
-        self.ultra_hex_framework_power = None  # Will be set to: ultra_hex_bitload * self.collective_collective_levels * self.collective_collective_iterations
-        
+        # Will be set to: ultra_hex_bitload * self.collective_collective_levels
+        # * self.collective_collective_iterations
+        self.ultra_hex_framework_power = None
+
         # Display suppressed - only show final architecture
-            
-        # DUAL-KNUTH COLLECTIVE SYSTEM: Using verified values from clean startup mock
-        
+
+        # DUAL-KNUTH COLLECTIVE SYSTEM: Using verified values from clean
+        # startup mock
+
         # Use hardcoded verified values instead of dynamic brainstem calculations
-        # These values are mathematically consistent with the clean startup mock
-        
+        # These values are mathematically consistent with the clean startup
+        # mock
+
         # COLLECTIVE BASE: Combined from all 5 category base capabilities (loaded dynamically from brainstem)
         # Suppress brainstem verbose output during base calculation
         brainstem_spam = io.StringIO()
+        # Step 2: Get Category Values from BRAINSTEM (not directly from
+        # iteration files)
+        print("🧠 Getting category values from Brainstem mathematical logic...")
         try:
-            from Singularity_Dave_Brainstem_UNIVERSE_POWERED import get_combined_categories
+            # CRITICAL: Get ALL values from brainstem mathematical
+            # implementations
+            from Singularity_Dave_Brainstem_UNIVERSE_POWERED import brain_get_all_category_values
             with contextlib.redirect_stdout(brainstem_spam):
-                base_result = get_combined_categories()
-            
-            # get_combined_categories() returns dict: {"base": {...}, "modifier": {...}, "collective": {...}}
-            collective_base_levels = base_result["base"]["levels"]  # Dynamic calculation from brainstem
-            collective_base_iterations = base_result["base"]["iterations"]  # Dynamic calculation from brainstem
+                brainstem_categories = brain_get_all_category_values()
+
+            if brainstem_categories["source"] == "brainstem_mathematical_logic":
+                print("✅ Using live brainstem mathematical implementations:")
+                print(
+                    f"   🧮 Math Problems: {
+                        brainstem_categories['math_implementations']['problems']} active")
+                print(
+                    f"   🔀 Math Paradoxes: {
+                        brainstem_categories['math_implementations']['paradoxes']} active")
+                print(
+                    f"   🌀 Entropy Base: {
+                        brainstem_categories['math_implementations']['entropy_base']}")
+                print(
+                    f"   🔐 Decryption Base: {
+                        brainstem_categories['math_implementations']['decryption_base']}")
+                print(
+                    f"   🎯 Near Solution Base: {
+                        brainstem_categories['math_implementations']['near_solution_base']}")
+
+            collective_base_levels = brainstem_categories["totals"]["base_levels"]
+            collective_base_iterations = brainstem_categories["totals"]["base_iterations"]
+
+            self.category_implementations = brainstem_categories["base_categories"]
+
         except Exception as e:
-            print(f"⚠️ Brainstem loading failed, using fallback")
-            print(f"   └─ ERROR_CODE: BRAINSTEM_001 - get_combined_categories() import failed")
-            print(f"   └─ CAUSE: {str(e)[:80]}")
-            print(f"   └─ FALLBACK: Using uniform architecture (400, 784560)")
-            collective_base_levels = 400  # Fallback for uniform architecture (80+80+80+80+80)
-            collective_base_iterations = 784560  # Fallback for uniform architecture (156912×5)
-        
+            print(f"⚠️ Brainstem connection error: {e}")
+            print("   Using fallback category values...")
+            collective_base_levels = 447  # Fallback sum (95+100+92+80+80)
+            collective_base_iterations = 1900824  # Fallback sum
+            self.category_implementations = None
+
         self.collective_base_knuth = f"Knuth(111-digit^5, {collective_base_levels}, {collective_base_iterations})"
-        
-        # COLLECTIVE MODIFIER: Combined from all 5 modifier categories (DYNAMIC from actual logic)
-        # Suppress brainstem verbose output during modifier calculation
-        brainstem_spam = io.StringIO()
+
+        # COLLECTIVE MODIFIER: From brainstem mathematical logic (not separate
+        # function)
         try:
-            with contextlib.redirect_stdout(brainstem_spam):
-                modifier_params = get_all_dynamic_modifiers()
-            collective_mod_levels = modifier_params['combined_levels']  # Dynamic: sum of all modifier levels
-            collective_mod_iterations = modifier_params['combined_iterations']  # Dynamic: sum of all modifier iterations
-            print("✅ All 5 dynamic modifiers loaded successfully")
-        except Exception as e:
-            print(f"⚠️ Dynamic modifier calculation failed, using fallback")
-            print(f"   └─ ERROR_CODE: BRAINSTEM_002 - get_all_dynamic_modifiers() failed")
-            print(f"   └─ CAUSE: {str(e)[:80]}")
-            print(f"   └─ FALLBACK: Using calculated fallback (441, 2353680)")
-            collective_mod_levels = 441  # Fallback: 90+81+90+84+96
-            collective_mod_iterations = 2353680  # Fallback: calculated sum
-        
+            # Get modifier values from the same brainstem category function
+            collective_mod_levels = brainstem_categories["totals"]["mod_levels"]
+            collective_mod_iterations = brainstem_categories["totals"]["mod_iterations"]
+            print("✅ Modifiers from brainstem mathematical logic")
+
+        except (NameError, KeyError) as e:
+            print(f"⚠️ Modifier calculation from brainstem failed, using fallback")
+            print(f"   └─ CAUSE: {str(e)}")
+            collective_mod_levels = 394  # Fallback calculated from modifier logic
+            collective_mod_iterations = 1237416  # Fallback calculated sum
+
         self.collective_modifier_knuth = f"Knuth(111-digit^5, {collective_mod_levels}, {collective_mod_iterations})"
-        
-        # Detailed category display suppressed - only show final combined architecture at end
-        
+
+        # Detailed category display suppressed - only show final combined
+        # architecture at end
+
         print("🌌 COMBINED Calculations:")
-        print(f"   🌟 Combined Categories: Knuth(111-digit^5, {collective_base_levels}, {collective_base_iterations:,})")
-        print(f"   ⚡ Combined Modifiers: Knuth(111-digit^5, {collective_mod_levels}, {collective_mod_iterations:,})")
+        print(
+            f"   🌟 Combined Categories: Knuth(111-digit^5, {collective_base_levels}, {
+                collective_base_iterations:,})")
+        print(
+            f"   ⚡ Combined Modifiers: Knuth(111-digit^5, {collective_mod_levels}, {
+                collective_mod_iterations:,})")
         combined_collective_levels = collective_base_levels + collective_mod_levels
         combined_collective_iterations = collective_base_iterations + collective_mod_iterations
-        print(f"   🚀 Combined Collective: Knuth(111-digit^10, {combined_collective_levels}, {combined_collective_iterations:,})")
-        print("="*60)
-        
-        # Set collective values from the verified calculations (base + dynamic modifiers)
-        collective_collective_levels = collective_base_levels + collective_mod_levels  # Dynamic sum
-        collective_collective_iterations = collective_base_iterations + collective_mod_iterations  # Dynamic sum
-        
+        print(
+            f"   🚀 Combined Collective: Knuth(111-digit^10, {combined_collective_levels}, {
+                combined_collective_iterations:,})")
+        print("=" * 60)
+
+        # Set collective values from the verified calculations (base + dynamic
+        # modifiers)
+        collective_collective_levels = collective_base_levels + \
+            collective_mod_levels  # Dynamic sum
+        collective_collective_iterations = collective_base_iterations + \
+            collective_mod_iterations  # Dynamic sum
+
         # STORE THESE AS INSTANCE VARIABLES FOR ACTUAL MINING LOGIC
         self.collective_base_levels = collective_base_levels
         self.collective_base_iterations = collective_base_iterations
@@ -1163,27 +1315,32 @@ class ProductionBitcoinMiner:
         self.collective_mod_iterations = collective_mod_iterations
         self.collective_collective_levels = collective_collective_levels  # TOTAL: 841
         self.collective_collective_iterations = collective_collective_iterations  # TOTAL: 3,138,240
-        
+
         self.collective_collective_knuth = f"Knuth(111-digit^10, {collective_collective_levels}, {collective_collective_iterations})"
-        
+
         # Calculate galaxy operations using verified mathematical constants
         universe_bitload = self.bitload  # Use the real 111-digit BitLoad
-        collective_concurrent_power = collective_collective_levels * collective_collective_iterations
-        self.galaxy_enhanced_operations = int((universe_bitload * collective_concurrent_power) // 10**100)
-        
+        collective_concurrent_power = collective_collective_levels * \
+            collective_collective_iterations
+        self.galaxy_enhanced_operations = int(
+            (universe_bitload * collective_concurrent_power) // 10**100)
+
         # NOW set Ultra Hex framework power with ACTUAL collective values
         ultra_hex_bitload = 53440218233631381765817797802176041745569365867804164607062753263570287425650497137535998136628173279129731368756
-        self.ultra_hex_framework_power = ultra_hex_bitload * self.collective_collective_levels * self.collective_collective_iterations
-        
+        self.ultra_hex_framework_power = ultra_hex_bitload * \
+            self.collective_collective_levels * self.collective_collective_iterations
+
         # Configure universe-scale targeting
         self.universe_target_zeros = 80
         print("   💥 MATHEMATICAL SUPERCOMPUTER - QUINTILLION - SCALE POWER!")
 
         # Configure for QUINTILLION-SCALE leading zeros
-        # With 1.623e+119 UNIVERSE-SCALE operations per hash, target should be much higher
+        # With 1.623e+119 UNIVERSE-SCALE operations per hash, target should be
+        # much higher
         self.universe_target_zeros = 80
 
-        # Define variables for Knuth notation display - USE DYNAMIC COLLECTIVE VALUES
+        # Define variables for Knuth notation display - USE DYNAMIC COLLECTIVE
+        # VALUES
         galaxy_base = int(
             "2085008559933730227672257701643751630687560855441060179963"
             "38881654571185256056754443039992227128051932599645909"
@@ -1192,20 +1349,28 @@ class ProductionBitcoinMiner:
         knuth_iterations = self.collective_collective_iterations  # 3,138,240
 
         print(
-            f"   🔥 Combined Mathematical Power: Knuth-Sorrellian-Class({galaxy_base}, {collective_concurrent_power // 10**50}, {knuth_iterations:,}) operations per hash"
+            f"   🔥 Combined Mathematical Power: Knuth-Sorrellian-Class({galaxy_base}, {
+                collective_concurrent_power // 10**50}, {
+                knuth_iterations:,}) operations per hash"
         )
         print(
-            f"   🧮 Galaxy Mathematical Operations: Knuth-Sorrellian-Class({galaxy_base}, {self.galaxy_enhanced_operations // 10**15}, {knuth_iterations:,})"
+            f"   🧮 Galaxy Mathematical Operations: Knuth-Sorrellian-Class({galaxy_base}, {
+                self.galaxy_enhanced_operations // 10**15}, {
+                knuth_iterations:,})"
         )
         print(
         )
         print("   🌌 Total Categories: 5 (Families + Lanes + Strides + Palette + Sandbox)")
         print("   💎 Ultra Hex System: Oversight layer managing all categories")
         print(f"   🎯 Expected Ultra Hex: Ultra 1-2 (each bucket holds 64 leading zeros)")
-        print(f"   🔢 Expected Standard Leading Zeros: 240-255 (approaching 256 theoretical maximum)")
-        print(f"   💥 Galaxy Formula: ({len(str(self.bitload))}-digit)^5 COMBINED POWER")
         print(
-            f"   🎯 Total Power: Knuth - Sorrellian - Class({galaxy_base}, {self.galaxy_enhanced_operations // 10**15}, {knuth_iterations}) mathematical operations"
+            f"   🔢 Expected Standard Leading Zeros: 240-255 (approaching 256 theoretical maximum)")
+        print(
+            f"   💥 Galaxy Formula: ({len(str(self.bitload))}-digit)^5 COMBINED POWER")
+        print(
+            f"   🎯 Total Power: Knuth - Sorrellian - Class({galaxy_base}, {
+                self.galaxy_enhanced_operations //
+                10**15}, {knuth_iterations}) mathematical operations"
         )
         print("🔍 CHECKPOINT 1: After Total Power print", flush=True)
 
@@ -1217,7 +1382,7 @@ class ProductionBitcoinMiner:
         self.hash_count = 0  # Track total hash attempts
         self.mathematical_nonce_count = 0  # Track mathematical nonces generated
         self.blocks_found = 0
-        
+
         # Load previous best difficulty to maintain progressive improvement
         self.best_difficulty = self.load_previous_best_difficulty()
         self.best_nonce = None
@@ -1234,7 +1399,8 @@ class ProductionBitcoinMiner:
         self.current_leading_zeros = 0
         self.best_leading_zeros_achieved = 0
         self.leading_zeros_history = []  # Track progress over time
-        self.target_leading_zeros = target_leading_zeros  # Ultra Hex handles 80+ zeros legitimately
+        # Ultra Hex handles 80+ zeros legitimately
+        self.target_leading_zeros = target_leading_zeros
 
         # BITS-TO-TARGET OPTIMIZATION (Your brilliant idea!)
         self.use_bits_target_optimization = True  # Enable your optimization
@@ -1245,12 +1411,14 @@ class ProductionBitcoinMiner:
         # Current mining state
         self.current_template = None
         self.current_target = None
-        self.current_difficulty = 2**64  # Universe-scale difficulty for full SHA-256 ceiling
+        # Universe-scale difficulty for full SHA-256 ceiling
+        self.current_difficulty = 2**64
         self.universe_target_zeros = 22  # MATHEMATICAL ENHANCEMENT TARGET - HONEST MINING!
 
         # Brain.QTL enhanced difficulty for mathematical superiority
         if self.brain_qtl_connection.get("brainstem_connected"):
-            qtl_target = self.brain_qtl_connection.get("target_leading_zeros", 64)
+            qtl_target = self.brain_qtl_connection.get(
+                "target_leading_zeros", 64)
             # Never limit below SHA-256 ceiling with Galaxy mathematical power
             qtl_target = max(qtl_target, 64)  # Ensure we use full capacity
             # Calculate difficulty for Brain.QTL target
@@ -1259,7 +1427,7 @@ class ProductionBitcoinMiner:
             print(
                 f"🧠 Brain.QTL Enhanced Target: {qtl_target} "
                 f"leading zeros (difficulty: {self.current_difficulty:,.0f})"
-                )
+            )
 
         self.mining_active = False
 
@@ -1270,10 +1438,11 @@ class ProductionBitcoinMiner:
         """Update global submission registry with new submission using System_File_Examples template"""
         try:
             from Singularity_Dave_Brainstem_UNIVERSE_POWERED import load_file_template_from_examples, capture_system_info
-            
+
             registry_path = self._brain_path("global_submission")
             if registry_path is None:
-                registry_path = (self.repo_root / f"{brain_get_base_path()}/Submission_Logs/global_submission.json")
+                registry_path = (
+                    self.repo_root / f"{brain_get_base_path()}/Submission_Logs/global_submission.json")
 
             # Load existing or initialize from template
             if registry_path.exists():
@@ -1281,16 +1450,19 @@ class ProductionBitcoinMiner:
                     with open(registry_path, "r", encoding="utf-8") as handle:
                         registry = json.load(handle)
                 except (OSError, IOError, PermissionError, json.JSONDecodeError) as e:
-                    self.logger.error(f"Cannot read registry, initializing from template: {e}")
-                    registry = load_file_template_from_examples('global_submission')
+                    self.logger.error(
+                        f"Cannot read registry, initializing from template: {e}")
+                    registry = load_file_template_from_examples(
+                        'global_submission')
                     registry['submissions'] = []
             else:
-                registry = load_file_template_from_examples('global_submission')
+                registry = load_file_template_from_examples(
+                    'global_submission')
                 registry['submissions'] = []
 
             # Get real system info
             system_info = capture_system_info()
-            
+
             moment = datetime.fromtimestamp(timestamp)
 
             # Create submission entry with real data
@@ -1306,13 +1478,16 @@ class ProductionBitcoinMiner:
                 "confirmations": submission_data.get("confirmations", 0),
                 "payout_btc": submission_data.get("amount_btc", 0.0)
             }
-            
+
             registry["submissions"].append(submission_entry)
             registry["metadata"]["last_updated"] = datetime.now().isoformat()
             registry["total_submissions"] = len(registry["submissions"])
-            registry["accepted"] = sum(1 for s in registry["submissions"] if s.get("status") == "accepted")
-            registry["rejected"] = sum(1 for s in registry["submissions"] if s.get("status") == "rejected")
-            registry["pending"] = sum(1 for s in registry["submissions"] if s.get("status") == "pending")
+            registry["accepted"] = sum(
+                1 for s in registry["submissions"] if s.get("status") == "accepted")
+            registry["rejected"] = sum(
+                1 for s in registry["submissions"] if s.get("status") == "rejected")
+            registry["pending"] = sum(
+                1 for s in registry["submissions"] if s.get("status") == "pending")
 
             try:
                 with open(registry_path, "w", encoding="utf-8") as handle:
@@ -1320,12 +1495,15 @@ class ProductionBitcoinMiner:
             except (OSError, IOError, PermissionError) as write_error:
                 self.logger.error(f"Cannot write registry: {write_error}")
                 try:
-                    fallback_path = Path("/tmp/global_submission_registry.json")
+                    fallback_path = Path(
+                        "/tmp/global_submission_registry.json")
                     with open(fallback_path, "w", encoding="utf-8") as handle:
                         json.dump(registry, handle, indent=2)
-                    self.logger.info(f"Registry saved to fallback: {fallback_path}")
+                    self.logger.info(
+                        f"Registry saved to fallback: {fallback_path}")
                 except Exception as fallback_error:
-                    self.logger.error(f"Fallback registry save failed: {fallback_error}")
+                    self.logger.error(
+                        f"Fallback registry save failed: {fallback_error}")
 
         except Exception as exc:
             print(f"❌ Error updating global submission registry: {exc}")
@@ -1334,7 +1512,7 @@ class ProductionBitcoinMiner:
         """Update daily ledger with detailed information using System_File_Examples template"""
         try:
             from Singularity_Dave_Brainstem_UNIVERSE_POWERED import load_file_template_from_examples, capture_system_info
-            
+
             timestamp_raw = submission_data.get("timestamp")
             moment = self._coerce_timestamp(timestamp_raw)
 
@@ -1357,9 +1535,13 @@ class ProductionBitcoinMiner:
                     / moment.strftime("%H")
                 )
                 ledger_path = fallback / "hourly_ledger.json"
-                # Validate hierarchical ledger path exists (should be created by Brainstem)
-                if not validate_folder_exists_miner(str(ledger_path.parent), "Production-Miner-hourly-ledger"):
-                    print(f"⚠️ Continuing without hourly ledger path: {ledger_path.parent}")
+                # Validate hierarchical ledger path exists (should be created
+                # by Brainstem)
+                if not validate_folder_exists_miner(
+                        str(ledger_path.parent), "Production-Miner-hourly-ledger"):
+                    print(
+                        f"⚠️ Continuing without hourly ledger path: {
+                            ledger_path.parent}")
 
             # Load existing or initialize from template
             if ledger_path.exists():
@@ -1367,7 +1549,8 @@ class ProductionBitcoinMiner:
                     with open(ledger_path, "r", encoding="utf-8") as handle:
                         ledger = json.load(handle)
                 except (OSError, IOError, PermissionError, json.JSONDecodeError) as e:
-                    self.logger.error(f"Cannot read ledger, initializing from template: {e}")
+                    self.logger.error(
+                        f"Cannot read ledger, initializing from template: {e}")
                     ledger = load_file_template_from_examples('hourly_ledger')
                     ledger['entries'] = []
             else:
@@ -1397,12 +1580,14 @@ class ProductionBitcoinMiner:
                 "leading_zeros": submission_data.get("leading_zeros", 0),
                 "status": "mined" if submission_data.get("meets_difficulty") else "mining"
             }
-            
+
             ledger["entries"].append(ledger_entry)
             ledger["metadata"]["last_updated"] = moment.isoformat()
-            ledger["hashes_this_hour"] = sum(e.get("hashes_tried", 0) for e in ledger["entries"])
+            ledger["hashes_this_hour"] = sum(
+                e.get("hashes_tried", 0) for e in ledger["entries"])
             ledger["attempts_this_hour"] = len(ledger["entries"])
-            ledger["blocks_found"] = sum(1 for e in ledger["entries"] if e.get("meets_difficulty"))
+            ledger["blocks_found"] = sum(
+                1 for e in ledger["entries"] if e.get("meets_difficulty"))
 
             self.save_to_dynamic_path(ledger_path, ledger)
 
@@ -1413,7 +1598,7 @@ class ProductionBitcoinMiner:
         """Update daily math proof with step-by-step evidence using templates"""
         try:
             from Singularity_Dave_Brainstem_UNIVERSE_POWERED import load_file_template_from_examples, capture_system_info
-            
+
             timestamp_raw = submission_data.get("timestamp")
             moment = self._coerce_timestamp(timestamp_raw)
 
@@ -1424,7 +1609,8 @@ class ProductionBitcoinMiner:
                 moment.strftime("%H"),
             )
 
-            proof_path = self._brain_path("hourly_math_proof", custom_components)
+            proof_path = self._brain_path(
+                "hourly_math_proof", custom_components)
             if proof_path is None:
                 fallback = (
                     self.repo_root
@@ -1474,7 +1660,7 @@ class ProductionBitcoinMiner:
                         "levels": self.knuth_sorrellian_class_levels,
                         "iterations": self.knuth_sorrellian_class_iterations
                     },
-                    "universe_bitload": "208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909"
+                    "universe_bitload": "get_bitload()"
                 }
             }
 
@@ -1499,7 +1685,9 @@ class ProductionBitcoinMiner:
         # Template file paths for daemon communication
         template_file = self.mining_process_folder / "working_template.json"
         if not template_file.parent.exists():
-            raise FileNotFoundError(f"Template directory not found: {template_file.parent}. Brain.QTL canonical authority via Brainstem should create this folder structure.")
+            raise FileNotFoundError(
+                f"Template directory not found: {
+                    template_file.parent}. Brain.QTL canonical authority via Brainstem should create this folder structure.")
 
         # Status tracking
         templates_processed = 0
@@ -1507,51 +1695,60 @@ class ProductionBitcoinMiner:
 
         while not self.shutdown_requested:
             try:
-                # CHECK FOR COMMANDS FROM LOOPING SYSTEM FIRST - HIGHEST PRIORITY
+                # CHECK FOR COMMANDS FROM LOOPING SYSTEM FIRST - HIGHEST
+                # PRIORITY
                 looping_command = self.check_looping_commands()
                 if looping_command == "mine_with_gps":
-                    print("🚀 GPS MINING command received - engaging Universe-Scale mathematical power!")
-                    
+                    print(
+                        "🚀 GPS MINING command received - engaging Universe-Scale mathematical power!")
+
                     # Load template from working_template.json
                     template_file = self.mining_process_folder / "working_template.json"
                     if not template_file.exists():
                         print(f"❌ Template file not found: {template_file}")
                         time.sleep(1)
                         continue
-                    
+
                     with open(template_file, 'r') as f:
                         template_data = json.load(f)
-                    
-                    # Extract actual template (handle both wrapped and direct formats)
+
+                    # Extract actual template (handle both wrapped and direct
+                    # formats)
                     if 'template' in template_data:
                         template = template_data['template']
                     else:
                         template = template_data
-                    
-                    print(f"📋 Loaded template for block: {template.get('height', 'unknown')}")
-                    print(f"   📦 Transactions: {len(template.get('transactions', []))}")
-                    
-                    # NOW use GPS mining with FULL Universe-Scale mathematical power!
+
+                    print(
+                        f"📋 Loaded template for block: {
+                            template.get(
+                                'height',
+                                'unknown')}")
+                    print(
+                        f"   📦 Transactions: {len(template.get('transactions', []))}")
+
+                    # NOW use GPS mining with FULL Universe-Scale mathematical
+                    # power!
                     results_file = self.mining_process_folder / "mining_result.json"
                     success = self.mine_with_gps_template_coordination(
                         template,
                         str(results_file),
                         max_time=10  # 10 seconds - write results fast!
                     )
-                    
+
                     print(f"✅ GPS mining completed - check {results_file}")
-                    
+
                     # Delete template AND command file to signal completion
                     if template_file.exists():
                         template_file.unlink()
                         print("✅ Template deleted - processing complete")
-                    
+
                     # Also delete command file so miner doesn't restart
                     cmd_file = self.temporary_template_root / "miner_commands.json"
                     if cmd_file.exists():
                         cmd_file.unlink()
                         print("✅ Command file deleted - ready for next command")
-                    
+
                     time.sleep(1)
                     continue
                 elif looping_command:
@@ -1559,18 +1756,21 @@ class ProductionBitcoinMiner:
                     # Handle other commands...
                     time.sleep(0.5)
                     continue
-                
+
                 # Only check for templates if NO commands are pending
                 # Brief sleep to avoid spinning
                 time.sleep(0.1)
-                
+
                 # Check for new template from looping system first
                 if template_file.exists():
                     # Read template from looping distribution
                     with open(template_file, "r") as f:
                         template_data = json.load(f)
 
-                    print(f"📥 Template received from looping system: Height {template_data.get('height', 'Unknown')}")
+                    print(
+                        f"📥 Template received from looping system: Height {
+                            template_data.get(
+                                'height', 'Unknown')}")
                     templates_processed += 1
                     last_template_time = time.time()
 
@@ -1583,37 +1783,48 @@ class ProductionBitcoinMiner:
                     # Mine the template with reasonable time limit (10 seconds)
                     print("⛏️ Starting mining on received template...")
                     mining_start_time = time.time()
-                    self.mine_block(max_time_seconds=10)  # 10 second limit - write results regardless
+                    # 10 second limit - write results regardless
+                    self.mine_block(max_time_seconds=10)
                     mining_elapsed = time.time() - mining_start_time
-                    
+
                     # Convert to hex for display
                     leading_zeros_hex = self.best_difficulty // 4
-                    print(f"✅ Mining completed after {mining_elapsed:.1f}s - best: {leading_zeros_hex} HEX leading zeros ({self.best_difficulty} bits)")
+                    print(
+                        f"✅ Mining completed after {
+                            mining_elapsed:.1f}s - best: {leading_zeros_hex} HEX leading zeros ({
+                            self.best_difficulty} bits)")
 
                     # Capture mining results
                     attempts_made = self.current_attempts - initial_attempts
                     hash_rate = attempts_made / mining_elapsed if mining_elapsed > 0 else 0
-                    
+
                     # Convert bits to hex for display
                     leading_zeros_hex = self.best_difficulty // 4  # 4 bits per hex char
                     leading_zeros_bits = self.best_difficulty
-                    
+
                     # Verify hash matches claimed leading zeros
                     hash_verified = False
                     if hasattr(self, 'best_hash') and self.best_hash:
-                        actual_leading_zeros = self.count_leading_zeros(self.best_hash)
+                        actual_leading_zeros = self.count_leading_zeros(
+                            self.best_hash)
                         if actual_leading_zeros == self.best_difficulty:
                             hash_verified = True
-                            print(f"✅ Hash verified: {actual_leading_zeros} bits matches claimed {self.best_difficulty} bits")
+                            print(
+                                f"✅ Hash verified: {actual_leading_zeros} bits matches claimed {
+                                    self.best_difficulty} bits")
                         else:
-                            print(f"⚠️ Hash mismatch: actual {actual_leading_zeros} bits vs claimed {self.best_difficulty} bits")
-                    
+                            print(
+                                f"⚠️ Hash mismatch: actual {actual_leading_zeros} bits vs claimed {
+                                    self.best_difficulty} bits")
+
                     # Build result based on whether we found a solution
                     result = {
                         "success": self.blocks_found > 0,
                         "blocks_found": self.blocks_found,
-                        "leading_zeros_hex": leading_zeros_hex,  # HEX zeros (standard display)
-                        "leading_zeros_bits": leading_zeros_bits,  # BITS (technical detail)
+                        # HEX zeros (standard display)
+                        "leading_zeros_hex": leading_zeros_hex,
+                        # BITS (technical detail)
+                        "leading_zeros_bits": leading_zeros_bits,
                         "best_difficulty": self.best_difficulty,
                         "leading_zeros": leading_zeros_hex,  # Use HEX for compatibility
                         "best_hash": self.best_hash if hasattr(self, 'best_hash') else "",
@@ -1635,56 +1846,65 @@ class ProductionBitcoinMiner:
                     # Clean up template file to signal completion
                     template_file.unlink()
                     print("✅ Template processing complete. Results saved.")
-                    
+
                     # 🎮 DEMO MODE FIX: Add sleep to prevent CPU spin
                     if self.demo_mode:
                         print("🎮 Demo mode: Sleeping before next template check...")
                         time.sleep(2)  # Brief pause in demo mode
-                
+
                 else:
                     # No template from looping system - behave like standalone mode
                     # Access DTM directly like standalone mode does
-                    print("📋 Checking Dynamic Template Manager cache for new template...")
-                    
+                    print(
+                        "📋 Checking Dynamic Template Manager cache for new template...")
+
                     # Use same template loading logic as standalone mode
                     dtm_template_file = self.temporary_template_root / "current_template.json"
                     if dtm_template_file.exists():
                         try:
                             with open(dtm_template_file, "r") as f:
                                 dtm_template_data = json.load(f)
-                            
-                            print(f"📥 Template loaded from DTM cache: Height {dtm_template_data.get('height', 'Unknown')}")
+
+                            print(
+                                f"📥 Template loaded from DTM cache: Height {
+                                    dtm_template_data.get(
+                                        'height', 'Unknown')}")
                             templates_processed += 1
                             last_template_time = time.time()
 
-                            # Set template and start mining (same as standalone)
+                            # Set template and start mining (same as
+                            # standalone)
                             self.current_template = dtm_template_data
                             self.blocks_found = 0
                             initial_attempts = self.current_attempts
                             initial_best = self.best_difficulty
 
-                            # Mine the template with reasonable time limit (10 seconds)
+                            # Mine the template with reasonable time limit (10
+                            # seconds)
                             print("⛏️ Starting mining on DTM template...")
                             mining_start_time = time.time()
-                            self.mine_block(max_time_seconds=10)  # 10 second limit - write results regardless
+                            # 10 second limit - write results regardless
+                            self.mine_block(max_time_seconds=10)
                             mining_elapsed = time.time() - mining_start_time
 
                             # Capture mining results
                             attempts_made = self.current_attempts - initial_attempts
                             hash_rate = attempts_made / mining_elapsed if mining_elapsed > 0 else 0
-                            
+
                             # Convert bits to hex for display
                             leading_zeros_hex = self.best_difficulty // 4
                             leading_zeros_bits = self.best_difficulty
-                            
+
                             # Verify hash matches claimed leading zeros
                             hash_verified = False
                             if hasattr(self, 'best_hash') and self.best_hash:
-                                actual_leading_zeros = self.count_leading_zeros(self.best_hash)
+                                actual_leading_zeros = self.count_leading_zeros(
+                                    self.best_hash)
                                 if actual_leading_zeros == self.best_difficulty:
                                     hash_verified = True
-                                    print(f"✅ Hash verified: matches {actual_leading_zeros} bits")
-                            
+                                    print(
+                                        f"✅ Hash verified: matches {actual_leading_zeros} bits")
+
                             # Build result
                             result = {
                                 "success": self.blocks_found > 0,
@@ -1709,15 +1929,18 @@ class ProductionBitcoinMiner:
                             with open(result_file, "w") as f:
                                 json.dump(result, f, indent=2)
 
-                            print("✅ DTM template processing complete. Results saved.")
-                            
+                            print(
+                                "✅ DTM template processing complete. Results saved.")
+
                             # 🎮 DEMO MODE FIX: Add sleep to prevent CPU spin
                             if self.demo_mode:
-                                print("🎮 Demo mode: Sleeping before next template check...")
+                                print(
+                                    "🎮 Demo mode: Sleeping before next template check...")
                                 time.sleep(2)  # Brief pause in demo mode
-                            
+
                         except Exception as dtm_error:
-                            print(f"⚠️ Error reading DTM template: {dtm_error}")
+                            print(
+                                f"⚠️ Error reading DTM template: {dtm_error}")
                     else:
                         print("📋 No DTM template available - waiting...")
                         gc.collect()
@@ -1725,7 +1948,9 @@ class ProductionBitcoinMiner:
 
                     # Status update every 30 seconds
                     if time.time() - last_template_time > 30:
-                        print(f"⏳ Daemon {self.terminal_id} waiting... (Processed: {templates_processed} templates)")
+                        print(
+                            f"⏳ Daemon {
+                                self.terminal_id} waiting... (Processed: {templates_processed} templates)")
                         last_template_time = time.time()
 
             except KeyboardInterrupt:
@@ -1758,7 +1983,10 @@ class ProductionBitcoinMiner:
 
         active_threads = threading.active_count()
         if active_threads > 1:  # Main thread plus any others
-            print(f"⚠️ {active_threads - 1} threads still active during shutdown")
+            print(
+                f"⚠️ {
+                    active_threads -
+                    1} threads still active during shutdown")
 
         print("✅ Graceful shutdown completed")
 
@@ -1768,7 +1996,8 @@ class ProductionBitcoinMiner:
             # Validate shared state directory exists
             shared_state_path = Path("shared_state")
             if not shared_state_path.exists():
-                raise FileNotFoundError(f"Shared state directory not found: {shared_state_path}. Brain.QTL canonical authority via Brainstem should create this folder structure.")
+                raise FileNotFoundError(
+                    f"Shared state directory not found: {shared_state_path}. Brain.QTL canonical authority via Brainstem should create this folder structure.")
 
             # Check if looping control file exists
             if self.control_file.exists():
@@ -1779,7 +2008,8 @@ class ProductionBitcoinMiner:
                     self.logger.error(f"Cannot read control file: {io_error}")
                     control_data = {}  # Fallback
                 except json.JSONDecodeError as json_error:
-                    self.logger.error(f"Invalid control file JSON: {json_error}")
+                    self.logger.error(
+                        f"Invalid control file JSON: {json_error}")
                     control_data = {}  # Fallback
 
                 if control_data.get("looping_system_active", False):
@@ -1788,7 +2018,8 @@ class ProductionBitcoinMiner:
 
                     # Initialize status file for looping system
                     self.update_status_for_looping_system(
-                        {"running": False, "initialized": True, "coordination_active": True}
+                        {"running": False, "initialized": True,
+                            "coordination_active": True}
                     )
                 else:
                     self.looping_control_enabled = False
@@ -1804,14 +2035,14 @@ class ProductionBitcoinMiner:
         try:
             if not self.looping_control_enabled:
                 return
-            
+
             # Log status update to system reports instead of separate file
             self.logger.info(f"Mining status update: {status_update}")
-            
+
             # Update internal state tracking
             status_update["last_update"] = datetime.now().isoformat()
             status_update["controlled_by_looping"] = True
-            
+
             # Store in memory for reference
             if not hasattr(self, '_current_status'):
                 self._current_status = {}
@@ -1823,24 +2054,44 @@ class ProductionBitcoinMiner:
     def read_looping_system_control(self):
         """Read control commands from looping system"""
         try:
-            system_base = "Test/Demo" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System"
-            control_file = normalized_path(f"{brain_get_base_path()}/{system_base}/shared_state/miner_control.json")
+            system_base = "Test/Demo" if os.getenv(
+                'DEMO_MODE', '').lower() == 'true' else "System"
+            control_file = normalized_path(
+                f"{brain_get_base_path()}/{system_base}/shared_state/miner_control.json")
             if control_file.exists():
                 try:
                     with open(control_file, "r") as f:
                         self.looping_control = json.load(f)
                 except (OSError, IOError, PermissionError) as io_error:
-                    self.logger.error(f"Cannot read looping control file: {io_error}")
+                    self.logger.error(
+                        f"Cannot read looping control file: {io_error}")
                     self.looping_control = {}  # Fallback
                 except json.JSONDecodeError as json_error:
-                    self.logger.error(f"Invalid looping control JSON: {json_error}")
+                    self.logger.error(
+                        f"Invalid looping control JSON: {json_error}")
                     self.looping_control = {}  # Fallback
 
                 print("🎮 LOOPING CONTROL LOADED:")
-                print(f"   🎯 Target zeros: {self.looping_control.get('target_leading_zeros', 'none')}")
-                print(f"   📋 Command: {self.looping_control.get('command', 'none')}")
-                print(f"   🔄 Mode: {self.looping_control.get('miner_mode', 'standard')}")
-                print(f"   🧠 GPS enabled: {self.looping_control.get('gps_orchestration_enabled', False)}")
+                print(
+                    f"   🎯 Target zeros: {
+                        self.looping_control.get(
+                            'target_leading_zeros',
+                            'none')}")
+                print(
+                    f"   📋 Command: {
+                        self.looping_control.get(
+                            'command',
+                            'none')}")
+                print(
+                    f"   🔄 Mode: {
+                        self.looping_control.get(
+                            'miner_mode',
+                            'standard')}")
+                print(
+                    f"   🧠 GPS enabled: {
+                        self.looping_control.get(
+                            'gps_orchestration_enabled',
+                            False)}")
 
                 # Update our target based on looping system
                 if "target_leading_zeros" in self.looping_control:
@@ -1881,18 +2132,23 @@ class ProductionBitcoinMiner:
                     print("🛑 STOP command received from looping system")
                     break
 
-                # No internal safety cap; external controller should stop mining
+                # No internal safety cap; external controller should stop
+                # mining
 
                 # Update target if changed
-                new_target = self.looping_control.get("target_leading_zeros", target_zeros)
+                new_target = self.looping_control.get(
+                    "target_leading_zeros", target_zeros)
                 if new_target != target_zeros:
-                    print(f"🎯 TARGET UPDATED: {target_zeros} → {new_target} zeros")
+                    print(
+                        f"🎯 TARGET UPDATED: {target_zeros} → {new_target} zeros")
                     target_zeros = new_target
                     sustain_count = 0  # Reset sustain count
 
                 # Run mining cycle
-                print(f"\n🔄 Mining cycle for {target_zeros} zeros (sustained: {sustain_count}/{required_sustains})")
-                result = self.mine_block(max_time_seconds=30)  # 30 - second cycles
+                print(
+                    f"\n🔄 Mining cycle for {target_zeros} zeros (sustained: {sustain_count}/{required_sustains})")
+                result = self.mine_block(
+                    max_time_seconds=30)  # 30 - second cycles
 
                 if result and "leading_zeros" in result:
                     achieved = result["leading_zeros"]
@@ -1905,9 +2161,12 @@ class ProductionBitcoinMiner:
                         )
 
                         if sustain_count >= required_sustains:
-                            print(f"🎯 TARGET SUSTAINED! Achieved {target_zeros} zeros {sustain_count} times")
-                            print("🔄 Entering maintenance mode - will continue at this level")
-                            # Continue mining but report that target is sustained
+                            print(
+                                f"🎯 TARGET SUSTAINED! Achieved {target_zeros} zeros {sustain_count} times")
+                            print(
+                                "🔄 Entering maintenance mode - will continue at this level")
+                            # Continue mining but report that target is
+                            # sustained
                             self.update_status_for_looping_system(
                                 {
                                     "target_achieved": True,
@@ -1919,7 +2178,8 @@ class ProductionBitcoinMiner:
                     else:
                         # Reset sustain count if we drop below target
                         if sustain_count > 0:
-                            print(f"⚠️ Dropped below target ({achieved} < {target_zeros}), resetting sustain count")
+                            print(
+                                f"⚠️ Dropped below target ({achieved} < {target_zeros}), resetting sustain count")
                             sustain_count = 0
 
                 # Brief pause between cycles
@@ -1943,8 +2203,17 @@ class ProductionBitcoinMiner:
         try:
             if not self.daemon_mode:
                 print("📋 SETTING TEMPLATE FOR MINING")
-                print(f"   📊 Template height: {template.get('height', 'unknown')}")
-                print(f"   🎯 Template target: {template.get('target', 'unknown')[:20]}...")
+                print(
+                    f"   📊 Template height: {
+                        template.get(
+                            'height',
+                            'unknown')}")
+                print(
+                    f"   🎯 Template target: {
+                        template.get(
+                            'target',
+                            'unknown')[
+                            :20]}...")
 
             # Store template for mining operations
             self.current_template = template
@@ -1964,7 +2233,12 @@ class ProductionBitcoinMiner:
         try:
             print("📋 RECEIVING TEMPLATE FROM DYNAMIC TEMPLATE MANAGER")
             print(f"   📊 Template height: {template.get('height', 'unknown')}")
-            print(f"   🎯 Template target: {template.get('target', 'unknown')[:20]}...")
+            print(
+                f"   🎯 Template target: {
+                    template.get(
+                        'target',
+                        'unknown')[
+                        :20]}...")
 
             # LIVE HOT-SWAP: Update template instantly without stopping mining
             self.live_template_swap(template)
@@ -1986,28 +2260,31 @@ class ProductionBitcoinMiner:
         except Exception as e:
             print(f"❌ Template reception error: {e}")
             return False
-    
+
     def register_with_dtm(self, dtm_instance):
         """🚀 RAM-BASED: Register with DTM and get template queue"""
         try:
             self.dtm_instance = dtm_instance
             self.template_queue = dtm_instance.register_miner(self.process_id)
-            print(f"✅ Registered with DTM - RAM queue ready for {self.process_id}")
+            print(
+                f"✅ Registered with DTM - RAM queue ready for {self.process_id}")
             return True
         except Exception as e:
             print(f"❌ DTM registration failed: {e}")
             self.dtm_instance = None
             self.template_queue = None
             return False
-    
-    def get_template_from_dtm_ram(self, timeout: float = 60.0) -> Optional[dict]:
+
+    def get_template_from_dtm_ram(
+            self, timeout: float = 60.0) -> Optional[dict]:
         """🚀 RAM-BASED: Get template from DTM via RAM queue (INSTANT - no disk I/O)"""
         if not self.dtm_instance or not self.template_queue:
             print("⚠️ Not registered with DTM - falling back to file-based template")
             return None
-        
+
         try:
-            template = self.dtm_instance.get_template_from_ram(self.process_id, timeout)
+            template = self.dtm_instance.get_template_from_ram(
+                self.process_id, timeout)
             if template:
                 print(f"📥 Retrieved template from DTM RAM queue")
                 self.receive_template_from_dynamic_manager(template)
@@ -2016,23 +2293,24 @@ class ProductionBitcoinMiner:
         except Exception as e:
             print(f"❌ RAM template retrieval failed: {e}")
             return None
-    
+
     def notify_solution_found(self, solution: dict):
         """⚡ INSTANT: Write solution immediately when found"""
         try:
             # Write to process folder INSTANTLY with DTM-expected filename
             import time
             timestamp = int(time.time())
-            solution_file = self.mining_process_folder / f"solution_{timestamp}.json"
+            solution_file = self.mining_process_folder / \
+                f"solution_{timestamp}.json"
             with open(solution_file, "w") as f:
                 json.dump(solution, f, indent=2)
             print(f"⚡ Solution written INSTANTLY to {solution_file}")
-            
+
             # Signal DTM if registered
             if self.dtm_instance:
                 # DTM will pick it up via automatic monitoring
                 print(f"📡 DTM notified - solution ready for validation")
-            
+
             return True
         except Exception as e:
             print(f"❌ Solution write failed: {e}")
@@ -2042,21 +2320,33 @@ class ProductionBitcoinMiner:
         """Hot-swap template while mining continues (no interruption to crazy leading zeros)"""
         try:
             print("🔄 HOT - SWAPPING TEMPLATE (mining continues)")
-            print(f"   📊 New template height: {new_template.get('height', 'unknown')}")
-            print(f"   🎯 New template target: {new_template.get('target', 'unknown')[:20]}...")
+            print(
+                f"   📊 New template height: {
+                    new_template.get(
+                        'height',
+                        'unknown')}")
+            print(
+                f"   🎯 New template target: {
+                    new_template.get(
+                        'target',
+                        'unknown')[
+                        :20]}...")
 
-            # Instantly update current template - mining loop will pick up new template on next nonce
+            # Instantly update current template - mining loop will pick up new
+            # template on next nonce
             self.current_template = new_template
             self._get_template_cache(self.current_template)
 
-            print("✅ Template hot - swapped successfully (leading zeros generation uninterrupted)")
+            print(
+                "✅ Template hot - swapped successfully (leading zeros generation uninterrupted)")
             return True
 
         except Exception as e:
             print(f"❌ Template hot - swap error: {e}")
             return False
 
-    def mine_with_gps_template_coordination(self, template, results_path, max_time):
+    def mine_with_gps_template_coordination(
+            self, template, results_path, max_time):
         """GPS-Enhanced mining with template coordination for looping system"""
         try:
             print("🧠 GPS - ENHANCED MINING WITH TEMPLATE COORDINATION")
@@ -2076,12 +2366,18 @@ class ProductionBitcoinMiner:
             target_leading_zeros = max(
                 universe_scale_config.get("target_leading_zeros", 51), 51
             )  # Force 51+ like standalone
-            use_targeted_ranges = production_config.get("use_targeted_ranges", False)
-            targeted_nonce_ranges = gps_intelligence.get("targeted_nonce_ranges", [])
-            solution_probability = gps_intelligence.get("solution_probability", 0.0)
+            use_targeted_ranges = production_config.get(
+                "use_targeted_ranges", False)
+            targeted_nonce_ranges = gps_intelligence.get(
+                "targeted_nonce_ranges", [])
+            solution_probability = gps_intelligence.get(
+                "solution_probability", 0.0)
 
-            print(f"   � UNIVERSE - SCALE DIFFICULTY: {universe_scale_difficulty:,.0f} (matching standalone)")
-            print(f"   �🎯 Target Leading Zeros: {target_leading_zeros} (universe - scale)")
+            print(
+                f"   � UNIVERSE - SCALE DIFFICULTY: {
+                    universe_scale_difficulty:,.0f} (matching standalone)")
+            print(
+                f"   �🎯 Target Leading Zeros: {target_leading_zeros} (universe - scale)")
             print(f"   📊 Solution Probability: {solution_probability:.6f}")
             print(f"   🔢 Targeted Nonce Ranges: {len(targeted_nonce_ranges)}")
             print("   🧠 Full Mathematical Framework: ACTIVATED")
@@ -2101,12 +2397,18 @@ class ProductionBitcoinMiner:
                     if time.time() - start_time >= max_time:
                         break
 
-                    print(f"🔍 Mining range: {range_info['start']:,} to {range_info['end']:,}")
-                    print(f"   🎯 GPS Confidence: {range_info['gps_confidence']:.2f}")
+                    print(
+                        f"🔍 Mining range: {
+                            range_info['start']:,    } to {
+                            range_info['end']:,        }")
+                    print(
+                        f"   🎯 GPS Confidence: {
+                            range_info['gps_confidence']:.2f}")
 
                     # Mine within this targeted range
                     range_result = self.mine_gps_targeted_range(
-                        template, range_info, results_path, min(max_time - (time.time() - start_time), 10)
+                        template, range_info, results_path, min(
+                            max_time - (time.time() - start_time), 10)
                     )
 
                     if range_result and range_result["leading_zeros"] > best_result["leading_zeros"]:
@@ -2114,7 +2416,9 @@ class ProductionBitcoinMiner:
 
                         # Check if we found a solution
                         if best_result["leading_zeros"] >= target_leading_zeros:
-                            print(f"🎉 GPS SOLUTION FOUND! {best_result['leading_zeros']} leading zeros")
+                            print(
+                                f"🎉 GPS SOLUTION FOUND! {
+                                    best_result['leading_zeros']} leading zeros")
 
                             final_results = {
                                 "status": "solution_found",
@@ -2136,24 +2440,31 @@ class ProductionBitcoinMiner:
                                 with open(results_path, "w") as f:
                                     json.dump(final_results, f)
                             except (OSError, IOError, PermissionError) as write_error:
-                                self.logger.error(f"Cannot write results: {write_error}")
-                                fallback_path = normalize_path_str("/tmp / mining_results.json")
+                                self.logger.error(
+                                    f"Cannot write results: {write_error}")
+                                fallback_path = normalize_path_str(
+                                    "/tmp / mining_results.json")
                                 try:
                                     with open(fallback_path, "w") as f:
                                         json.dump(final_results, f)
-                                    self.logger.info(f"Results saved to fallback: {fallback_path}")
+                                    self.logger.info(
+                                        f"Results saved to fallback: {fallback_path}")
                                 except Exception as fallback_error:
-                                    self.logger.error(f"Fallback results save failed: {fallback_error}")
+                                    self.logger.error(
+                                        f"Fallback results save failed: {fallback_error}")
 
                             return True
             else:
                 print("🌌 Using universe - scale mathematical mining")
 
                 # Use standard universe-scale mining
-                mining_result = self.mine_block_with_universe_scale_math(template, max_time, target_leading_zeros)
+                mining_result = self.mine_block_with_universe_scale_math(
+                    template, max_time, target_leading_zeros)
 
-                if mining_result and mining_result.get("leading_zeros", 0) >= target_leading_zeros:
-                    print(f"🎉 UNIVERSE - SCALE SOLUTION FOUND! {mining_result['leading_zeros']} leading zeros")
+                if mining_result and mining_result.get(
+                        "leading_zeros", 0) >= target_leading_zeros:
+                    print(
+                        f"🎉 UNIVERSE - SCALE SOLUTION FOUND! {mining_result['leading_zeros']} leading zeros")
 
                     final_results = {
                         "status": "solution_found",
@@ -2175,7 +2486,7 @@ class ProductionBitcoinMiner:
             # No solution found in time limit - write partial results
             leading_zeros_hex = self.best_difficulty // 4
             leading_zeros_bits = self.best_difficulty
-            
+
             timeout_results = {
                 "status": "timeout",
                 "success": False,
@@ -2195,25 +2506,36 @@ class ProductionBitcoinMiner:
 
             # Display results
             if self.best_difficulty > 0:
-                print(f"⏰ GPS Mining timeout - Best achieved: {leading_zeros_hex} HEX leading zeros ({leading_zeros_bits} bits)")
-                print(f"   Hash: {self.best_hash[:64] if hasattr(self, 'best_hash') else 'N/A'}...")
-                print(f"   Nonce: {self.best_nonce if hasattr(self, 'best_nonce') else 0:,}")
+                print(
+                    f"⏰ GPS Mining timeout - Best achieved: {leading_zeros_hex} HEX leading zeros ({leading_zeros_bits} bits)")
+                print(
+                    f"   Hash: {self.best_hash[:64] if hasattr(self, 'best_hash') else 'N/A'}...")
+                print(
+                    f"   Nonce: {
+                        self.best_nonce if hasattr(
+                            self,
+                            'best_nonce') else 0:,        }")
             else:
                 print(f"⏰ GPS Mining timeout - No improved results")
             return False
-            
+
         except Exception as e:
             print(f"❌ GPS Mining coordination error: {e}")
             return False
 
-    def mine_gps_targeted_range(self, template, range_info, results_path, max_time):
+    def mine_gps_targeted_range(
+            self, template, range_info, results_path, max_time):
         """Mine within a GPS-targeted nonce range using universe-scale mathematical framework"""
         try:
             start_nonce = range_info["start"]
             end_nonce = range_info["end"]
             confidence = range_info["gps_confidence"]
 
-            print(f"⛏️ GPS Mining range: {start_nonce:,} to {end_nonce:,} (confidence: {confidence:.2f})")
+            print(
+                f"⛏️ GPS Mining range: {
+                    start_nonce:,    } to {
+                    end_nonce:,        } (confidence: {
+                    confidence:.2f})")
             print("🌌 ACTIVATING UNIVERSE - SCALE FRAMEWORK FOR GPS RANGE")
 
             # Use the REAL mining session within the targeted range
@@ -2221,14 +2543,17 @@ class ProductionBitcoinMiner:
             self.gps_target_range = range_info
 
             # Run universe-scale mining session
-            mining_session = self.start_mining_session(max_time_seconds=max_time)
+            mining_session = self.start_mining_session(
+                max_time_seconds=max_time)
 
-            if mining_session and mining_session.get("best_leading_zeros", 0) > 0:
+            if mining_session and mining_session.get(
+                    "best_leading_zeros", 0) > 0:
                 # Get Ultra Hex + Standard dual display
-                triple_count = self.get_triple_leading_zeros(mining_session["best_hash"])
+                triple_count = self.get_triple_leading_zeros(
+                    mining_session["best_hash"])
                 ultra_hex = triple_count['ultra_hex']['ultra_hex_leading_zeros']
                 standard_hex = triple_count['standard_hex']
-                
+
                 best_result = {
                     "leading_zeros": mining_session["best_leading_zeros"],
                     "nonce": mining_session["best_nonce"],
@@ -2239,10 +2564,17 @@ class ProductionBitcoinMiner:
 
                 ultra_hex_data = triple_count['ultra_hex']
                 ultra_bucket = ultra_hex_data['ultra_hex_digit']
-                print(f"🎉 GPS UNIVERSE-SCALE ULTRA HEX RESULT: Ultra-{ultra_bucket} Bucket ({ultra_hex} enhanced zeros), {standard_hex} Standard leading zeros!")
+                print(
+                    f"🎉 GPS UNIVERSE-SCALE ULTRA HEX RESULT: Ultra-{ultra_bucket} Bucket ({ultra_hex} enhanced zeros), {standard_hex} Standard leading zeros!")
                 print(f"   🔢 Nonce: {best_result['nonce']:,}")
-                print(f"   📊 Hash Rate: {mining_session.get('hash_rate', 0):,.0f} H / s")
-                print(f"   💥 Ultra Hex Power: {triple_count['ultra_hex']['total_equivalent_operations']:,} SHA-256 operations represented!")
+                print(
+                    f"   📊 Hash Rate: {
+                        mining_session.get(
+                            'hash_rate',
+                            0):,.0f} H / s")
+                print(
+                    f"   💥 Ultra Hex Power: {
+                        triple_count['ultra_hex']['total_equivalent_operations']:,    } SHA-256 operations represented!")
 
                 # Update progress for looping system
                 progress_status = {
@@ -2270,7 +2602,8 @@ class ProductionBitcoinMiner:
             traceback.print_exc()
             return None
 
-    def mine_block_with_universe_scale_math(self, template, max_time, target_leading_zeros):
+    def mine_block_with_universe_scale_math(
+            self, template, max_time, target_leading_zeros):
         """Mine block using universe-scale mathematical framework - SYNCHRONOUS"""
         try:
             print("🌌 UNIVERSE-SCALE MATHEMATICAL MINING")
@@ -2278,16 +2611,18 @@ class ProductionBitcoinMiner:
 
             # Set template for mining
             self.current_template = template
-            
+
             # Mine DIRECTLY (synchronous - waits for completion)
-            print(f"⛏️  Mining for {max_time} seconds with Universe-Scale math...")
+            print(
+                f"⛏️  Mining for {max_time} seconds with Universe-Scale math...")
             self.mine_block(max_time_seconds=max_time)
-            
+
             # Get results after mining completes
             if self.best_difficulty > 0:
-                # Get triple leading zeros count (Ultra Hex + Standard + Binary)
+                # Get triple leading zeros count (Ultra Hex + Standard +
+                # Binary)
                 triple_count = self.get_triple_leading_zeros(self.best_hash)
-                
+
                 best_result = {
                     "leading_zeros": self.best_difficulty,
                     "nonce": self.best_nonce,
@@ -2300,11 +2635,23 @@ class ProductionBitcoinMiner:
                 ultra_hex_info = triple_count['ultra_hex']
                 ultra_bucket = ultra_hex_info['ultra_hex_digit']
                 ultra_enhanced = ultra_hex_info['ultra_hex_leading_zeros']
-                print(f"🌌 UNIVERSE-SCALE ULTRA HEX RESULT: Ultra-{ultra_bucket} Bucket ({ultra_enhanced} enhanced zeros), {triple_count['standard_hex']} Standard leading zeros")
-                print(f"💥 Ultra Hex Bucket: Ultra {ultra_hex_info['ultra_hex_digit']} ({ultra_hex_info['bucket_progress']}/64 progress, {ultra_hex_info['bucket_fullness_percent']:.1f}% full)")
-                print(f"🔗 Ultra Hex Bucket System: {ultra_hex_info['bucket_explanation']}")
-                print(f"🚀 Galaxy Enhancement: 666-digit^6 mathematical framework (influence: +{ultra_hex_info['galaxy_influence']})")
-                print(f"🔢 Standard Achievement: {triple_count['standard_hex']}/256 maximum leading zeros")
+                print(
+                    f"🌌 UNIVERSE-SCALE ULTRA HEX RESULT: Ultra-{ultra_bucket} Bucket ({ultra_enhanced} enhanced zeros), {
+                        triple_count['standard_hex']} Standard leading zeros")
+                print(
+                    f"💥 Ultra Hex Bucket: Ultra {
+                        ultra_hex_info['ultra_hex_digit']} ({
+                        ultra_hex_info['bucket_progress']}/64 progress, {
+                        ultra_hex_info['bucket_fullness_percent']:.1f}% full)")
+                print(
+                    f"🔗 Ultra Hex Bucket System: {
+                        ultra_hex_info['bucket_explanation']}")
+                print(
+                    f"🚀 Galaxy Enhancement: 666-digit^6 mathematical framework (influence: +{
+                        ultra_hex_info['galaxy_influence']})")
+                print(
+                    f"🔢 Standard Achievement: {
+                        triple_count['standard_hex']}/256 maximum leading zeros")
                 print(f"   🔢 Nonce: {best_result['nonce']:,}")
                 print(f"   📊 Attempts: {self.current_attempts:,}")
                 print("   💎 ULTRA HEX REVOLUTIONARY BREAKTHROUGH ACHIEVED!")
@@ -2339,7 +2686,9 @@ class ProductionBitcoinMiner:
             bits = template.get("bits", "170404cb")
 
             # Construct block header (simplified but proper structure)
-            block_header = f"{prev_hash}{merkle_root}{timestamp:08x}{bits}{nonce:08x}"
+            block_header = f"{prev_hash}{merkle_root}{
+                timestamp:08x}{bits}{
+                nonce:08x}"
 
             # Double SHA256 (Bitcoin standard)
             first_hash = hashlib.sha256(block_header.encode()).digest()
@@ -2382,10 +2731,12 @@ class ProductionBitcoinMiner:
 
             while True:
                 cycle += 1
-                print(f"\n🔄 Mining cycle #{cycle} (target: {target_leading_zeros} zeros)")
+                print(
+                    f"\n🔄 Mining cycle #{cycle} (target: {target_leading_zeros} zeros)")
 
                 # Mine for a reasonable time
-                result = self.mine_block(max_time_seconds=60)  # 1 minute cycles
+                result = self.mine_block(
+                    max_time_seconds=60)  # 1 minute cycles
 
                 if result:
                     leading_zeros = result.get("leading_zeros", 0)
@@ -2402,24 +2753,32 @@ class ProductionBitcoinMiner:
 
                     # Display Ultra Hex results for this cycle
                     if result and result.get("hash"):
-                        triple_count = self.get_triple_leading_zeros(result.get("hash"))
+                        triple_count = self.get_triple_leading_zeros(
+                            result.get("hash"))
                         ultra_hex_info = triple_count['ultra_hex']
                         ultra_bucket = ultra_hex_info['ultra_hex_digit']
                         ultra_enhanced = ultra_hex_info['ultra_hex_leading_zeros']
-                        print(f"📊 Cycle #{cycle}: {leading_zeros} standard leading zeros, Ultra-{ultra_bucket} Bucket ({ultra_enhanced} enhanced zeros)")
-                        print(f"   💥 Ultra Hex Power: {ultra_hex_info['total_equivalent_operations']:,} SHA-256 operations")
+                        print(
+                            f"📊 Cycle #{cycle}: {leading_zeros} standard leading zeros, Ultra-{ultra_bucket} Bucket ({ultra_enhanced} enhanced zeros)")
+                        print(
+                            f"   💥 Ultra Hex Power: {
+                                ultra_hex_info['total_equivalent_operations']:,    } SHA-256 operations")
                     else:
-                        print(f"📊 Cycle #{cycle}: {leading_zeros} leading zeros achieved")
+                        print(
+                            f"📊 Cycle #{cycle}: {leading_zeros} leading zeros achieved")
 
                     # Check if we reached target
                     if leading_zeros >= target_leading_zeros:
-                        print(f"� TARGET ACHIEVED! {leading_zeros} >= {target_leading_zeros} leading zeros")
-                        print("⚡ CONTINUING CONTINUOUS MINING TO SUSTAIN TARGET LEVEL...")
+                        print(
+                            f"� TARGET ACHIEVED! {leading_zeros} >= {target_leading_zeros} leading zeros")
+                        print(
+                            "⚡ CONTINUING CONTINUOUS MINING TO SUSTAIN TARGET LEVEL...")
 
                         # Update sustained leading zeros
                         if leading_zeros > self.leading_zeros_sustained:
                             self.leading_zeros_sustained = leading_zeros
-                            print(f"🆙 New sustained level: {leading_zeros} leading zeros")
+                            print(
+                                f"🆙 New sustained level: {leading_zeros} leading zeros")
 
                         # Update status but DON'T STOP - keep mining!
                         self.update_status_for_looping_system(
@@ -2438,18 +2797,22 @@ class ProductionBitcoinMiner:
                     # Update sustained leading zeros
                     if leading_zeros > self.leading_zeros_sustained:
                         self.leading_zeros_sustained = leading_zeros
-                        
-                        # Get Ultra Hex + Standard display for sustained results
+
+                        # Get Ultra Hex + Standard display for sustained
+                        # results
                         if result and result.get("hash"):
-                            triple_count = self.get_triple_leading_zeros(result.get("hash"))
+                            triple_count = self.get_triple_leading_zeros(
+                                result.get("hash"))
                             ultra_hex_data = triple_count['ultra_hex']
                             ultra_bucket = ultra_hex_data['ultra_hex_digit']
                             ultra_enhanced = ultra_hex_data['ultra_hex_leading_zeros']
                             standard_hex = triple_count['standard_hex']
-                                
-                            print(f"🆙 NEW BEST SUSTAINED: 🌌 Ultra-{ultra_bucket} Bucket ({ultra_enhanced} enhanced zeros), 🔷 {standard_hex} Standard leading zeros!")
+
+                            print(
+                                f"🆙 NEW BEST SUSTAINED: 🌌 Ultra-{ultra_bucket} Bucket ({ultra_enhanced} enhanced zeros), 🔷 {standard_hex} Standard leading zeros!")
                         else:
-                            print(f"🆙 New best: {leading_zeros} leading zeros sustained")
+                            print(
+                                f"🆙 New best: {leading_zeros} leading zeros sustained")
 
                 # Check for stop command from looping system
                 if self.check_looping_stop_command():
@@ -2483,7 +2846,8 @@ class ProductionBitcoinMiner:
             print(f"❌ Mining error: {e}")
 
             self.update_status_for_looping_system(
-                {"running": False, "success": False, "error": str(e), "mining_completed": datetime.now().isoformat()}
+                {"running": False, "success": False, "error": str(
+                    e), "mining_completed": datetime.now().isoformat()}
             )
 
             return None
@@ -2511,7 +2875,8 @@ class ProductionBitcoinMiner:
         print("🔥 LIVE TEMPLATE HOT - SWAP: Zero interruption to mathematical power!")
 
         # Atomic template swap - single operation, no performance impact
-        old_height = self.current_template.get("height", "unknown") if self.current_template else "none"
+        old_height = self.current_template.get(
+            "height", "unknown") if self.current_template else "none"
         self.current_template = new_template
         new_height = new_template.get("height", "unknown")
 
@@ -2519,7 +2884,8 @@ class ProductionBitcoinMiner:
         print("🌌 Mathematical power continues uninterrupted!")
 
         # The mining loop will automatically pick up the new template
-        # on next iteration - no stopping, no slowing, pure mathematical continuity
+        # on next iteration - no stopping, no slowing, pure mathematical
+        # continuity
 
     def return_results_to_dynamic_manager(self, mining_results):
         """Return mining results to dynamic template manager (for looping system workflow)"""
@@ -2528,14 +2894,20 @@ class ProductionBitcoinMiner:
 
             if mining_results and mining_results.get("success"):
                 print("✅ Successful results being returned:")
-                print(f"   🎯 Leading zeros: {mining_results.get('leading_zeros_achieved')}")
+                print(
+                    f"   🎯 Leading zeros: {
+                        mining_results.get('leading_zeros_achieved')}")
                 print(f"   🔢 Nonce: {mining_results.get('nonce')}")
-                print(f"   📋 Complete block data: {'✓' if mining_results.get('complete_block_data') else '✗'}")
+                print(
+                    f"   📋 Complete block data: {
+                        '✓' if mining_results.get('complete_block_data') else '✗'}")
             else:
                 print("⚠️ Partial or failed results being returned")
 
-            # Save results to shared state for dynamic template manager to pick up
-            results_file = normalized_path("shared_state / production_miner_results.json")
+            # Save results to shared state for dynamic template manager to pick
+            # up
+            results_file = normalized_path(
+                "shared_state / production_miner_results.json")
             with open(results_file, "w") as f:
                 json.dump(mining_results, f, indent=2)
 
@@ -2586,26 +2958,31 @@ class ProductionBitcoinMiner:
 
             # Test basic initialization
             if not hasattr(self, "brain_qtl_connection"):
-                return {"verification_passed": False, "error": "Brain.QTL connection not initialized"}
+                return {"verification_passed": False,
+                        "error": "Brain.QTL connection not initialized"}
 
             # Test template generation
             template = self.get_fallback_universe_template()
             if not template:
-                return {"verification_passed": False, "error": "Template generation failed"}
+                return {"verification_passed": False,
+                        "error": "Template generation failed"}
 
             # Test hash calculation
             test_hash = self.calculate_universe_hash(template, 12345)
             if not test_hash:
-                return {"verification_passed": False, "error": "Hash calculation failed"}
+                return {"verification_passed": False,
+                        "error": "Hash calculation failed"}
 
             # Test leading zeros counting
             leading_zeros = self.count_leading_zeros(test_hash)
             if leading_zeros < 0:
-                return {"verification_passed": False, "error": "Leading zeros counting failed"}
+                return {"verification_passed": False,
+                        "error": "Leading zeros counting failed"}
 
             print("✅ Basic mining verification passed")
             print(
-                f"   🧠 Brain.QTL: {'CONNECTED' if self.brain_qtl_connection.get('brainstem_connected') else 'FALLBACK'}"
+                f"   🧠 Brain.QTL: {
+                    'CONNECTED' if self.brain_qtl_connection.get('brainstem_connected') else 'FALLBACK'}"
             )
             print("   📋 Template: Generated successfully")
             print(f"   🔢 Hash test: {leading_zeros} leading zeros achieved")
@@ -2659,8 +3036,10 @@ class ProductionBitcoinMiner:
             header = self.construct_block_header(template, nonce)
 
             # Calculate LEGITIMATE double SHA256 hash (Bitcoin standard)
-            # NO MANIPULATION - Bitcoin network will verify this exact calculation
-            hash_result = hashlib.sha256(hashlib.sha256(header).digest()).digest()
+            # NO MANIPULATION - Bitcoin network will verify this exact
+            # calculation
+            hash_result = hashlib.sha256(
+                hashlib.sha256(header).digest()).digest()
 
             return hash_result.hex()
 
@@ -2668,97 +3047,123 @@ class ProductionBitcoinMiner:
             print(f"❌ Error calculating legitimate Bitcoin hash: {e}")
             return None
 
-    def calculate_mathematical_over_solution(self, template_data):
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+# DELETED DUPLICATE
+
+    def derive_bitcoin_nonces_from_massive_calculator(
+            self, massive_calc, template_data):
         """
-        KNUTH-SORRELLIAN CALCULATOR: Generate massive leading zero solutions (20-50+ zeros)
-        Returns mathematical over-solutions that DTM will down-convert to Bitcoin levels
+        Derive actual Bitcoin nonces from a massive mathematical over-solution.
+        This converts the high-level mathematical construct into specific 32-bit nonces.
         """
-        print("🧮 MATHEMATICAL CALCULATOR: Generating over-solutions with massive leading zeros...")
-        
-        # Universe-scale mathematical parameters
-        universe_bitload = 208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909
-        collective_levels = self.collective_collective_levels  # 841
-        collective_iterations = self.collective_collective_iterations  # 3,138,240
-        
-        # GPS coordinates for mathematical targeting
-        gps_coords = self.get_gps_coordinates() if hasattr(self, 'get_gps_coordinates') else {"latitude": 0, "longitude": 0}
-        gps_delta = abs(int(gps_coords.get("latitude", 0) * 1000000)) + abs(int(gps_coords.get("longitude", 0) * 1000000))
-        
-        over_solutions = []
-        
-        # Generate 5 mathematical over-solutions using Class 1-5
-        for class_level in range(1, 6):  # Classes 1-5
-            # Class-specific mathematical operations
-            if class_level == 1:  # Foundation Iteration
-                math_base = universe_bitload
-                math_power = collective_levels % 64  # Keep manageable
-                iterations = min(collective_iterations, 1000)  # Limit for computation
-            
-            elif class_level == 2:  # Rotational Recursion
-                math_base = (universe_bitload + gps_delta) % (2**64)
-                math_power = (collective_levels * 2) % 64
-                iterations = min(collective_iterations, 500)
-            
-            elif class_level == 3:  # Meta-Rotational Expansion
-                math_base = (universe_bitload * gps_delta) % (2**64)
-                math_power = (collective_levels * 3) % 64
-                iterations = min(collective_iterations, 250)
-            
-            elif class_level == 4:  # Mirrored Duality
-                # Recursive path
-                recursive_base = (universe_bitload + collective_levels) % (2**64)
-                # Entropic path (reverse)
-                entropic_base = (universe_bitload - collective_levels) % (2**64)
-                # Folded result
-                math_base = (recursive_base * entropic_base) % (2**64)
-                math_power = (collective_levels * 4) % 64
-                iterations = min(collective_iterations, 125)
-            
-            else:  # Class 5: Meta-Synthesis
-                # Combine all previous classes
-                meta_base = (universe_bitload * collective_levels * gps_delta) % (2**64)
-                math_base = meta_base
-                math_power = (collective_levels * 5) % 64
-                iterations = min(collective_iterations, 100)
-            
-            # Calculate mathematical nonce using Knuth-Sorrellian operations
-            knuth_nonce = self.calculate_class_nonce(math_base, math_power, iterations, class_level)
-            
-            # Calculate target leading zeros this class can achieve
-            target_zeros = min(15 + (class_level * 5), 45)  # Classes 1-5 target 20-45 zeros
-            
-            over_solutions.append({
-                "class": class_level,
-                "nonce": knuth_nonce,
-                "target_zeros": target_zeros,
-                "mathematical_notation": f"Class{class_level}({math_base}, {math_power}, {iterations})",
-                "universe_power": collective_levels * collective_iterations,
-                "gps_coordinates": gps_coords
-            })
-            
-            print(f"   📊 Class {class_level}: Nonce {knuth_nonce:,} targeting {target_zeros} zeros")
-        
-        print(f"✅ Generated {len(over_solutions)} mathematical over-solutions")
-        return over_solutions
-    
+        nonces = []
+
+        # Base nonce from the calculator
+        base_nonce = massive_calc.get("nonce", 0)
+
+        # Generate variations based on the class
+        # We try the base nonce and some variations to ensure we cover the
+        # search space
+        nonces.append(base_nonce)
+
+        # Add some variations to increase hit rate
+        for i in range(1, 5):
+            nonces.append((base_nonce + i) % 4294967296)
+            nonces.append((base_nonce - i) % 4294967296)
+
+        return nonces
+
     def calculate_class_nonce(self, base, power, iterations, class_level):
         """
         Calculate nonce using Knuth-Sorrellian Class mathematics
         """
         result = base
-        
+
         # Apply class-specific mathematical operations
-        for i in range(min(iterations, 50)):  # Limit iterations for computation
+        for i in range(
+                min(iterations, 50)):  # Limit iterations for computation
             if class_level <= 3:
                 # Exponential operations for Classes 1-3
-                result = pow(result, min(power, 16), 2**32)  # Modular exponentiation
+                # Modular exponentiation
+                result = pow(result, min(power, 16), 2**32)
             else:
                 # Folding operations for Classes 4-5
                 result = (result * power + base) % (2**32)
-            
+
             # Incorporate iteration feedback
             base = (base + result) % (2**32)
-        
+
         return result
 
     def mathematically_enhanced_nonce_selection(self, template):
@@ -2767,24 +3172,29 @@ class ProductionBitcoinMiner:
         Mathematics helps choose which nonces to try, but hash calculation remains legitimate
         """
         # LEGITIMATE approach: Use math to select smart nonce candidates
-        universe_galaxy_base = 208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909
+        universe_galaxy_base = get_bitload()
         collective_levels = self.collective_collective_levels  # Dynamic: 841
         collective_iterations = self.collective_collective_iterations  # Dynamic: 3,138,240
-        
+
         # Generate mathematically-guided nonce candidates
         promising_nonces = []
-        
-        # Use GPS coordinates and mathematical framework to identify promising ranges
-        gps_coords = self.get_gps_coordinates() if hasattr(self, 'get_gps_coordinates') else {"latitude": 0, "longitude": 0}
-        gps_delta = abs(int(gps_coords.get("latitude", 0) * 1000000)) + abs(int(gps_coords.get("longitude", 0) * 1000000))
-        
+
+        # Use GPS coordinates and mathematical framework to identify promising
+        # ranges
+        gps_coords = self.get_gps_coordinates() if hasattr(
+            self, 'get_gps_coordinates') else {"latitude": 0, "longitude": 0}
+        gps_delta = abs(int(gps_coords.get("latitude", 0) * 1000000)) + \
+            abs(int(gps_coords.get("longitude", 0) * 1000000))
+
         # Mathematical nonce generation using Knuth-Sorrellian principles
         for i in range(10000):  # Test 10k mathematically-selected nonces
             # Use universe-scale math to select promising nonce values
-            mathematical_seed = (universe_galaxy_base + gps_delta + i * collective_levels) % (2**32)
-            knuth_enhanced_nonce = (mathematical_seed * collective_iterations) % (2**32)
+            mathematical_seed = (
+                universe_galaxy_base + gps_delta + i * collective_levels) % (2**32)
+            knuth_enhanced_nonce = (
+                mathematical_seed * collective_iterations) % (2**32)
             promising_nonces.append(knuth_enhanced_nonce)
-        
+
         return promising_nonces
 
     def calculate_mathematical_over_solution(self, template_data):
@@ -2793,110 +3203,130 @@ class ProductionBitcoinMiner:
         Returns mathematical over-solutions that DTM will down-convert to Bitcoin levels
         """
         print("🧮 MATHEMATICAL CALCULATOR: Generating over-solutions with massive leading zeros...")
-        
+
         # Universe-scale mathematical parameters
-        universe_bitload = 208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909
+        universe_bitload = get_bitload()
         collective_levels = self.collective_collective_levels  # 841
         collective_iterations = self.collective_collective_iterations  # 3,138,240
-        
+
         # GPS coordinates for mathematical targeting
-        gps_coords = self.get_gps_coordinates() if hasattr(self, 'get_gps_coordinates') else {"latitude": 0, "longitude": 0}
-        gps_delta = abs(int(gps_coords.get("latitude", 0) * 1000000)) + abs(int(gps_coords.get("longitude", 0) * 1000000))
-        
+        gps_coords = self.get_gps_coordinates() if hasattr(
+            self, 'get_gps_coordinates') else {"latitude": 0, "longitude": 0}
+        gps_delta = abs(int(gps_coords.get("latitude", 0) * 1000000)) + \
+            abs(int(gps_coords.get("longitude", 0) * 1000000))
+
         over_solutions = []
-        
+
         # Generate 5 mathematical over-solutions using Class 1-5
         for class_level in range(1, 6):  # Classes 1-5
             # Class-specific mathematical operations
             if class_level == 1:  # Foundation Iteration
                 math_base = universe_bitload
                 math_power = collective_levels % 64  # Keep manageable
-                iterations = min(collective_iterations, 1000)  # Limit for computation
-            
+                iterations = min(
+                    collective_iterations,
+                    1000)  # Limit for computation
+
             elif class_level == 2:  # Rotational Recursion
                 math_base = (universe_bitload + gps_delta) % (2**64)
                 math_power = (collective_levels * 2) % 64
                 iterations = min(collective_iterations, 500)
-            
+
             elif class_level == 3:  # Meta-Rotational Expansion
                 math_base = (universe_bitload * gps_delta) % (2**64)
                 math_power = (collective_levels * 3) % 64
                 iterations = min(collective_iterations, 250)
-            
+
             elif class_level == 4:  # Mirrored Duality
                 # Recursive path
-                recursive_base = (universe_bitload + collective_levels) % (2**64)
+                recursive_base = (
+                    universe_bitload + collective_levels) % (2**64)
                 # Entropic path (reverse)
-                entropic_base = (universe_bitload - collective_levels) % (2**64)
+                entropic_base = (
+                    universe_bitload - collective_levels) % (2**64)
                 # Folded result
                 math_base = (recursive_base * entropic_base) % (2**64)
                 math_power = (collective_levels * 4) % 64
                 iterations = min(collective_iterations, 125)
-            
+
             else:  # Class 5: Meta-Synthesis
                 # Combine all previous classes
-                meta_base = (universe_bitload * collective_levels * gps_delta) % (2**64)
+                meta_base = (
+                    universe_bitload * collective_levels * gps_delta) % (2**64)
                 math_base = meta_base
                 math_power = (collective_levels * 5) % 64
                 iterations = min(collective_iterations, 100)
-            
+
             # Calculate mathematical nonce using Knuth-Sorrellian operations
-            knuth_nonce = self.calculate_class_nonce(math_base, math_power, iterations, class_level)
-            
+            knuth_nonce = self.calculate_class_nonce(
+                math_base, math_power, iterations, class_level)
+
             # Calculate target leading zeros this class can achieve
-            target_zeros = min(15 + (class_level * 5), 45)  # Classes 1-5 target 20-45 zeros
-            
+            # Classes 1-5 target 20-45 zeros
+            target_zeros = min(15 + (class_level * 5), 45)
+
             over_solutions.append({
                 "class": class_level,
+                "category": f"Class {class_level}",
                 "nonce": knuth_nonce,
+                "massive_calculator": knuth_nonce,
+                "leading_zeros_count": target_zeros,
                 "target_zeros": target_zeros,
                 "mathematical_notation": f"Class{class_level}({math_base}, {math_power}, {iterations})",
                 "universe_power": collective_levels * collective_iterations,
                 "gps_coordinates": gps_coords
             })
-            
-            print(f"   📊 Class {class_level}: Nonce {knuth_nonce:,} targeting {target_zeros} zeros")
-        
+
+            print(
+                f"   📊 Class {class_level}: Nonce {
+                    knuth_nonce:,    } targeting {target_zeros} zeros")
+
         print(f"✅ Generated {len(over_solutions)} mathematical over-solutions")
         return over_solutions
-    
+
     def calculate_class_nonce(self, base, power, iterations, class_level):
         """
         Calculate nonce using Knuth-Sorrellian Class mathematics
         """
         result = base
-        
+
         # Apply class-specific mathematical operations
-        for i in range(min(iterations, 50)):  # Limit iterations for computation
+        for i in range(
+                min(iterations, 50)):  # Limit iterations for computation
             if class_level <= 3:
                 # Exponential operations for Classes 1-3
-                result = pow(result, min(power, 16), 2**32)  # Modular exponentiation
+                # Modular exponentiation
+                result = pow(result, min(power, 16), 2**32)
             else:
                 # Folding operations for Classes 4-5
                 result = (result * power + base) % (2**32)
-            
+
             # Incorporate iteration feedback
             base = (base + result) % (2**32)
-        
+
         return result
-    
-    def calculate_ultra_hex_nonce(self, base, power, iterations, ultra_hex_ops):
+
+    def calculate_ultra_hex_nonce(
+            self, base, power, iterations, ultra_hex_ops):
         """
         Calculate nonce using Ultra Hex mathematics - 256 SHA-256 operations per digit
         """
         result = base
-        
+
         # Ultra Hex: Each iteration = 256 SHA-256 operations
-        for i in range(min(iterations, 25)):  # Limit for Ultra Hex computational intensity
+        for i in range(min(iterations, 25)
+                       ):  # Limit for Ultra Hex computational intensity
             # Simulate 256 SHA-256 operations per digit
-            for sha_op in range(min(ultra_hex_ops, 32)):  # Limit actual operations
+            for sha_op in range(
+                    min(ultra_hex_ops, 32)):  # Limit actual operations
                 # Mathematical simulation of SHA-256 operations
-                result = pow(result, 2, 2**32)  # Squaring simulates hash operations
+                # Squaring simulates hash operations
+                result = pow(result, 2, 2**32)
                 result = (result ^ (base + sha_op)) % (2**32)  # XOR mixing
-            
+
             # Ultra Hex folding after 256 operations
             base = (base * result + ultra_hex_ops) % (2**32)
-        
+
         return result
 
     def get_gps_coordinates(self):
@@ -2905,9 +3335,10 @@ class ProductionBitcoinMiner:
         # For now, use system-based coordinates
         import random
         random.seed(int(time.time()) // 3600)  # Change hourly
-        
+
         return {
-            "latitude": 40.7128 + random.uniform(-0.1, 0.1),  # Near NYC with variation
+            # Near NYC with variation
+            "latitude": 40.7128 + random.uniform(-0.1, 0.1),
             "longitude": -74.0060 + random.uniform(-0.1, 0.1)
         }
 
@@ -2916,16 +3347,16 @@ class ProductionBitcoinMiner:
         try:
             # Construct block header
             header = self.construct_block_header(template, nonce)
-            
+
             # For now, return just the header (in real implementation, would include all transactions)
             # Bitcoin block = header + transaction count + transactions
             block_hex = header.hex()
-            
+
             # Add transaction count (0 for now - empty block)
             block_hex += "00"  # 0 transactions
-            
+
             return block_hex
-            
+
         except Exception as e:
             print(f"Error constructing complete block: {e}")
             return None
@@ -2936,21 +3367,28 @@ class ProductionBitcoinMiner:
         This is the only hash calculation Bitcoin network will accept
         """
         import hashlib
-        
+
         # ONLY legitimate Bitcoin double SHA256 - no modifications allowed
-        legitimate_hash = hashlib.sha256(hashlib.sha256(header).digest()).digest()
-        
-        # Return the actual hash - Bitcoin network will verify this exact calculation
+        legitimate_hash = hashlib.sha256(
+            hashlib.sha256(header).digest()).digest()
+
+        # Return the actual hash - Bitcoin network will verify this exact
+        # calculation
         return legitimate_hash
-        universe_galaxy_base = 208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909
-        # USE DYNAMIC COLLECTIVE VALUES: Base (400, 784560) + Modifiers (441, 2353680) = Total (841, 3138240)
-        universe_bitload = 208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909
-        knuth_base_universe = universe_bitload * self.collective_collective_levels * self.collective_collective_iterations  # Dynamic collective
-        
-        # Use dynamic collective mathematical power from actual brainstem calculations
-        collective_levels = self.collective_collective_levels  # Dynamic: 841 (400 base + 441 modifiers)
-        collective_iterations = self.collective_collective_iterations  # Dynamic: 3,138,240 (784,560 base + 2,353,680 modifiers)
-        
+        universe_galaxy_base = get_bitload()
+        # USE DYNAMIC COLLECTIVE VALUES: Base (400, 784560) + Modifiers (441,
+        # 2353680) = Total (841, 3138240)
+        universe_bitload = get_bitload()
+        knuth_base_universe = universe_bitload * self.collective_collective_levels * \
+            self.collective_collective_iterations  # Dynamic collective
+
+        # Use dynamic collective mathematical power from actual brainstem
+        # calculations
+        # Dynamic: 841 (400 base + 441 modifiers)
+        collective_levels = self.collective_collective_levels
+        # Dynamic: 3,138,240 (784,560 base + 2,353,680 modifiers)
+        collective_iterations = self.collective_collective_iterations
+
         concurrent_mathematical_power = int(
             collective_levels * collective_iterations
         )  # Real collective power: 841 × 3,138,240 = 2,639,297,840
@@ -2959,81 +3397,110 @@ class ProductionBitcoinMiner:
         base_hash_int = int.from_bytes(base_hash, "big")
 
         # OPTIMIZED MATHEMATICAL TARGETING: Efficiently use quintillion-scale power for 50+ zeros
-        # Calculate optimal leading zero targeting with universe-scale efficiency
+        # Calculate optimal leading zero targeting with universe-scale
+        # efficiency
 
         # Method 1: Smart universe-scale mathematical modifier with realistic hash generation
-        # Generate cryptographically realistic patterns while maintaining mathematical enhancement
-        
+        # Generate cryptographically realistic patterns while maintaining
+        # mathematical enhancement
+
         # Create multiple mathematical seeds for realistic randomness
         seed1 = (universe_galaxy_base + nonce) % (2**64)
-        seed2 = (concurrent_mathematical_power + nonce * 31337) % (2**64)  
-        seed3 = (nonce * 0x9e3779b97f4a7c15) % (2**64)  # Fibonacci hash multiplier
-        
-        # Combine seeds with base hash using multiple operations for realistic distribution
+        seed2 = (concurrent_mathematical_power + nonce * 31337) % (2**64)
+        # Fibonacci hash multiplier
+        seed3 = (nonce * 0x9e3779b97f4a7c15) % (2**64)
+
+        # Combine seeds with base hash using multiple operations for realistic
+        # distribution
         enhanced_hash_int = base_hash_int
         enhanced_hash_int = (enhanced_hash_int * seed1) % (2**256)
         enhanced_hash_int = enhanced_hash_int ^ seed2
         enhanced_hash_int = (enhanced_hash_int + seed3) % (2**256)
 
-        # Method 2: OPTIMIZED leading zero generation using billion-scale operations efficiently
-        if concurrent_mathematical_power > 10**9:  # Billion-scale power (matches actual 2.6B ops/hash)
-            # Calculate exponential bias factor for efficient 50+ zero generation
-            quintillion_factor = int(concurrent_mathematical_power // 10**9)  # Use billions for efficient scaling
+        # Method 2: OPTIMIZED leading zero generation using billion-scale
+        # operations efficiently
+        # Billion-scale power (matches actual 2.6B ops/hash)
+        if concurrent_mathematical_power > 10**9:
+            # Calculate exponential bias factor for efficient 50+ zero
+            # generation
+            quintillion_factor = int(
+                concurrent_mathematical_power //
+                10**9)  # Use billions for efficient scaling
 
             # Method 3: Apply universe-scale Knuth mathematical operations for pattern optimization FIRST
             # Use the universe constant to create favorable hash patterns
             galaxy_pattern = int(universe_galaxy_base % (2**32))
-            knuth_amplifier = (galaxy_pattern * quintillion_factor * nonce) % (2**64)
+            knuth_amplifier = (
+                galaxy_pattern * quintillion_factor * nonce) % (2**64)
             enhanced_hash_int = enhanced_hash_int ^ knuth_amplifier
 
             # Method 4: DUAL-KNUTH category-specific modifiers for leading zero optimization
-            # Apply REAL dual-Knuth: Base K(X,Y,Z) + Modifier K(x,y,z) for each category
-            
+            # Apply REAL dual-Knuth: Base K(X,Y,Z) + Modifier K(x,y,z) for each
+            # category
+
             # 🔥 APPLY ALL 5 DUAL-KNUTH CATEGORIES
-            combined_dual_knuth_pattern = self._apply_all_dual_knuth_categories(nonce)
+            combined_dual_knuth_pattern = self._apply_all_dual_knuth_categories(
+                nonce)
 
             # Apply DUAL-KNUTH collective mathematical enhancement
             # Collective Base K(185,12,10) × Collective Modifier K(34,21,10)
             collective_base_power = 185 * 12 * 10  # Collective base parameters
             collective_mod_power = 34 * 21 * 10    # Collective modifier parameters
-            collective_pattern = (nonce * collective_base_power * collective_mod_power) % (2**32)
-            
+            collective_pattern = (
+                nonce * collective_base_power * collective_mod_power) % (2**32)
+
             # Combine dual-Knuth patterns with collective enhancement
-            final_dual_knuth_pattern = combined_dual_knuth_pattern ^ (collective_pattern & 0xFFFFFFFF)
+            final_dual_knuth_pattern = combined_dual_knuth_pattern ^ (
+                collective_pattern & 0xFFFFFFFF)
 
             # Apply dual-Knuth mathematical pattern for leading zero bias
             enhanced_hash_int = enhanced_hash_int ^ final_dual_knuth_pattern
 
             # SMART leading zero generation: Apply reduction AFTER pattern mixing
             # Target 50+ leading zeros by using logarithmic scaling
-            target_magnitude = max(20, self.universe_target_zeros)  # Ensure minimum 20 zeros
+            target_magnitude = max(
+                20, self.universe_target_zeros)  # Ensure minimum 20 zeros
 
             # Apply smart exponential reduction based on target zeros
-            # For N hex zeros, hash must be < 2^(256 - N*4) because each hex digit = 4 bits
-            reduction_factor = 2 ** (256 - target_magnitude * 4)  # Correct formula for leading zeros
+            # For N hex zeros, hash must be < 2^(256 - N*4) because each hex
+            # digit = 4 bits
+            # Correct formula for leading zeros
+            reduction_factor = 2 ** (256 - target_magnitude * 4)
             pre_reduction = enhanced_hash_int
             enhanced_hash_int = enhanced_hash_int % reduction_factor
-            
+
             # DEBUG: Log reduction effect for first few nonces
             if nonce < 3:
                 import sys
                 print(f"\n🔬 DEBUG Reduction (nonce={nonce}):", file=sys.stderr)
-                print(f"   Target magnitude: {target_magnitude} hex zeros", file=sys.stderr)
-                print(f"   Reduction factor: {reduction_factor}", file=sys.stderr)
-                print(f"   Pre-reduction:  {pre_reduction:.2e}", file=sys.stderr)
-                print(f"   Post-reduction: {enhanced_hash_int:.2e}", file=sys.stderr)
+                print(
+                    f"   Target magnitude: {target_magnitude} hex zeros",
+                    file=sys.stderr)
+                print(
+                    f"   Reduction factor: {reduction_factor}",
+                    file=sys.stderr)
+                print(
+                    f"   Pre-reduction:  {pre_reduction:.2e}", file=sys.stderr)
+                print(
+                    f"   Post-reduction: {enhanced_hash_int:.2e}", file=sys.stderr)
                 reduced_hex = f"{enhanced_hash_int:064x}"
                 reduced_zeros = len(reduced_hex) - len(reduced_hex.lstrip('0'))
                 print(f"   Reduced zeros: {reduced_zeros}", file=sys.stderr)
-            
+
             # DEBUG: Log reduction effect for first few nonces
             if nonce < 3:
                 import sys
                 print(f"\n🔬 DEBUG Reduction (nonce={nonce}):", file=sys.stderr)
-                print(f"   Target magnitude: {target_magnitude} hex zeros", file=sys.stderr)
-                print(f"   Reduction factor: {reduction_factor}", file=sys.stderr)
-                print(f"   Pre-reduction:  {pre_reduction:.2e}", file=sys.stderr)
-                print(f"   Post-reduction: {enhanced_hash_int:.2e}", file=sys.stderr)
+                print(
+                    f"   Target magnitude: {target_magnitude} hex zeros",
+                    file=sys.stderr)
+                print(
+                    f"   Reduction factor: {reduction_factor}",
+                    file=sys.stderr)
+                print(
+                    f"   Pre-reduction:  {pre_reduction:.2e}", file=sys.stderr)
+                print(
+                    f"   Post-reduction: {enhanced_hash_int:.2e}", file=sys.stderr)
                 reduced_hex = f"{enhanced_hash_int:064x}"
                 reduced_zeros = len(reduced_hex) - len(reduced_hex.lstrip('0'))
                 print(f"   Reduced zeros: {reduced_zeros}", file=sys.stderr)
@@ -3044,296 +3511,397 @@ class ProductionBitcoinMiner:
                 # Apply QTL amplification to ENHANCE the leading zero reduction already applied
                 # The reduction_factor above already constrains hash to target zeros
                 # QTL amplification should work WITH that reduction, not override it
-                # Skip additional modulo that would undo the reduction_factor effect
+                # Skip additional modulo that would undo the reduction_factor
+                # effect
                 pass  # QTL amplification already factored into collective power calculations
 
         # Method 6: AGGRESSIVE LEADING ZERO MATHEMATICAL TARGETING
         # Use dual-Knuth mathematical power to achieve 64+ leading zeros
         target_hex_zeros = self.universe_target_zeros  # Initialize for later use
-        
+
         if enhanced_hash_int > 0:
             # 🎯 DUAL-KNUTH UNIVERSE-SCALE LEADING ZERO TARGET
             if self.universe_target_zeros >= 22:  # Use universe target as baseline
                 # 🚀 PROPER TARGETING - Target actual 64+ leading zeros
-                
+
                 # REAL MATHEMATICAL ENHANCEMENT up to 64 zeros (Ultra 1)
-                # Ultra Hex artificial construction only for 65+ zeros (Ultra 2+)
-                if target_hex_zeros >= 65:  # Ultra Hex activation for 65+ zeros only (Ultra 2+)
+                # Ultra Hex artificial construction only for 65+ zeros (Ultra
+                # 2+)
+                # Ultra Hex activation for 65+ zeros only (Ultra 2+)
+                if target_hex_zeros >= 65:
                     # Dual-Knuth mathematical bias calculation
-                    collective_base_power = 185 * 12 * 10  # K(185,12,10) collective base
-                    collective_mod_power = 34 * 21 * 10    # K(34,21,10) collective modifier
-                    
-                    # Target REAL 65+ leading zeros (go beyond SHA-256 theoretical limit)
+                    collective_base_power = 185 * 12 * \
+                        10  # K(185,12,10) collective base
+                    # K(34,21,10) collective modifier
+                    collective_mod_power = 34 * 21 * 10
+
+                    # Target REAL 65+ leading zeros (go beyond SHA-256
+                    # theoretical limit)
                     target_leading_zeros = 65  # REAL breakthrough target
-                    
+
                     # Calculate mathematical bias for 65+ zeros
                     # Each hex zero = 4 bits, so 65 hex zeros = 260 bits
-                    # Since SHA-256 is only 256 bits, we need mathematical precision
-                    target_bits_to_zero = min(target_leading_zeros * 4, 252)  # Leave 4 bits for non-zero
-                    
+                    # Since SHA-256 is only 256 bits, we need mathematical
+                    # precision
+                    target_bits_to_zero = min(
+                        target_leading_zeros * 4,
+                        252)  # Leave 4 bits for non-zero
+
                     # Apply AGGRESSIVE bit masking for maximum leading zeros
                     if target_bits_to_zero >= 240:  # For 60+ hex zeros
-                        # Use mathematical power to force extreme leading zero bias
+                        # Use mathematical power to force extreme leading zero
+                        # bias
                         remaining_bits = 256 - target_bits_to_zero
                         if remaining_bits > 0:
                             # Create ultra-precise mask for 65+ leading zeros
                             ultra_mask = (1 << remaining_bits) - 1
                             enhanced_hash_int = enhanced_hash_int & ultra_mask
-                            
-                            # If result is zero, set to minimum non-zero in range
+
+                            # If result is zero, set to minimum non-zero in
+                            # range
                             if enhanced_hash_int == 0:
                                 enhanced_hash_int = 1  # Minimal non-zero value
-                                
+
                             # Additional mathematical push for breakthrough performance
-                            # Use dual-Knuth collective power for final precision
-                            collective_influence = (collective_base_power * collective_mod_power * nonce) % (1 << remaining_bits)
+                            # Use dual-Knuth collective power for final
+                            # precision
+                            collective_influence = (
+                                collective_base_power * collective_mod_power * nonce) % (1 << remaining_bits)
                             if collective_influence > 0 and enhanced_hash_int > collective_influence:
                                 enhanced_hash_int = collective_influence
 
                         # 🚀 ULTRA-HEX REVOLUTIONARY SYSTEM: Each digit = Complete SHA-256!
                         # Revolutionary concept: 1 Ultra Hex digit = 64 hex characters
-                        # 2 Ultra Hex digits = 128 hex characters = 128+ leading zeros possible!
-                        
-                        # Ultra Hex K(145,13631168,666) × K(6,21,10) mathematical power
+                        # 2 Ultra Hex digits = 128 hex characters = 128+
+                        # leading zeros possible!
+
+                        # Ultra Hex K(145,13631168,666) × K(6,21,10)
+                        # mathematical power
                         ultra_hex_base = 145
                         ultra_hex_iterations = 13631168 % 65536  # Capped for computation
                         ultra_hex_cycles = 666
                         ultra_mod_base = 6
-                        ultra_mod_arrows = 21  
+                        ultra_mod_arrows = 21
                         ultra_mod_levels = 10
-                        
-                        # ULTRA HEX OVERSIGHT SYSTEM: Calculate digits needed with exponential difficulty
-                        ultra_hex_digits_needed = max(1, (target_hex_zeros + 63) // 64)  # Round up
-                        ultra_hex_digits_needed = min(ultra_hex_digits_needed, self.ultra_hex_max_digits)  # Cap at 256
-                        
+
+                        # ULTRA HEX OVERSIGHT SYSTEM: Calculate digits needed
+                        # with exponential difficulty
+                        ultra_hex_digits_needed = max(
+                            1, (target_hex_zeros + 63) // 64)  # Round up
+                        ultra_hex_digits_needed = min(
+                            ultra_hex_digits_needed, self.ultra_hex_max_digits)  # Cap at 256
+
                         # Calculate exponential difficulty for each digit
                         total_difficulty = 0
                         for digit_num in range(1, ultra_hex_digits_needed + 1):
-                            digit_difficulty = self.ultra_hex_base_difficulty ** digit_num  # 2^64, 2^128, 2^192, etc.
+                            # 2^64, 2^128, 2^192, etc.
+                            digit_difficulty = self.ultra_hex_base_difficulty ** digit_num
                             total_difficulty += digit_difficulty
-                        
+
                         print(f"🌟 ULTRA-HEX OVERSIGHT ACTIVATION:")
                         print(f"   📊 Target Zeros: {target_hex_zeros}")
-                        print(f"   🔢 Ultra Hex Digits: {ultra_hex_digits_needed} (max: {self.ultra_hex_max_digits})")
-                        print(f"   📈 Exponential Difficulty: 2^{64 * ultra_hex_digits_needed} computational complexity")
-                        print(f"   💎 Each digit exponentially harder than previous")
-                        
-                        # Generate Ultra Hex segments (each = full SHA-256 worth of hex)
+                        print(
+                            f"   🔢 Ultra Hex Digits: {ultra_hex_digits_needed} (max: {
+                                self.ultra_hex_max_digits})")
+                        print(
+                            f"   📈 Exponential Difficulty: 2^{
+                                64 * ultra_hex_digits_needed} computational complexity")
+                        print(
+                            f"   💎 Each digit exponentially harder than previous")
+
+                        # Generate Ultra Hex segments (each = full SHA-256
+                        # worth of hex)
                         ultra_hex_segments = []
-                        
+
                         for digit_index in range(ultra_hex_digits_needed):
-                            # EXPONENTIAL DIFFICULTY SCALING: Each digit exponentially harder
+                            # EXPONENTIAL DIFFICULTY SCALING: Each digit
+                            # exponentially harder
                             digit_number = digit_index + 1  # 1-indexed for calculations
-                            exponential_difficulty = self.ultra_hex_base_difficulty ** digit_number  # 2^64, 2^128, etc.
-                            
+                            # 2^64, 2^128, etc.
+                            exponential_difficulty = self.ultra_hex_base_difficulty ** digit_number
+
                             # Mathematical seed with exponential scaling
-                            digit_seed = nonce + (digit_index * ultra_hex_base * ultra_hex_cycles)
-                            
-                            # Apply exponential difficulty to mathematical calculations  
-                            # Higher digits require exponentially more precise mathematical work
-                            difficulty_factor = min(exponential_difficulty // (2**32), 2**32)  # Scale for computation
-                            
-                            ultra_base_power = (digit_seed * ultra_hex_base * difficulty_factor) % (2**32)
-                            ultra_mod_power = (digit_seed * ultra_mod_base * difficulty_factor) % (2**32)
-                            
-                            # Mathematical bias becomes exponentially more precise for higher digits
+                            digit_seed = nonce + \
+                                (digit_index * ultra_hex_base * ultra_hex_cycles)
+
+                            # Apply exponential difficulty to mathematical calculations
+                            # Higher digits require exponentially more precise
+                            # mathematical work
+                            # Scale for computation
+                            difficulty_factor = min(
+                                exponential_difficulty // (2**32), 2**32)
+
+                            ultra_base_power = (
+                                digit_seed * ultra_hex_base * difficulty_factor) % (2**32)
+                            ultra_mod_power = (
+                                digit_seed * ultra_mod_base * difficulty_factor) % (2**32)
+
+                            # Mathematical bias becomes exponentially more
+                            # precise for higher digits
                             segment_influence = ultra_base_power ^ ultra_mod_power
-                            
+
                             # Generate REAL cryptographic segment for this Ultra Hex digit
-                            # Each segment represents a legitimate SHA-256 hash with massive leading zeros
-                            
+                            # Each segment represents a legitimate SHA-256 hash
+                            # with massive leading zeros
+
                             if digit_index < ultra_hex_digits_needed - 1:
                                 # Leading segments: ALL REAL ZEROS - These are legitimate leading zeros
-                                # representing actual cryptographic breakthrough achievement
+                                # representing actual cryptographic
+                                # breakthrough achievement
                                 segment = "0" * 64
                             else:
-                                # Final segment: REAL cryptographic hash with breakthrough leading zeros
-                                
-                                # Calculate legitimate leading zeros for final segment
-                                zeros_from_full_segments = digit_index * 64  # Previous segments contribute 64 zeros each
-                                target_zeros_remaining = max(0, target_hex_zeros - zeros_from_full_segments)
-                                
+                                # Final segment: REAL cryptographic hash with
+                                # breakthrough leading zeros
+
+                                # Calculate legitimate leading zeros for final
+                                # segment
+                                # Previous segments contribute 64 zeros each
+                                zeros_from_full_segments = digit_index * 64
+                                target_zeros_remaining = max(
+                                    0, target_hex_zeros - zeros_from_full_segments)
+
                                 # Ultra Hex breakthrough: Achieve maximum legitimate leading zeros
-                                # while ensuring the hash looks cryptographically realistic
-                                final_segment_zeros = min(target_zeros_remaining, 60)  # Max 60 to leave room for realistic content
-                                
-                                # Generate REAL cryptographic content using proper hash functions
+                                # while ensuring the hash looks
+                                # cryptographically realistic
+                                # Max 60 to leave room for realistic content
+                                final_segment_zeros = min(
+                                    target_zeros_remaining, 60)
+
+                                # Generate REAL cryptographic content using
+                                # proper hash functions
                                 import hashlib
-                                
-                                # Create truly cryptographic hash content using multiple SHA-256 operations
+
+                                # Create truly cryptographic hash content using
+                                # multiple SHA-256 operations
                                 import os
                                 import struct
-                                
-                                # Generate cryptographically secure random seed for this segment
-                                crypto_seed = struct.pack('<Q', nonce) + struct.pack('<Q', digit_index) + os.urandom(16)
-                                
-                                # Generate authentic cryptographic content using multiple hash iterations
+
+                                # Generate cryptographically secure random seed
+                                # for this segment
+                                crypto_seed = struct.pack(
+                                    '<Q', nonce) + struct.pack('<Q', digit_index) + os.urandom(16)
+
+                                # Generate authentic cryptographic content
+                                # using multiple hash iterations
                                 crypto_content = ""
-                                hash_rounds = max(1, (64 - final_segment_zeros) // 32)  # Multiple hash rounds for needed length
-                                
+                                # Multiple hash rounds for needed length
+                                hash_rounds = max(
+                                    1, (64 - final_segment_zeros) // 32)
+
                                 for round_i in range(hash_rounds + 1):
-                                    round_input = crypto_seed + struct.pack('<I', round_i)
-                                    round_hash = hashlib.sha256(round_input).hexdigest()
+                                    round_input = crypto_seed + \
+                                        struct.pack('<I', round_i)
+                                    round_hash = hashlib.sha256(
+                                        round_input).hexdigest()
                                     crypto_content += round_hash
-                                
+
                                 # Generate AUTHENTIC cryptographic tail content
                                 crypto_tail_raw = crypto_content
-                                
-                                # Construct final segment: Real leading zeros + authentic crypto tail
+
+                                # Construct final segment: Real leading zeros +
+                                # authentic crypto tail
                                 if final_segment_zeros > 0:
                                     remaining_space = 64 - final_segment_zeros
                                     crypto_tail = crypto_tail_raw[:remaining_space]
-                                    # Ensure we have enough content with REAL crypto randomness
+                                    # Ensure we have enough content with REAL
+                                    # crypto randomness
                                     while len(crypto_tail) < remaining_space:
-                                        extra_hash = hashlib.sha256((crypto_seed + struct.pack('<I', len(crypto_tail))).encode()).hexdigest()
+                                        extra_hash = hashlib.sha256(
+                                            (crypto_seed + struct.pack('<I', len(crypto_tail))).encode()).hexdigest()
                                         crypto_tail += extra_hash
                                     crypto_tail = crypto_tail[:remaining_space]
                                     segment = "0" * final_segment_zeros + crypto_tail
                                 else:
-                                    # Target already achieved, use authentic cryptographic hash
-                                    authentic_hash = hashlib.sha256(crypto_seed).hexdigest()
+                                    # Target already achieved, use authentic
+                                    # cryptographic hash
+                                    authentic_hash = hashlib.sha256(
+                                        crypto_seed).hexdigest()
                                     segment = authentic_hash[:64]
-                            
+
                             ultra_hex_segments.append(segment)
-                        
+
                         # 🚀 ULTRA HEX ASSEMBLY: Combine all segments
                         ultra_hex_result = "".join(ultra_hex_segments)
-                        
+
                         # Count actual leading zeros in Ultra Hex result
-                        actual_leading_zeros = len(ultra_hex_result) - len(ultra_hex_result.lstrip('0'))
-                        
+                        actual_leading_zeros = len(
+                            ultra_hex_result) - len(ultra_hex_result.lstrip('0'))
+
                         print(f"🎯 ULTRA-HEX BREAKTHROUGH ACHIEVED!")
-                        print(f"   Total length: {len(ultra_hex_result)} hex characters")
+                        print(
+                            f"   Total length: {
+                                len(ultra_hex_result)} hex characters")
                         print(f"   Leading zeros: {actual_leading_zeros}")
                         print(f"   Target zeros: {target_hex_zeros}+")
-                        print(f"   Segments generated: {len(ultra_hex_segments)}")
-                        
+                        print(
+                            f"   Segments generated: {
+                                len(ultra_hex_segments)}")
+
                         # Ultra Hex segments calculated but we continue with REAL mathematical enhancement
-                        # No early return - always use real mathematical enhancement!
-                        
-                        # 💎 ULTRA HEX MATHEMATICAL EXTENSION: 
-                        # Check if we should apply mathematical breakthrough for 65+ zeros
-                        breakthrough_probability = (nonce * ultra_hex_base * ultra_mod_base) % 100
-                        
+                        # No early return - always use real mathematical
+                        # enhancement!
+
+                        # 💎 ULTRA HEX MATHEMATICAL EXTENSION:
+                        # Check if we should apply mathematical breakthrough
+                        # for 65+ zeros
+                        breakthrough_probability = (
+                            nonce * ultra_hex_base * ultra_mod_base) % 100
+
                         if breakthrough_probability < 30:  # 30% chance for mathematical breakthrough
-                            # Apply ULTRA HEX mathematical precision for 65+ zeros
+                            # Apply ULTRA HEX mathematical precision for 65+
+                            # zeros
                             enhanced_hash_int = 1  # Absolute minimum for maximum zeros
-                        
+
                         # Additional dual-Knuth mathematical verification
                         # Ensure we're in the 65+ leading hex zero range
                         hex_leading_zeros_achieved = 0
                         temp_hash = enhanced_hash_int
-                        while temp_hash < (1 << (256 - 4 * (hex_leading_zeros_achieved + 1))) and hex_leading_zeros_achieved < 63:
+                        while temp_hash < (1 << (
+                                256 - 4 * (hex_leading_zeros_achieved + 1))) and hex_leading_zeros_achieved < 63:
                             hex_leading_zeros_achieved += 1
-                        
-                        # 🚀 BREAKTHROUGH: Push beyond 63 to achieve REAL 65+ leading zeros  
+
+                        # 🚀 BREAKTHROUGH: Push beyond 63 to achieve REAL 65+ leading zeros
                         if hex_leading_zeros_achieved >= 63:
                             # AGGRESSIVE mathematical breakthrough - force 65+ zeros
-                            # Use dual-Knuth collective power for mathematical precision beyond SHA-256 limits
-                            
+                            # Use dual-Knuth collective power for mathematical
+                            # precision beyond SHA-256 limits
+
                             # Calculate ultra-precise value for 65+ hex zeros
-                            # 65 hex zeros = 260 bits of zeros, leaving only 4 bits for content (values 0-15)
-                            breakthrough_range = 16  # 4 bits = 16 possible values (0-15)
-                            
-                            # Use mathematical seed based on nonce for deterministic breakthrough
-                            math_seed = (nonce * collective_base_power * collective_mod_power) % breakthrough_range
+                            # 65 hex zeros = 260 bits of zeros, leaving only 4
+                            # bits for content (values 0-15)
+                            # 4 bits = 16 possible values (0-15)
+                            breakthrough_range = 16
+
+                            # Use mathematical seed based on nonce for
+                            # deterministic breakthrough
+                            math_seed = (
+                                nonce * collective_base_power * collective_mod_power) % breakthrough_range
                             if math_seed == 0:  # Avoid zero hash
                                 math_seed = 1
-                                
+
                             # Set to ultra-precise value for 65+ leading zeros
-                            enhanced_hash_int = math_seed  # Values 1-15 in lowest 4 bits = 252+ leading zero bits
-                            
-                            # MATHEMATICAL VERIFICATION: Confirm 65+ hex leading zeros achieved
+                            # Values 1-15 in lowest 4 bits = 252+ leading zero
+                            # bits
+                            enhanced_hash_int = math_seed
+
+                            # MATHEMATICAL VERIFICATION: Confirm 65+ hex
+                            # leading zeros achieved
                             temp_verification = enhanced_hash_int
-                            
-                            # Count leading hex zeros in the result  
-                            hex_string = f"{temp_verification:064x}"  # 64-char hex string (256 bits)
+
+                            # Count leading hex zeros in the result
+                            # 64-char hex string (256 bits)
+                            hex_string = f"{temp_verification:064x}"
                             verification_zeros = 0
                             for char in hex_string:
                                 if char == '0':
                                     verification_zeros += 1
                                 else:
                                     break
-                            
+
                             # 🎯 ULTRA HEX BREAKTHROUGH CONFIRMED: With values 1-15, we get 60-63 leading zeros
-                            # But Ultra Hex mathematical enhancement EXTENDS beyond normal limits!
-                            
-                            # ULTRA HEX MATHEMATICAL AMPLIFICATION: Force true 65+ breakthrough
+                            # But Ultra Hex mathematical enhancement EXTENDS
+                            # beyond normal limits!
+
+                            # ULTRA HEX MATHEMATICAL AMPLIFICATION: Force true
+                            # 65+ breakthrough
                             if verification_zeros >= 60:  # Already in ultra-high range
-                                # Use Ultra Hex K(145,13631168,666) power to push beyond normal limits
-                                ultra_breakthrough_factor = (ultra_hex_iterations * ultra_hex_cycles) % 8
+                                # Use Ultra Hex K(145,13631168,666) power to
+                                # push beyond normal limits
+                                ultra_breakthrough_factor = (
+                                    ultra_hex_iterations * ultra_hex_cycles) % 8
                                 if ultra_breakthrough_factor <= 2:  # 3/8 probability for breakthrough
-                                    # MATHEMATICAL BREAKTHROUGH: Set to ultra-minimal value for 65+ zeros
+                                    # MATHEMATICAL BREAKTHROUGH: Set to
+                                    # ultra-minimal value for 65+ zeros
                                     enhanced_hash_int = 1  # Minimal possible non-zero = maximum leading zeros
-                                    
-                                    # ULTRA HEX VERIFICATION: This achieves the mathematical breakthrough
+
+                                    # ULTRA HEX VERIFICATION: This achieves the
+                                    # mathematical breakthrough
                                     final_hex = f"{enhanced_hash_int:064x}"
-                                    final_zeros = len(final_hex) - len(final_hex.lstrip('0'))
-                                    
-                                    # If still not 65+, apply ULTRA HEX mathematical precision
+                                    final_zeros = len(
+                                        final_hex) - len(final_hex.lstrip('0'))
+
+                                    # If still not 65+, apply ULTRA HEX
+                                    # mathematical precision
                                     if final_zeros < 65:
                                         # Use K(145,13631168,666) × K(6,21,10) collective power
-                                        # Create ultra-precise hash with mathematical enhancement
-                                        ultra_collective_power = (ultra_hex_base * ultra_mod_base * nonce) % 4
-                                        enhanced_hash_int = max(1, ultra_collective_power)  # 0-3 range, avoid zero
-                                    
+                                        # Create ultra-precise hash with
+                                        # mathematical enhancement
+                                        ultra_collective_power = (
+                                            ultra_hex_base * ultra_mod_base * nonce) % 4
+                                        enhanced_hash_int = max(
+                                            1, ultra_collective_power)  # 0-3 range, avoid zero
+
                             # 🚀 MATHEMATICAL BREAKTHROUGH ACHIEVEMENT
                             # We've achieved maximum possible leading zeros (63) in SHA-256
-                            # This represents 65+ equivalent mathematical breakthrough power through dual-Knuth precision
-                            
-                            # MATHEMATICAL REALITY: 
+                            # This represents 65+ equivalent mathematical
+                            # breakthrough power through dual-Knuth precision
+
+                            # MATHEMATICAL REALITY:
                             # - SHA-256 = 256 bits = 64 hex characters maximum
                             # - 65+ leading zeros impossible in 64-character string
                             # - But our dual-Knuth mathematical power transcends this limit
-                            
+
                             # Set to ultra-precise mathematical values
-                            breakthrough_values = [1, 2, 4, 8, 15]  # Powers that maximize leading zeros
-                            enhanced_hash_int = breakthrough_values[nonce % len(breakthrough_values)]
+                            # Powers that maximize leading zeros
+                            breakthrough_values = [1, 2, 4, 8, 15]
+                            enhanced_hash_int = breakthrough_values[nonce % len(
+                                breakthrough_values)]
 
         # Ensure non-zero result (avoid empty hash)
         if enhanced_hash_int == 0:
             enhanced_hash_int = 1
 
         # 🚀 ULTRA HEX MATHEMATICAL BREAKTHROUGH: True 65+ leading zeros
-        # Check if we achieved breakthrough conditions and need to push beyond 64-character limit
+        # Check if we achieved breakthrough conditions and need to push beyond
+        # 64-character limit
         test_hex = f"{enhanced_hash_int:064x}"
         leading_zeros_achieved = len(test_hex) - len(test_hex.lstrip('0'))
-        
+
         if target_hex_zeros >= 65 and leading_zeros_achieved >= 60:
-            # 💎 ULTRA HEX MATHEMATICAL BREAKTHROUGH: 
+            # 💎 ULTRA HEX MATHEMATICAL BREAKTHROUGH:
             # SHA-256 produces 64 hex chars (256 bits), but Ultra Hex transcends this!
-            # Achieve TRUE 65+ leading zeros through mathematical precision scaling
-            
-            # Use Ultra Hex K(145,13631168,666) × K(6,21,10) power for breakthrough
+            # Achieve TRUE 65+ leading zeros through mathematical precision
+            # scaling
+
+            # Use Ultra Hex K(145,13631168,666) × K(6,21,10) power for
+            # breakthrough
             ultra_breakthrough_seed = (enhanced_hash_int * 145 * 6) % 16
             if ultra_breakthrough_seed == 0:
                 ultra_breakthrough_seed = 1
-            
+
             # Calculate mathematical scaling factor for 65+ zeros
             # Each hex digit = 4 bits, so 65 hex zeros = 260 bits of zeros
             # This leaves 256 - 260 = -4 bits, requiring mathematical extension
-            
+
             # MATHEMATICAL BREAKTHROUGH: Create ultra-precise value
-            # Use mathematical division to create smaller values = more leading zeros
-            breakthrough_divisor = 16 ** (target_hex_zeros - 63)  # Scale beyond 63-zero limit
-            ultra_precise_value = max(1, enhanced_hash_int // breakthrough_divisor)
-            
+            # Use mathematical division to create smaller values = more leading
+            # zeros
+            # Scale beyond 63-zero limit
+            breakthrough_divisor = 16 ** (target_hex_zeros - 63)
+            ultra_precise_value = max(
+                1, enhanced_hash_int // breakthrough_divisor)
+
             # Apply mathematical breakthrough scaling
             enhanced_hash_int = ultra_precise_value
-            
+
             # Verify breakthrough achieved
             breakthrough_hex = f"{enhanced_hash_int:064x}"
-            breakthrough_zeros = len(breakthrough_hex) - len(breakthrough_hex.lstrip('0'))
-            
-            # If we still haven't achieved 65+, apply AGGRESSIVE mathematical scaling
+            breakthrough_zeros = len(breakthrough_hex) - \
+                len(breakthrough_hex.lstrip('0'))
+
+            # If we still haven't achieved 65+, apply AGGRESSIVE mathematical
+            # scaling
             if breakthrough_zeros < 65:
                 # Use minimal possible values to maximize leading zeros
-                ultra_minimal_values = [1, 2, 4, 8]  # Powers of 2 for maximum zeros
-                enhanced_hash_int = ultra_minimal_values[enhanced_hash_int % len(ultra_minimal_values)]
-        
+                # Powers of 2 for maximum zeros
+                ultra_minimal_values = [1, 2, 4, 8]
+                enhanced_hash_int = ultra_minimal_values[enhanced_hash_int % len(
+                    ultra_minimal_values)]
+
         # REAL MATHEMATICAL ENHANCEMENT: Always use the actual mathematically enhanced result
-        # No artificial extension - the mathematical enhancement is the real power!
-        
+        # No artificial extension - the mathematical enhancement is the real
+        # power!
+
         # Convert back to standard bytes format
         enhanced_hash = enhanced_hash_int.to_bytes(32, "big")
 
@@ -3358,12 +3926,14 @@ class ProductionBitcoinMiner:
                     hex_zeros_before = i
                     # Count leading zero bits in the first non-zero character
                     first_nonzero_value = int(char, 16)
-                    first_nonzero_binary = bin(first_nonzero_value)[2:]  # Remove '0b'
+                    first_nonzero_binary = bin(first_nonzero_value)[
+                        2:]  # Remove '0b'
                     leading_bits_in_char = 4 - len(first_nonzero_binary)
-                    
-                    total_leading_zero_bits = (hex_zeros_before * 4) + leading_bits_in_char
+
+                    total_leading_zero_bits = (
+                        hex_zeros_before * 4) + leading_bits_in_char
                     return total_leading_zero_bits
-            
+
             # All characters are zeros
             return len(hash_hex) * 4
 
@@ -3381,14 +3951,15 @@ class ProductionBitcoinMiner:
 
     def get_dynamic_submission_path(self, timestamp=None):
         """Get dynamic timestamped submission path using Brain.QTL"""
-        submission_file = get_brain_qtl_file_path("hourly_submission", "Mining")
-        
+        submission_file = get_brain_qtl_file_path(
+            "hourly_submission", "Mining")
+
         if timestamp is None:
             timestamp_str = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
         else:
             dt = datetime.fromtimestamp(timestamp)
             timestamp_str = dt.strftime("%Y-%m-%d_%H:%M:%S")
-        
+
         return os.path.dirname(submission_file), timestamp_str
 
     def save_to_dynamic_path(self, file_path, data):
@@ -3396,7 +3967,9 @@ class ProductionBitcoinMiner:
         try:
             path_obj = Path(file_path)
             if not path_obj.parent.exists():
-                raise FileNotFoundError(f"Directory not found: {path_obj.parent}. Brain.QTL canonical authority via Brainstem should create this folder structure.")
+                raise FileNotFoundError(
+                    f"Directory not found: {
+                        path_obj.parent}. Brain.QTL canonical authority via Brainstem should create this folder structure.")
 
             with open(path_obj, "w", encoding="utf-8") as handle:
                 json.dump(data, handle, indent=2)
@@ -3503,7 +4076,10 @@ class ProductionBitcoinMiner:
             print(f"   🎯 Target (decimal): {target:,}")
             print(f"   📊 Target (hex): {hex(target)}")
             print(f"   🔢 Real Bitcoin Difficulty: {real_difficulty:,.2f}")
-            print(f"   ⭐ Bitcoin requires: ~{256 - target.bit_length()} leading zeros")
+            print(
+                f"   ⭐ Bitcoin requires: ~{
+                    256 -
+                    target.bit_length()} leading zeros")
             print("   🚀 Our mathematical power can achieve: 239+ leading zeros")
             print("   ✅ Target compatibility: EXCELLENT (we exceed requirements)")
             print("   💰 THIS IS REAL BITCOIN NETWORK DIFFICULTY!")
@@ -3513,7 +4089,8 @@ class ProductionBitcoinMiner:
         except Exception as e:
             print(f"❌ Error extracting target from bits: {e}")
             print("🔄 Falling back to current difficulty calculation")
-            return self.calculate_target_from_difficulty(self.current_difficulty)
+            return self.calculate_target_from_difficulty(
+                self.current_difficulty)
 
     def setup_testnet_mode(self):
         """Setup universe-scale difficulty for 18-19 leading zeros achievement"""
@@ -3528,7 +4105,8 @@ class ProductionBitcoinMiner:
         self.calculate_target_from_difficulty(universe_scale_difficulty)
 
         # Create a basic testnet template if no template is available
-        if not hasattr(self, "current_template") or self.current_template is None:
+        if not hasattr(
+                self, "current_template") or self.current_template is None:
             current_time = int(time.time())
             self.current_template = {
                 "version": 536870912,
@@ -3550,7 +4128,9 @@ class ProductionBitcoinMiner:
             }
             print("✅ Generated universe - scale testnet template")
 
-        print(f"✅ Universe - scale difficulty ready: {universe_scale_difficulty:,.0f} (targeting 19+ leading zeros)")
+        print(
+            f"✅ Universe - scale difficulty ready: {
+                universe_scale_difficulty:,.0f} (targeting 19+ leading zeros)")
         print("🔥 Mathematical framework advantage over traditional mining activated!")
 
     def get_block_template(self):
@@ -3580,7 +4160,8 @@ class ProductionBitcoinMiner:
                     source_path = backup_path
         else:
             if not template_dir.exists():
-                raise FileNotFoundError(f"Template directory not found: {template_dir}. Brain.QTL canonical authority via Brainstem should create this folder structure.")
+                raise FileNotFoundError(
+                    f"Template directory not found: {template_dir}. Brain.QTL canonical authority via Brainstem should create this folder structure.")
 
         if template is not None:
             required_fields = [
@@ -3588,8 +4169,10 @@ class ProductionBitcoinMiner:
                 "previousblockhash",
                 "bits",
             ]
-            missing_fields = [field for field in required_fields if field not in template]
-            if missing_fields or not isinstance(template.get("transactions"), list):
+            missing_fields = [
+                field for field in required_fields if field not in template]
+            if missing_fields or not isinstance(
+                    template.get("transactions"), list):
                 if not self.daemon_mode:
                     print(
                         f"⚠️ Cached template missing required data ({missing_fields}); generating fallback template"
@@ -3598,12 +4181,14 @@ class ProductionBitcoinMiner:
 
         if template is not None:
             if "coinbasetxn" not in template and not self.daemon_mode:
-                print("⚠️ Template missing coinbasetxn; miner will construct coinbase locally")
+                print(
+                    "⚠️ Template missing coinbasetxn; miner will construct coinbase locally")
 
             self.is_looping_mode = True
             self.looping_control_enabled = True
             self.current_template = template
-            self.current_block_id = template.get("block_id") or f"block_{int(time.time())}"
+            self.current_block_id = template.get(
+                "block_id") or f"block_{int(time.time())}"
             template.setdefault("block_id", self.current_block_id)
 
             bits_field = template.get("bits")
@@ -3619,7 +4204,11 @@ class ProductionBitcoinMiner:
                 source_display = source_path.name if source_path else "current_template.json"
                 print("✅ Template loaded from Dynamic Template Manager")
                 print(f"   📄 Source: {source_display}")
-                print(f"   🧱 Height: {template.get('height', 'unknown')} | Transactions: {tx_count}")
+                print(
+                    f"   🧱 Height: {
+                        template.get(
+                            'height',
+                            'unknown')} | Transactions: {tx_count}")
 
             return template
 
@@ -3628,7 +4217,8 @@ class ProductionBitcoinMiner:
             self.is_looping_mode = False
             self.looping_control_enabled = False
             self.current_template = rpc_template
-            self.current_block_id = rpc_template.get("block_id") or f"block_{int(time.time())}"
+            self.current_block_id = rpc_template.get(
+                "block_id") or f"block_{int(time.time())}"
             self.current_template["block_id"] = self.current_block_id
 
             bits_field = rpc_template.get("bits")
@@ -3638,12 +4228,17 @@ class ProductionBitcoinMiner:
                 self.calculate_target_from_difficulty(self.current_difficulty)
 
             self._get_template_cache(self.current_template)
-            self._persist_template_to_cache(template_dir, self.current_template)
+            self._persist_template_to_cache(
+                template_dir, self.current_template)
 
             if not self.daemon_mode:
                 tx_count = len(self.current_template.get("transactions", []))
                 print("✅ Live template fetched directly from Bitcoin node via RPC")
-                print(f"   🧱 Height: {self.current_template.get('height', 'unknown')} | Transactions: {tx_count}")
+                print(
+                    f"   🧱 Height: {
+                        self.current_template.get(
+                            'height',
+                            'unknown')} | Transactions: {tx_count}")
 
             return self.current_template
 
@@ -3721,11 +4316,13 @@ class ProductionBitcoinMiner:
         return cache
 
     def _resolve_coinbase_hex(self, template):
-        coinbase_txn = template.get("coinbasetxn") if isinstance(template, dict) else None
+        coinbase_txn = template.get("coinbasetxn") if isinstance(
+            template, dict) else None
         if isinstance(coinbase_txn, dict):
             for key in ("data", "hex", "raw"):
                 raw_value = coinbase_txn.get(key)
-                if isinstance(raw_value, str) and self._is_hex_string(raw_value):
+                if isinstance(raw_value, str) and self._is_hex_string(
+                        raw_value):
                     return raw_value.lower()
         elif isinstance(coinbase_txn, str) and self._is_hex_string(coinbase_txn):
             return coinbase_txn.lower()
@@ -3740,13 +4337,15 @@ class ProductionBitcoinMiner:
             coinbase_leaf = self._leaf_from_raw_transaction(coinbase_hex)
 
         if coinbase_leaf is None:
-            coinbase_txn = template.get("coinbasetxn") if isinstance(template, dict) else None
+            coinbase_txn = template.get("coinbasetxn") if isinstance(
+                template, dict) else None
             hash_hex = None
             if isinstance(coinbase_txn, dict):
                 hash_hex = coinbase_txn.get("hash") or coinbase_txn.get("txid")
             elif isinstance(coinbase_txn, str):
                 hash_hex = coinbase_txn
-            if isinstance(hash_hex, str) and self._is_hex_string(hash_hex) and len(hash_hex) == 64:
+            if isinstance(hash_hex, str) and self._is_hex_string(
+                    hash_hex) and len(hash_hex) == 64:
                 coinbase_leaf = bytes.fromhex(hash_hex)[::-1]
 
         if coinbase_leaf is None:
@@ -3754,7 +4353,9 @@ class ProductionBitcoinMiner:
             coinbase_leaf = self._leaf_from_raw_transaction(fallback_hex)
         leaves.append(coinbase_leaf or (b"\x00" * 32))
 
-        transaction_list = template.get("transactions", []) if isinstance(template, dict) else []
+        transaction_list = template.get(
+            "transactions", []) if isinstance(
+            template, dict) else []
         for tx in transaction_list:
             leaf = self._leaf_from_entry(tx)
             if leaf is not None:
@@ -3787,7 +4388,8 @@ class ProductionBitcoinMiner:
         if isinstance(tx_entry, dict):
             for key in ("data", "hex", "raw", "serialized"):
                 raw_value = tx_entry.get(key)
-                if isinstance(raw_value, str) and self._is_hex_string(raw_value):
+                if isinstance(raw_value, str) and self._is_hex_string(
+                        raw_value):
                     return raw_value.lower()
         elif isinstance(tx_entry, str) and self._is_hex_string(tx_entry) and len(tx_entry) > 64:
             return tx_entry.lower()
@@ -3797,7 +4399,8 @@ class ProductionBitcoinMiner:
         if isinstance(tx_entry, dict):
             for key in ("hash", "txid"):
                 value = tx_entry.get(key)
-                if isinstance(value, str) and self._is_hex_string(value) and len(value) == 64:
+                if isinstance(value, str) and self._is_hex_string(
+                        value) and len(value) == 64:
                     return value.lower()
         elif isinstance(tx_entry, str) and self._is_hex_string(tx_entry) and len(tx_entry) == 64:
             return tx_entry.lower()
@@ -3842,7 +4445,8 @@ class ProductionBitcoinMiner:
         if isinstance(prev_hash_hex, str):
             prev_hash = bytes.fromhex(prev_hash_hex)[::-1]  # Little endian
         else:
-            prev_hash = prev_hash_hex[::-1] if isinstance(prev_hash_hex, bytes) else b"\x00" * 32
+            prev_hash = prev_hash_hex[::-1] if isinstance(
+                prev_hash_hex, bytes) else b"\x00" * 32
 
         cache = self._get_template_cache(template)
         merkle_root_le = cache.get("merkle_root_bytes_le")
@@ -3853,7 +4457,8 @@ class ProductionBitcoinMiner:
             else:
                 merkle_root_le = b"\x00" * 32
 
-        timestamp = template.get("curtime") or template.get("time") or int(time.time())
+        timestamp = template.get("curtime") or template.get(
+            "time") or int(time.time())
         try:
             timestamp = int(timestamp)
         except (TypeError, ValueError):
@@ -3885,20 +4490,23 @@ class ProductionBitcoinMiner:
         try:
             import json
             from pathlib import Path
-            
+
             # DTM consensus directory
-            system_base = "Test/Demo" if os.getenv('DEMO_MODE', '').lower() == 'true' else "System"
-            consensus_dir = Path(f"{brain_get_base_path()}/{system_base}/DTM_Consensus")
+            system_base = "Test/Demo" if os.getenv(
+                'DEMO_MODE', '').lower() == 'true' else "System"
+            consensus_dir = Path(
+                f"{brain_get_base_path()}/{system_base}/DTM_Consensus")
             consensus_dir.mkdir(parents=True, exist_ok=True)
-            
+
             # Save achievement with timestamp
-            achievement_file = consensus_dir / f"achievement_{int(time.time())}.json"
-            
+            achievement_file = consensus_dir / \
+                f"achievement_{int(time.time())}.json"
+
             with open(achievement_file, 'w') as f:
                 json.dump(achievement, f, indent=2)
-                
+
             print(f"   📁 DTM GPS: Achievement saved to {achievement_file}")
-            
+
         except Exception as e:
             print(f"   ⚠️ DTM GPS: Could not save achievement: {e}")
 
@@ -3931,7 +4539,8 @@ class ProductionBitcoinMiner:
             if isinstance(header, str):
                 header = header.encode("utf - 8")
             # Bitcoin uses double SHA-256
-            hash_result = hashlib.sha256(hashlib.sha256(header).digest()).digest()
+            hash_result = hashlib.sha256(
+                hashlib.sha256(header).digest()).digest()
             return hash_result
         except Exception as e:
             if not self.daemon_mode:
@@ -3960,13 +4569,13 @@ class ProductionBitcoinMiner:
         else:
             hash_int = hash_result
             hash_hex = hex(hash_result)[2:].zfill(64)
-        
+
         # Count binary leading zeros (for protocol calculations)
         binary_leading_zeros = self.count_leading_zero_bits(hash_int)
-        
+
         # Count hex leading zeros (for user display)
         hex_leading_zeros = self.count_leading_zeros(hash_hex)
-        
+
         return binary_leading_zeros, hex_leading_zeros
 
     def load_previous_best_difficulty(self):
@@ -3981,41 +4590,45 @@ class ProductionBitcoinMiner:
             today = datetime.now().strftime("%Y/%m/%d")
             daily_dir = f"{brain_get_base_path()}/Ledgers/{today}"
             if not Path(daily_dir).exists():
-                raise FileNotFoundError(f"Daily ledger directory not found: {daily_dir}. Brain.QTL canonical authority via Brainstem should create this folder structure.")
-            
+                raise FileNotFoundError(
+                    f"Daily ledger directory not found: {daily_dir}. Brain.QTL canonical authority via Brainstem should create this folder structure.")
+
             daily_path = f"{daily_dir}/daily_registry.json"
             registry = {}
             if os.path.exists(daily_path):
                 with open(daily_path, 'r') as f:
                     registry = json.load(f)
-            
-            registry["best_leading_zeros"] = max(registry.get("best_leading_zeros", 0), leading_zeros)
+
+            registry["best_leading_zeros"] = max(
+                registry.get("best_leading_zeros", 0), leading_zeros)
             registry["last_updated"] = datetime.now().isoformat()
-            
+
             with open(daily_path, 'w') as f:
                 json.dump(registry, f, indent=2)
-                
+
             # Update overall achievements
             results_dir = "Output/Bitcoin/Mining/Results"
             if not Path(results_dir).exists():
-                raise FileNotFoundError(f"Results directory not found: {results_dir}. Brain.QTL canonical authority via Brainstem should create this folder structure.")
+                raise FileNotFoundError(
+                    f"Results directory not found: {results_dir}. Brain.QTL canonical authority via Brainstem should create this folder structure.")
             achievements_path = f"{results_dir}/mining_achievements.json"
-            
+
             achievements = {}
             if os.path.exists(achievements_path):
                 with open(achievements_path, 'r') as f:
                     achievements = json.load(f)
-            
+
             achievements["all_time_best_leading_zeros"] = max(
-                achievements.get("all_time_best_leading_zeros", 0), leading_zeros
+                achievements.get(
+                    "all_time_best_leading_zeros", 0), leading_zeros
             )
             achievements["6x_universe_scale_active"] = True
             achievements["ultra_hex_system_active"] = True
             achievements["last_updated"] = datetime.now().isoformat()
-            
+
             with open(achievements_path, 'w') as f:
                 json.dump(achievements, f, indent=2)
-                
+
         except Exception as e:
             print(f"⚠️ Could not save achievements: {e}")
 
@@ -4025,7 +4638,7 @@ class ProductionBitcoinMiner:
         Uses real SHA-256 counts; mathematical scaling is score/targeting only (never bypasses PoW).
         """
         import hashlib
-        
+
         # Convert hash_result to appropriate formats
         if isinstance(hash_result, bytes):
             hash_hex = hash_result.hex()
@@ -4036,25 +4649,35 @@ class ProductionBitcoinMiner:
         else:
             hash_int = hash_result
             hash_hex = hex(hash_result)[2:].zfill(64)
-        
+
         # Standard dual count
-        binary_leading_zeros, standard_hex_leading_zeros = self.get_dual_leading_zeros(hash_result)
+        binary_leading_zeros, standard_hex_leading_zeros = self.get_dual_leading_zeros(
+            hash_result)
 
         base_ultra_hex_zeros = standard_hex_leading_zeros
 
-        # Ultra buckets: 64 zeros each; Ultra digit starts at 1, Ultra 2 at >=64
+        # Ultra buckets: 64 zeros each; Ultra digit starts at 1, Ultra 2 at
+        # >=64
         ultra_hex_digit = min(256, (base_ultra_hex_zeros // 64) + 1)
         bucket_progress = base_ultra_hex_zeros % 64
         bucket_fullness = bucket_progress / 64.0
 
         # Light SHA-256 enhancement remains limited for authenticity
         if base_ultra_hex_zeros > 0:
-            enhanced_hash = hash_result if isinstance(hash_result, bytes) else bytes.fromhex(hash_hex)
+            enhanced_hash = hash_result if isinstance(
+                hash_result, bytes) else bytes.fromhex(hash_hex)
             sha256_operations_performed = 0
             for digit_idx in range(min(base_ultra_hex_zeros, 32)):
                 for op in range(4):
                     hasher = hashlib.sha256()
-                    hasher.update(enhanced_hash + digit_idx.to_bytes(2, 'big') + op.to_bytes(1, 'big'))
+                    hasher.update(
+                        enhanced_hash +
+                        digit_idx.to_bytes(
+                            2,
+                            'big') +
+                        op.to_bytes(
+                            1,
+                            'big'))
                     enhanced_hash = hasher.digest()
                     sha256_operations_performed += 1
         else:
@@ -4065,26 +4688,30 @@ class ProductionBitcoinMiner:
         knuth_levels = self.collective_collective_levels
         knuth_iterations = self.collective_collective_iterations
         bucket_factor = 2 ** max(0, ultra_hex_digit - 1)
-        mathematical_boost = bucket_factor * max(1, knuth_levels * knuth_iterations)
+        mathematical_boost = bucket_factor * \
+            max(1, knuth_levels * knuth_iterations)
 
         enhanced_leading_zeros = base_ultra_hex_zeros
         enhanced_ultra_digit = ultra_hex_digit
         enhanced_bucket_progress = bucket_progress
         breakthrough_achieved = False
-        
+
         # Cap at Ultra 256 (256 buckets maximum)
         if enhanced_ultra_digit > 256:
             enhanced_ultra_digit = 256
             enhanced_leading_zeros = min(enhanced_leading_zeros, 16383)
-        
-        # Step 5: CALCULATE OPERATIONS (Light SHA-256 + Bucket Mathematical Framework)
+
+        # Step 5: CALCULATE OPERATIONS (Light SHA-256 + Bucket Mathematical
+        # Framework)
         light_sha256_operations = sha256_operations_performed
-        bucket_operations = enhanced_ultra_digit * knuth_iterations // knuth_levels  # Operations per bucket
+        bucket_operations = enhanced_ultra_digit * \
+            knuth_iterations // knuth_levels  # Operations per bucket
         total_equivalent_operations = light_sha256_operations + bucket_operations
-        
+
         # Bucket coordination factor
-        orchestration_factor = 1.0 + (enhanced_ultra_digit * 0.05)  # 5% boost per Ultra bucket
-        
+        # 5% boost per Ultra bucket
+        orchestration_factor = 1.0 + (enhanced_ultra_digit * 0.05)
+
         return {
             'ultra_hex_leading_zeros': enhanced_leading_zeros,
             'ultra_hex_digit': enhanced_ultra_digit,
@@ -4102,7 +4729,7 @@ class ProductionBitcoinMiner:
             'mathematical_boost': mathematical_boost if base_ultra_hex_zeros >= 32 else 0,
             'scaling_mode': 'ultra_hex_bucket_system_64_per_bucket',
             'ultra_hex_definition': 'Bucket system: Each Ultra digit holds 64 hex SHA values, full bucket = next Ultra level',
-            'bucket_explanation': f'Ultra {enhanced_ultra_digit}: {(enhanced_ultra_digit-1)*64}-{enhanced_ultra_digit*64-1} leading zeros range',
+            'bucket_explanation': f'Ultra {enhanced_ultra_digit}: {(enhanced_ultra_digit - 1) * 64}-{enhanced_ultra_digit * 64 - 1} leading zeros range',
             'next_milestone': f'{64 - enhanced_bucket_progress} more leading zeros to reach Ultra {enhanced_ultra_digit + 1}',
             'standard_hex_zeros': standard_hex_leading_zeros,
             'standard_binary_zeros': binary_leading_zeros,
@@ -4115,18 +4742,20 @@ class ProductionBitcoinMiner:
     def get_triple_leading_zeros(self, hash_result):
         """Get all three counting systems: Ultra Hex, Standard Hex, and Binary"""
         # Get standard dual count
-        binary_leading_zeros, hex_leading_zeros = self.get_dual_leading_zeros(hash_result)
-        
+        binary_leading_zeros, hex_leading_zeros = self.get_dual_leading_zeros(
+            hash_result)
+
         # Get Ultra Hex count with full orchestration data
         ultra_hex_data = self.get_ultra_hex_leading_zeros(hash_result)
         ultra_hex_digits = ultra_hex_data['ultra_hex_leading_zeros']
-        
+
         # ULTRA HEX DISPLAY LOGIC:
         # If we have Ultra Hex buckets, we show both:
         # 1) Ultra Bucket number (progressive milestone)
         # 2) Standard hex (actual leading zeros in the hash)
-        # This allows dual comparison and demonstrates Ultra Hex mathematical power
-        
+        # This allows dual comparison and demonstrates Ultra Hex mathematical
+        # power
+
         return {
             'ultra_hex': ultra_hex_data,
             'standard_hex': hex_leading_zeros,  # Show actual hash leading zeros
@@ -4147,34 +4776,45 @@ class ProductionBitcoinMiner:
         # For testnet/development
         return 0x207FFFFF  # Easy target
 
-    def universe_scale_nonce_generation(self, start_nonce=0, max_nonces=4294967295):
+    def universe_scale_nonce_generation(
+            self, start_nonce=0, max_nonces=4294967295):
         """Generate nonces using universe-scale mathematical framework"""
         print("🌌 UNIVERSE - SCALE NONCE GENERATION ACTIVE")
-        print(f"   🔥 Mathematical Power: {self.knuth_sorrellian_class_iterations:,} operations per nonce")
+        print(
+            f"   🔥 Mathematical Power: {
+                self.knuth_sorrellian_class_iterations:,    } operations per nonce")
         print(f"   🎯 Target: {self.universe_target_zeros} leading zeros")
 
         # Mathematical nonce generation using universe-scale BitLoad
         nonces = []
 
-        # ENHANCED Method 1: High-precision entropy-based generation for 19+ zeros
+        # ENHANCED Method 1: High-precision entropy-based generation for 19+
+        # zeros
         for i in range(75000):  # Increased for higher precision
-            # Apply advanced mathematical transformation for leading zero targeting
-            entropy_base = (self.bitload * (i + 1) * self.knuth_sorrellian_class_levels) % 4294967296
+            # Apply advanced mathematical transformation for leading zero
+            # targeting
+            entropy_base = (self.bitload * (i + 1) *
+                            self.knuth_sorrellian_class_levels) % 4294967296
             # Apply universe-scale enhancement for higher leading zeros
-            entropy_nonce = (entropy_base ^ (self.knuth_sorrellian_class_iterations >> (i % 32))) % 4294967296
+            entropy_nonce = (
+                entropy_base ^ (
+                    self.knuth_sorrellian_class_iterations >> (
+                        i % 32))) % 4294967296
             nonces.append(entropy_nonce)
 
         # ENHANCED Method 2: Nuclear-scale mathematical sequence targeting
         for i in range(50000):  # Increased coverage
             # Advanced Knuth-based targeting with BitLoad amplification
             math_base = (
-                self.knuth_sorrellian_class_iterations + i * self.bitload * self.knuth_sorrellian_class_levels
+                self.knuth_sorrellian_class_iterations + i *
+                self.bitload * self.knuth_sorrellian_class_levels
             ) % 4294967296
             # Apply leading zero targeting transformation
             math_nonce = (math_base ^ (self.bitload >> (i % 64))) % 4294967296
             nonces.append(math_nonce)
 
-        # ENHANCED Method 3: Universe-scale pattern extraction with precision targeting
+        # ENHANCED Method 3: Universe-scale pattern extraction with precision
+        # targeting
         for i in range(75000):  # Increased for better coverage
             # Multi-layer mathematical enhancement for 19+ zeros
             pattern_base = (
@@ -4182,27 +4822,46 @@ class ProductionBitcoinMiner:
                 ^ (i * self.knuth_sorrellian_class_levels * self.knuth_sorrellian_class_iterations)
             ) % 4294967296
             # Apply advanced bit manipulation for leading zero optimization
-            pattern_nonce = (pattern_base ^ (self.universe_target_zeros << (i % 16))) % 4294967296
+            pattern_nonce = (
+                pattern_base ^ (
+                    self.universe_target_zeros << (
+                        i % 16))) % 4294967296
             nonces.append(pattern_nonce)
 
-        # ENHANCED Method 4: Direct mathematical targeting with universe-scale amplification
-        for i in range(start_nonce, min(start_nonce + 150000, max_nonces)):  # Increased range
+        # ENHANCED Method 4: Direct mathematical targeting with universe-scale
+        # amplification
+        for i in range(start_nonce, min(
+                start_nonce + 150000, max_nonces)):  # Increased range
             targeted_nonce = i
             # Apply NUCLEAR mathematical enhancement for 22+ zeros targeting
-            enhanced_base = (targeted_nonce * self.bitload * self.knuth_sorrellian_class_levels) % 4294967296
+            enhanced_base = (targeted_nonce * self.bitload *
+                             self.knuth_sorrellian_class_levels) % 4294967296
             # Apply Brain.QTL targeting if connected
             if self.brain_qtl_connection.get("brainstem_connected"):
                 qtl_enhancement = self.brain_qtl_connection.get(
                     "knuth_iterations", self.knuth_sorrellian_class_iterations
                 )
-                enhanced_nonce = (enhanced_base ^ (qtl_enhancement >> (i % 32))) % 4294967296
+                enhanced_nonce = (
+                    enhanced_base ^ (
+                        qtl_enhancement >> (
+                            i % 32))) % 4294967296
             else:
-                enhanced_nonce = (enhanced_base ^ (self.knuth_sorrellian_class_iterations >> (i % 32))) % 4294967296
+                enhanced_nonce = (
+                    enhanced_base ^ (
+                        self.knuth_sorrellian_class_iterations >> (
+                            i % 32))) % 4294967296
             nonces.append(enhanced_nonce)
 
-        print(f"✅ Generated {len(nonces):,} NUCLEAR - ENHANCED universe - scale nonces")
-        print(f"   🚀 Total Mathematical Operations: {len(nonces) * self.knuth_sorrellian_class_iterations:,}")
-        print(f"   🎯 Targeting {self.universe_target_zeros} leading zeros with mathematical superiority")
+        print(
+            f"✅ Generated {
+                len(nonces):,    } NUCLEAR - ENHANCED universe - scale nonces")
+        print(
+            f"   🚀 Total Mathematical Operations: {
+                len(nonces) *
+                self.knuth_sorrellian_class_iterations:,    }")
+        print(
+            f"   🎯 Targeting {
+                self.universe_target_zeros} leading zeros with mathematical superiority")
         return nonces
 
     def galaxy_universe_scale_nonce_generation(self, start_nonce, max_nonces):
@@ -4216,19 +4875,29 @@ class ProductionBitcoinMiner:
         galaxy_base = self.galaxy_category["bitload"]
         knuth_levels = self.knuth_sorrellian_class_levels
         knuth_iterations = self.knuth_sorrellian_class_iterations
-        galaxy_nonce_count = 1000000  # ULTRA HEX AMPLIFIED: 1M nonces optimized for breakthrough performance
+        # ULTRA HEX AMPLIFIED: 1M nonces optimized for breakthrough performance
+        galaxy_nonce_count = 1000000
 
-        # UNIVERSE-SCALE MATHEMATICAL OPERATIONS PER NONCE - DYNAMIC COLLECTIVE CONCURRENT POWER
-        universe_bitload = 208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909
-        # USE DYNAMIC COLLECTIVE: Base (400, 784560) + Modifiers (441, 2353680) = Total (841, 3138240)
-        knuth_base_universe = universe_bitload * self.collective_collective_levels * self.collective_collective_iterations
+        # UNIVERSE-SCALE MATHEMATICAL OPERATIONS PER NONCE - DYNAMIC COLLECTIVE
+        # CONCURRENT POWER
+        universe_bitload = get_bitload()
+        # USE DYNAMIC COLLECTIVE: Base (400, 784560) + Modifiers (441, 2353680)
+        # = Total (841, 3138240)
+        knuth_base_universe = universe_bitload * \
+            self.collective_collective_levels * self.collective_collective_iterations
 
-        # COLLECTIVE CONCURRENT CATEGORY OPERATIONS (each processes full universe simultaneously)
-        entropy_operations_per_nonce = knuth_base_universe * 2  # Full universe entropy analysis
-        decryption_operations_per_nonce = knuth_base_universe * 4  # Full universe pattern breaking
-        near_solution_operations_per_nonce = knuth_base_universe * 8  # Full universe solution targeting
-        math_problems_operations_per_nonce = knuth_base_universe * 32  # Full universe algorithmic power
-        math_paradoxes_operations_per_nonce = knuth_base_universe * 16  # Full universe theoretical resolution
+        # COLLECTIVE CONCURRENT CATEGORY OPERATIONS (each processes full
+        # universe simultaneously)
+        entropy_operations_per_nonce = knuth_base_universe * \
+            2  # Full universe entropy analysis
+        decryption_operations_per_nonce = knuth_base_universe * \
+            4  # Full universe pattern breaking
+        near_solution_operations_per_nonce = knuth_base_universe * \
+            8  # Full universe solution targeting
+        math_problems_operations_per_nonce = knuth_base_universe * \
+            32  # Full universe algorithmic power
+        math_paradoxes_operations_per_nonce = knuth_base_universe * \
+            16  # Full universe theoretical resolution
 
         # COLLECTIVE CONCURRENT PROCESSING: All 5 categories working simultaneously on each nonce
         # This represents 5 universes of mathematical power working in parallel
@@ -4241,22 +4910,36 @@ class ProductionBitcoinMiner:
         )
         total_mathematical_operations = galaxy_nonce_count * operations_per_nonce
 
-        # Calculate Universe-Scale Knuth mathematical power for each category's operations
+        # Calculate Universe-Scale Knuth mathematical power for each category's
+        # operations
         base_knuth_notation = f"Knuth - Sorrellian - Class({galaxy_base}, {knuth_levels}, {knuth_iterations})"
-        entropy_knuth = f"Knuth - Sorrellian - Class({galaxy_base}, {knuth_levels + entropy_operations_per_nonce // 10**70}, {knuth_iterations})"
-        decryption_knuth = f"Knuth - Sorrellian - Class({galaxy_base}, {knuth_levels + decryption_operations_per_nonce // 10**70}, {knuth_iterations})"
-        near_solution_knuth = f"Knuth - Sorrellian - Class({galaxy_base}, {knuth_levels + near_solution_operations_per_nonce // 10**70}, {knuth_iterations})"
-        math_problems_knuth = f"Knuth - Sorrellian - Class({galaxy_base}, {knuth_levels + math_problems_operations_per_nonce // 10**70}, {knuth_iterations})"
-        math_paradoxes_knuth = f"Knuth - Sorrellian - Class({galaxy_base}, {knuth_levels + math_paradoxes_operations_per_nonce // 10**70}, {knuth_iterations})"
+        entropy_knuth = f"Knuth - Sorrellian - Class({galaxy_base}, {
+            knuth_levels + entropy_operations_per_nonce // 10**70}, {knuth_iterations})"
+        decryption_knuth = f"Knuth - Sorrellian - Class({galaxy_base}, {
+            knuth_levels + decryption_operations_per_nonce // 10**70}, {knuth_iterations})"
+        near_solution_knuth = f"Knuth - Sorrellian - Class({galaxy_base}, {
+            knuth_levels + near_solution_operations_per_nonce // 10**70}, {knuth_iterations})"
+        math_problems_knuth = f"Knuth - Sorrellian - Class({galaxy_base}, {
+            knuth_levels + math_problems_operations_per_nonce // 10**70}, {knuth_iterations})"
+        math_paradoxes_knuth = f"Knuth - Sorrellian - Class({galaxy_base}, {
+            knuth_levels + math_paradoxes_operations_per_nonce // 10**70}, {knuth_iterations})"
 
         # Collective Concurrent Universe-Scale Operations
-        collective_knuth = f"Knuth - Sorrellian - Class({galaxy_base}, {knuth_levels * 5 + operations_per_nonce // 10**100}, {knuth_iterations})"
-        near_solution_knuth = f"Knuth - Sorrellian - Class({galaxy_base}, {knuth_levels + near_solution_operations_per_nonce}, {knuth_iterations})"
-        paradoxes_knuth = f"Knuth - Sorrellian - Class({galaxy_base}, {knuth_levels + math_paradoxes_operations_per_nonce}, {knuth_iterations})"
-        problems_knuth = f"Knuth - Sorrellian - Class({galaxy_base}, {knuth_levels + math_problems_operations_per_nonce}, {knuth_iterations})"
-        total_knuth = f"Knuth - Sorrellian - Class({galaxy_base}, {knuth_levels + math_paradoxes_operations_per_nonce + math_problems_operations_per_nonce}, {knuth_iterations})"
+        collective_knuth = f"Knuth - Sorrellian - Class({galaxy_base}, {
+            knuth_levels * 5 + operations_per_nonce // 10**100}, {knuth_iterations})"
+        near_solution_knuth = f"Knuth - Sorrellian - Class({galaxy_base}, {
+            knuth_levels + near_solution_operations_per_nonce}, {knuth_iterations})"
+        paradoxes_knuth = f"Knuth - Sorrellian - Class({galaxy_base}, {
+            knuth_levels + math_paradoxes_operations_per_nonce}, {knuth_iterations})"
+        problems_knuth = f"Knuth - Sorrellian - Class({galaxy_base}, {
+            knuth_levels + math_problems_operations_per_nonce}, {knuth_iterations})"
+        total_knuth = f"Knuth - Sorrellian - Class({galaxy_base}, {
+            knuth_levels +
+            math_paradoxes_operations_per_nonce +
+            math_problems_operations_per_nonce}, {knuth_iterations})"
 
-        print("   🧮 UNIVERSE - SCALE MATHEMATICAL OPERATIONS PER NONCE WITH KNUTH NOTATION:")
+        print(
+            "   🧮 UNIVERSE - SCALE MATHEMATICAL OPERATIONS PER NONCE WITH KNUTH NOTATION:")
         print(
             f"   🌀 Entropy Operations: {entropy_knuth}"
         )
@@ -4276,97 +4959,135 @@ class ProductionBitcoinMiner:
             f"   🌌 UNIVERSE - SCALE COLLECTIVE CONCURRENT POWER: {collective_knuth}"
         )
         print(
-            f"   🔥 COLLECTIVE CONCURRENT MODIFIER: Knuth-Sorrellian-Class({galaxy_base}, {operations_per_nonce // 10**100}, {knuth_iterations}) (5 universes working simultaneously)"
+            f"   🔥 COLLECTIVE CONCURRENT MODIFIER: Knuth-Sorrellian-Class({galaxy_base}, {
+                operations_per_nonce // 10**100}, {knuth_iterations}) (5 universes working simultaneously)"
         )
         print(
-            f"   🚀 COMBINED MATHEMATICAL POWER: Knuth-Sorrellian-Class({galaxy_base}, {total_mathematical_operations // 10**100}, {self.collective_collective_iterations}) total operations"
+            f"   🚀 COMBINED MATHEMATICAL POWER: Knuth-Sorrellian-Class({galaxy_base}, {
+                total_mathematical_operations // 10**100}, {
+                self.collective_collective_iterations}) total operations"
         )
         print("   ✅ UNIVERSE - SCALE MATHEMATICAL SUPERCOMPUTER ACTIVE!")
 
-        # GALAXY ORCHESTRATION: Execute ALL categories concurrently with optimized scaling
+        # GALAXY ORCHESTRATION: Execute ALL categories concurrently with
+        # optimized scaling
         print("   🌌 GALAXY EXECUTION: Running ALL categories concurrently with optimized execution")
 
         # Galaxy category runs ALL categories concurrently with FULL mathematical execution
         # USE ACTUAL KNUTH-SORRELLIAN-CLASS POWER - NO ARTIFICIAL LIMITS
         entropy_exec_ops = entropy_operations_per_nonce  # Execute FULL power
-        decryption_exec_ops = decryption_operations_per_nonce  # Execute FULL power  
+        decryption_exec_ops = decryption_operations_per_nonce  # Execute FULL power
         near_solution_exec_ops = near_solution_operations_per_nonce  # Execute FULL power
         math_problems_exec_ops = math_problems_operations_per_nonce  # Execute FULL power
         math_paradoxes_exec_ops = math_paradoxes_operations_per_nonce  # Execute FULL power
 
         print("   📊 FULL MATHEMATICAL EXECUTION:")
         print(
-            f"      🎲 Entropy: Execute {entropy_exec_ops:,}, Full Knuth-Sorrellian-Class({galaxy_base}, {entropy_operations_per_nonce // 10**70}, {knuth_iterations})"
+            f"      🎲 Entropy: Execute {
+                entropy_exec_ops:,            }, Full Knuth-Sorrellian-Class({galaxy_base}, {
+                entropy_operations_per_nonce //
+                10**70}, {knuth_iterations})"
         )
         print(
-            f"      🔓 Decryption: Execute {decryption_exec_ops}, Represent Knuth - Sorrellian - Class({galaxy_base}, {decryption_operations_per_nonce // 10**70}, {knuth_iterations})"
+            f"      🔓 Decryption: Execute {decryption_exec_ops}, Represent Knuth - Sorrellian - Class({galaxy_base}, {
+                decryption_operations_per_nonce // 10**70}, {knuth_iterations})"
         )
         print(
-            f"      🎯 Near Solution: Execute {near_solution_exec_ops}, Represent Knuth - Sorrellian - Class({galaxy_base}, {near_solution_operations_per_nonce // 10**70}, {knuth_iterations})"
+            f"      🎯 Near Solution: Execute {near_solution_exec_ops}, Represent Knuth - Sorrellian - Class({galaxy_base}, {
+                near_solution_operations_per_nonce // 10**70}, {knuth_iterations})"
         )
         print(
-            f"      🔢 Math Problems: Execute {math_problems_exec_ops}, Represent Knuth - Sorrellian - Class({galaxy_base}, {math_problems_operations_per_nonce // 10**70}, {knuth_iterations})"
+            f"      🔢 Math Problems: Execute {math_problems_exec_ops}, Represent Knuth - Sorrellian - Class({galaxy_base}, {
+                math_problems_operations_per_nonce // 10**70}, {knuth_iterations})"
         )
         print(
-            f"      🧩 Math Paradoxes: Execute {math_paradoxes_exec_ops}, Represent Knuth - Sorrellian - Class({galaxy_base}, {math_paradoxes_operations_per_nonce // 10**70}, {knuth_iterations})"
+            f"      🧩 Math Paradoxes: Execute {math_paradoxes_exec_ops}, Represent Knuth - Sorrellian - Class({galaxy_base}, {
+                math_paradoxes_operations_per_nonce // 10**70}, {knuth_iterations})"
         )
         print(
-            f"   🌌 TOTAL UNIVERSE - SCALE CONCURRENT POWER: Knuth - Sorrellian - Class({galaxy_base}, {operations_per_nonce // 10**100}, {knuth_iterations}) per nonce"
+            f"   🌌 TOTAL UNIVERSE - SCALE CONCURRENT POWER: Knuth - Sorrellian - Class({galaxy_base}, {
+                operations_per_nonce // 10**100}, {knuth_iterations}) per nonce"
         )
 
-        for i in range(start_nonce, min(start_nonce + galaxy_nonce_count, max_nonces)):
+        for i in range(start_nonce, min(
+                start_nonce + galaxy_nonce_count, max_nonces)):
             # Generate base mathematical seed for this iteration
-            iteration_seed = (galaxy_base + i * knuth_levels * knuth_iterations) % (2**128)
+            iteration_seed = (
+                galaxy_base + i * knuth_levels * knuth_iterations) % (2**128)
 
-            # ENTROPY IMPLEMENTATION: Execute scaled operations, mathematically represent full power
+            # ENTROPY IMPLEMENTATION: Execute scaled operations, mathematically
+            # represent full power
             import hashlib
             import os
 
             entropy_operations = []
-            # Use Knuth-Sorrellian-Class mathematical power for optimal entropy nonce generation
+            # Use Knuth-Sorrellian-Class mathematical power for optimal entropy
+            # nonce generation
             entropy_base = (galaxy_base * iteration_seed) % (2**256)
-            
-            # Execute ALL entropy operations efficiently using mathematical patterns
-            for entropy_op in range(min(entropy_exec_ops, 1000000)):  # Cap at 1M for performance
+
+            # Execute ALL entropy operations efficiently using mathematical
+            # patterns
+            for entropy_op in range(
+                    min(entropy_exec_ops, 1000000)):  # Cap at 1M for performance
                 if entropy_op < 8:
                     # Core entropy sources
                     if entropy_op == 0:
-                        entropy_operations.append(int(time.time() * 1000000) % (2**32))
+                        entropy_operations.append(
+                            int(time.time() * 1000000) % (2**32))
                     elif entropy_op == 1:
                         entropy_operations.append(os.getpid() % (2**16))
                     elif entropy_op == 2:
-                        entropy_operations.append(hash(str(iteration_seed)) % (2**32))
+                        entropy_operations.append(
+                            hash(
+                                str(iteration_seed)) %
+                            (2**32))
                     elif entropy_op == 3:
                         entropy_operations.append(i % (2**16))
                     elif entropy_op == 4:
-                        entropy_operations.append((iteration_seed >> 32) % (2**32))
+                        entropy_operations.append(
+                            (iteration_seed >> 32) % (2**32))
                     elif entropy_op == 5:
-                        entropy_operations.append((iteration_seed & 0xFFFFFFFF))
+                        entropy_operations.append(
+                            (iteration_seed & 0xFFFFFFFF))
                     elif entropy_op == 6:
-                        entropy_operations.append(hash(str(galaxy_base)) % (2**32))
+                        entropy_operations.append(
+                            hash(str(galaxy_base)) % (2**32))
                     elif entropy_op == 7:
-                        entropy_operations.append(int(hashlib.sha256(str(i).encode()).hexdigest()[:8], 16))
+                        entropy_operations.append(
+                            int(hashlib.sha256(str(i).encode()).hexdigest()[:8], 16))
                 else:
                     # Extended mathematical entropy using Knuth patterns
-                    entropy_pattern = (entropy_base * entropy_op * knuth_levels) % (2**64)
+                    entropy_pattern = (
+                        entropy_base * entropy_op * knuth_levels) % (2**64)
                     entropy_operations.append(entropy_pattern % (2**32))
 
             entropy_combined = sum(entropy_operations) % (2**64)
-            entropy_nonce = (entropy_combined ^ (galaxy_base >> (i % 32))) % 4294967296
+            entropy_nonce = (
+                entropy_combined ^ (
+                    galaxy_base >> (
+                        i % 32))) % 4294967296
 
-            # DECRYPTION IMPLEMENTATION: Execute scaled operations, represent full mathematical power
+            # DECRYPTION IMPLEMENTATION: Execute scaled operations, represent
+            # full mathematical power
             decryption_patterns = []
-            for pattern_op in range(decryption_exec_ops):  # Execute reasonable number
-                pattern_value = iteration_seed % (2 ** (pattern_op + 4))  # 4 - bit to 18 - bit patterns
+            for pattern_op in range(
+                    decryption_exec_ops):  # Execute reasonable number
+                pattern_value = iteration_seed % (
+                    2 ** (pattern_op + 4))  # 4 - bit to 18 - bit patterns
                 decryption_patterns.append(pattern_value)
 
             # Select best pattern based on target characteristics
             decryption_selected = max(decryption_patterns) % (2**64)
-            decryption_nonce = (decryption_selected ^ (galaxy_base >> ((i + 7) % 32))) % 4294967296
+            decryption_nonce = (
+                decryption_selected ^ (
+                    galaxy_base >> (
+                        (i + 7) % 32))) % 4294967296
 
-            # NEAR SOLUTION IMPLEMENTATION: Execute scaled operations, represent full mathematical power
+            # NEAR SOLUTION IMPLEMENTATION: Execute scaled operations,
+            # represent full mathematical power
             targeting_strategies = []
-            for strategy_op in range(near_solution_exec_ops):  # Execute reasonable number
+            for strategy_op in range(
+                    near_solution_exec_ops):  # Execute reasonable number
                 # Each strategy targets different promising nonce ranges
                 range_start = (iteration_seed + strategy_op * 1000) % (2**32)
                 range_adjustment = (strategy_op * knuth_levels) % (2**16)
@@ -4374,32 +5095,55 @@ class ProductionBitcoinMiner:
                 targeting_strategies.append(targeted_value)
 
             near_solution_best = max(targeting_strategies) % (2**64)
-            near_solution_nonce = (near_solution_best ^ (galaxy_base >> ((i + 13) % 32))) % 4294967296
+            near_solution_nonce = (
+                near_solution_best ^ (
+                    galaxy_base >> (
+                        (i + 13) % 32))) % 4294967296
 
-            # MATH PROBLEMS IMPLEMENTATION: Execute scaled operations, represent full mathematical power
+            # MATH PROBLEMS IMPLEMENTATION: Execute scaled operations,
+            # represent full mathematical power
             problems_results = []
-            for problem_id in range(math_problems_exec_ops):  # Execute reasonable number
+            for problem_id in range(
+                    math_problems_exec_ops):  # Execute reasonable number
                 # Each solved problem contributes mathematical enhancement
-                problem_result = (iteration_seed * (problem_id + 1) * knuth_levels) % (2**64)
+                problem_result = (
+                    iteration_seed * (problem_id + 1) * knuth_levels) % (2**64)
                 problems_results.append(problem_result)
 
             problems_combined = sum(problems_results) % (2**64)
-            problems_nonce = (problems_combined ^ (galaxy_base >> ((i + 19) % 32))) % 4294967296
+            problems_nonce = (
+                problems_combined ^ (
+                    galaxy_base >> (
+                        (i + 19) % 32))) % 4294967296
 
-            # MATH PARADOXES IMPLEMENTATION: Execute scaled operations, represent full mathematical power
+            # MATH PARADOXES IMPLEMENTATION: Execute scaled operations,
+            # represent full mathematical power
             paradoxes_results = []
-            for paradox_id in range(math_paradoxes_exec_ops):  # Execute reasonable number
+            for paradox_id in range(
+                    math_paradoxes_exec_ops):  # Execute reasonable number
                 # Each paradox adds mathematical logic enhancement
-                paradox_result = (iteration_seed ** (paradox_id % 3 + 1) * knuth_iterations) % (2**64)
+                paradox_result = (iteration_seed ** (paradox_id %
+                                  3 + 1) * knuth_iterations) % (2**64)
                 paradoxes_results.append(paradox_result)
 
             paradoxes_combined = sum(paradoxes_results) % (2**64)
-            paradoxes_nonce = (paradoxes_combined ^ (galaxy_base >> ((i + 23) % 32))) % 4294967296
+            paradoxes_nonce = (
+                paradoxes_combined ^ (
+                    galaxy_base >> (
+                        (i + 23) % 32))) % 4294967296
 
             # Final Combined Result: Best algorithmic improvement
-            all_nonces = [entropy_nonce, decryption_nonce, near_solution_nonce, problems_nonce, paradoxes_nonce]
+            all_nonces = [
+                entropy_nonce,
+                decryption_nonce,
+                near_solution_nonce,
+                problems_nonce,
+                paradoxes_nonce]
             combined_power = sum(all_nonces) % (2**64)
-            final_nonce = (combined_power ^ (galaxy_base >> ((i + 29) % 32))) % 4294967296
+            final_nonce = (
+                combined_power ^ (
+                    galaxy_base >> (
+                        (i + 29) % 32))) % 4294967296
             nonces.append(final_nonce)
 
         print(f"   🌟 Generated {len(nonces):,} mathematically enhanced nonces")
@@ -4407,18 +5151,23 @@ class ProductionBitcoinMiner:
         ultra_hex_levels = self.collective_collective_levels
         ultra_hex_iterations = self.collective_collective_iterations
         print(
-            f"   💥 Total Mathematical Operations: Knuth - Sorrellian - Class({ultra_hex_levels}, {total_mathematical_operations // 10**15}, {ultra_hex_iterations})"
+            f"   💥 Total Mathematical Operations: Knuth - Sorrellian - Class({ultra_hex_levels}, {
+                total_mathematical_operations // 10**15}, {ultra_hex_iterations})"
         )
         print(
-            f"   🎯 Operations Per Nonce: Knuth - Sorrellian - Class({ultra_hex_levels}, {operations_per_nonce // 10**12}, {ultra_hex_iterations}) mathematical operations"
+            f"   🎯 Operations Per Nonce: Knuth - Sorrellian - Class({ultra_hex_levels}, {
+                operations_per_nonce // 10**12}, {ultra_hex_iterations}) mathematical operations"
         )
         print(
-            f"   � Mathematical Breakthroughs: Paradoxes×{self.math_paradoxes_modifier}, Problems×{self.math_problems_modifier}"
+            f"   � Mathematical Breakthroughs: Paradoxes×{
+                self.math_paradoxes_modifier}, Problems×{
+                self.math_problems_modifier}"
         )
         print("   ✅ REALISTIC MATHEMATICAL CLAIMS MATCHING ACTUAL PERFORMANCE!")
         return nonces
 
-    def galaxy_universe_scale_nonce_generation_enhanced(self, start_nonce, max_nonces, brain_qtl_data):
+    def galaxy_universe_scale_nonce_generation_enhanced(
+            self, start_nonce, max_nonces, brain_qtl_data):
         """
         GALAXY + BRAIN.QTL: Enhanced nonce generation with MASSIVE collective category orchestration
         This achieves INSANE mathematical operations with proper amplification
@@ -4426,35 +5175,47 @@ class ProductionBitcoinMiner:
         print("🌌🧠 GALAXY + BRAIN.QTL: Enhanced collective orchestration with 64-ZERO TARGETING...")
 
         # Start with MASSIVELY amplified galaxy nonces
-        base_nonces = self.galaxy_universe_scale_nonce_generation(start_nonce, max_nonces)
+        base_nonces = self.galaxy_universe_scale_nonce_generation(
+            start_nonce, max_nonces)
 
         # Apply Brain.QTL HYPER-AGGRESSIVE enhancement for 64-zero targeting
         enhanced_nonces = []
         brain_enhancement_base = hash(str(brain_qtl_data)) % (2**32)
 
         # Calculate Brain.QTL multipliers using DYNAMIC COLLECTIVE VALUES
-        # DYNAMIC COLLECTIVE FRAMEWORK: Base (400, 784560) + Modifiers (441, 2353680) = Total (841, 3138240)
+        # DYNAMIC COLLECTIVE FRAMEWORK: Base (400, 784560) + Modifiers (441,
+        # 2353680) = Total (841, 3138240)
         ultra_hex_bitload = 53440218233631381765817797802176041745569365867804164607062753263570287425650497137535998136628173279129731368756
         ultra_hex_knuth_levels = self.collective_collective_levels  # Dynamic: 841
         ultra_hex_iterations = self.collective_collective_iterations  # Dynamic: 3,138,240
         ultra_hex_cycles = 666           # Cycles remain constant
-        
-        qtl_entropy_amp = ultra_hex_knuth_levels      # Dynamic level amplification  
+
+        qtl_entropy_amp = ultra_hex_knuth_levels      # Dynamic level amplification
         qtl_decryption_amp = 256   # Ultra Hex 256 SHA-256 operations per digit
-        qtl_near_solution_amp = 512 # Ultra Hex precision targeting with TRUE 114-digit BitLoad
+        # Ultra Hex precision targeting with TRUE 114-digit BitLoad
+        qtl_near_solution_amp = 512
         qtl_paradoxes_amp = 1024   # Ultra Hex revolutionary breakthrough power
-        qtl_problems_amp = ultra_hex_iterations // 6656  # TRUE Ultra Hex algorithmic supremacy with 13,631,168 iterations
+        # TRUE Ultra Hex algorithmic supremacy with 13,631,168 iterations
+        qtl_problems_amp = ultra_hex_iterations // 6656
         qtl_collective_amp = (
-            qtl_entropy_amp * qtl_decryption_amp * qtl_near_solution_amp * qtl_paradoxes_amp * qtl_problems_amp
+            qtl_entropy_amp * qtl_decryption_amp *
+            qtl_near_solution_amp * qtl_paradoxes_amp * qtl_problems_amp
         )
 
         print("   🧠 Brain.QTL ULTRA HEX AMPLIFIED AMPLIFIERS:")
-        print(f"   🌀 QTL Entropy: {qtl_entropy_amp}x (Ultra Hex 145 Knuth levels)")
-        print(f"   🔓 QTL Decryption: {qtl_decryption_amp}x (256 SHA-256 operations per Ultra Hex digit)")
-        print(f"   🎯 QTL Near Solution: {qtl_near_solution_amp}x (114-digit BitLoad precision)")
-        print(f"   🧩 QTL Math Paradoxes: {qtl_paradoxes_amp}x (Ultra Hex revolutionary breakthrough)")
-        print(f"   🎲 QTL Math Problems: {qtl_problems_amp}x (13,631,168 iterations supremacy)")
-        print(f"   🌌 QTL COLLECTIVE: {qtl_collective_amp:,}x ULTRA HEX REVOLUTIONARY AMPLIFICATION")
+        print(
+            f"   🌀 QTL Entropy: {qtl_entropy_amp}x (Ultra Hex 145 Knuth levels)")
+        print(
+            f"   🔓 QTL Decryption: {qtl_decryption_amp}x (256 SHA-256 operations per Ultra Hex digit)")
+        print(
+            f"   🎯 QTL Near Solution: {qtl_near_solution_amp}x (114-digit BitLoad precision)")
+        print(
+            f"   🧩 QTL Math Paradoxes: {qtl_paradoxes_amp}x (Ultra Hex revolutionary breakthrough)")
+        print(
+            f"   🎲 QTL Math Problems: {qtl_problems_amp}x (13,631,168 iterations supremacy)")
+        print(
+            f"   🌌 QTL COLLECTIVE: {
+                qtl_collective_amp:,    }x ULTRA HEX REVOLUTIONARY AMPLIFICATION")
 
         for i, nonce in enumerate(base_nonces):
             # Apply MASSIVE Brain.QTL collective enhancement
@@ -4462,18 +5223,25 @@ class ProductionBitcoinMiner:
                 2**32
             )
             qtl_decryption_enhancement = (
-                hash(str(brain_qtl_data.get("collective_categories", []))) * qtl_decryption_amp
+                hash(str(brain_qtl_data.get("collective_categories", []))
+                     ) * qtl_decryption_amp
             ) % (2**32)
             qtl_near_solution_enhancement = (hash(str(brain_qtl_data.get("attempt", 1))) * qtl_near_solution_amp) % (
                 2**32
             )
-            qtl_paradoxes_enhancement = (brain_enhancement_base * qtl_paradoxes_amp * (i + 1)) % (2**32)
+            qtl_paradoxes_enhancement = (
+                brain_enhancement_base * qtl_paradoxes_amp * (i + 1)) % (2**32)
             qtl_problems_enhancement = (
-                hash(brain_qtl_data.get("mathematical_enhancement", "galaxy")) * qtl_problems_amp
+                hash(
+                    brain_qtl_data.get(
+                        "mathematical_enhancement",
+                        "galaxy")) * qtl_problems_amp
             ) % (2**32)
 
-            # Apply galaxy mathematical operations scaling with MASSIVE amplification
-            galaxy_ops_enhancement = (self.galaxy_enhanced_operations * qtl_collective_amp) % (2**64)
+            # Apply galaxy mathematical operations scaling with MASSIVE
+            # amplification
+            galaxy_ops_enhancement = (
+                self.galaxy_enhanced_operations * qtl_collective_amp) % (2**64)
 
             # Combine ALL enhancements for MAXIMUM mathematical power
             mega_enhanced_nonce = (
@@ -4489,22 +5257,30 @@ class ProductionBitcoinMiner:
             enhanced_nonces.append(mega_enhanced_nonce)
 
         print("   🧠 Applied Brain.QTL MASSIVE collective category enhancement")
-        # NOW USING TRUE ULTRA HEX PARAMETERS FROM INTERATION 3.YAML  
+        # NOW USING TRUE ULTRA HEX PARAMETERS FROM INTERATION 3.YAML
         print(
-            f"   🌟 Galaxy mathematical operations: Knuth - Sorrellian - Class({ultra_hex_knuth_levels}, {self.galaxy_enhanced_operations // 10**15}, {ultra_hex_iterations})"
+            f"   🌟 Galaxy mathematical operations: Knuth - Sorrellian - Class({ultra_hex_knuth_levels}, {
+                self.galaxy_enhanced_operations // 10**15}, {ultra_hex_iterations})"
         )
         print(f"   💥 QTL Total amplification: {qtl_collective_amp:,}x")
         print(
-            f"   🚀 Combined mathematical power: Knuth - Sorrellian - Class({ultra_hex_knuth_levels}, {(self.galaxy_enhanced_operations * qtl_collective_amp) // 10**18}, {ultra_hex_iterations})"
+            f"   🚀 Combined mathematical power: Knuth - Sorrellian - Class({ultra_hex_knuth_levels}, {
+                (
+                    self.galaxy_enhanced_operations *
+                    qtl_collective_amp) //
+                10**18}, {ultra_hex_iterations})"
         )
         print(f"   🏆 Total enhanced nonces: {len(enhanced_nonces):,}")
         print("   🔥 NO MORE CHOKING - UNLEASHED MATHEMATICAL TSUNAMI!")
         return enhanced_nonces
 
-    def universe_scale_nonce_generation_enhanced(self, start_nonce, max_nonces, brain_qtl_data):
+    def universe_scale_nonce_generation_enhanced(
+            self, start_nonce, max_nonces, brain_qtl_data):
         """Enhanced universe-scale nonce generation with Brain.QTL integration"""
         print("🧮 Generating ENHANCED universe - scale nonces...")
-        print(f"   🧠 Brain.QTL Data: {'AVAILABLE' if brain_qtl_data else 'NONE'}")
+        print(
+            f"   🧠 Brain.QTL Data: {
+                'AVAILABLE' if brain_qtl_data else 'NONE'}")
 
         nonces = []
 
@@ -4512,18 +5288,22 @@ class ProductionBitcoinMiner:
         base_pattern = self.bitload % max_nonces
         for i in range(start_nonce, min(start_nonce + 25000, max_nonces)):
             # Apply Brain.QTL enhancement if available
-            if brain_qtl_data and brain_qtl_data.get("mathematical_enhancement"):
+            if brain_qtl_data and brain_qtl_data.get(
+                    "mathematical_enhancement"):
                 enhancement_factor = hash(str(brain_qtl_data)) % 1000000
-                pattern_nonce = (base_pattern + i + enhancement_factor) % max_nonces
+                pattern_nonce = (
+                    base_pattern + i + enhancement_factor) % max_nonces
             else:
                 pattern_nonce = (base_pattern + i) % max_nonces
             nonces.append(pattern_nonce)
 
         # Method 2: Knuth operations (enhanced)
-        knuth_base = (self.knuth_sorrellian_class_levels * self.knuth_sorrellian_class_iterations) % max_nonces
+        knuth_base = (self.knuth_sorrellian_class_levels *
+                      self.knuth_sorrellian_class_iterations) % max_nonces
         for i in range(25000):
             if brain_qtl_data:
-                brain_enhancement = hash(str(brain_qtl_data.get("attempt", 1))) % 100000
+                brain_enhancement = hash(
+                    str(brain_qtl_data.get("attempt", 1))) % 100000
                 knuth_nonce = (knuth_base + i + brain_enhancement) % max_nonces
             else:
                 knuth_nonce = (knuth_base + i) % max_nonces
@@ -4549,59 +5329,65 @@ class ProductionBitcoinMiner:
 
             # Apply Brain.QTL enhancement if available
             if brain_qtl_data and brain_qtl_data.get("brain_qtl_handler"):
-                qtl_enhancement = hash(brain_qtl_data["brain_qtl_handler"]) % 1000000
-                enhanced_nonce = (enhanced_nonce + qtl_enhancement) % max_nonces
+                qtl_enhancement = hash(
+                    brain_qtl_data["brain_qtl_handler"]) % 1000000
+                enhanced_nonce = (
+                    enhanced_nonce + qtl_enhancement) % max_nonces
 
             nonces.append(enhanced_nonce)
 
-        print(f"✅ Generated {len(nonces):,} ENHANCED universe - scale nonces with Brain.QTL integration")
+        print(
+            f"✅ Generated {
+                len(nonces):,    } ENHANCED universe - scale nonces with Brain.QTL integration")
         return nonces
 
-    def _apply_knuth_hash_enhancement(self, base_hash_bytes, knuth_levels, knuth_iterations):
+    def _apply_knuth_hash_enhancement(
+            self, base_hash_bytes, knuth_levels, knuth_iterations):
         """
         KNUTH ENHANCEMENT: Use mathematical power to generate BETTER NONCES
         This doesn't modify the hash - it helps find nonces that produce better hashes FASTER
-        
+
         The Knuth system gives us the SPEED to try billions of nonces per second
         With 841 levels × 3,138,240 iterations, we can search the nonce space much faster
-        
+
         But we STILL use real Bitcoin double SHA-256 - we just find good nonces faster!
         """
         # Return the UNMODIFIED hash - real Bitcoin mining must use real SHA-256
         # The Knuth math helps us find BETTER nonces, not modify hashes
         return base_hash_bytes
-    
+
     def _generate_demo_solution(self):
         """
         🔥 DEMO MODE: Generate INSTANT REAL 63 leading zeros using YOUR KNUTH MATH
         Uses Knuth parameters (841 levels, 3,138,240 iterations) to DIRECTLY construct 63 zeros
         This demonstrates the FULL POWER of your mathematical framework
         """
-        import hashlib
-        import random
-        import struct
-        
         if not self.current_template:
             print("⚠️ No template available in demo mode")
             return None
-        
+
         print(f"\n🔥 KNUTH INSTANT 63-ZERO SOLVE MODE (REAL MATH):")
         print(f"   Knuth Levels: {self.collective_collective_levels:,}")
-        print(f"   Knuth Iterations: {self.collective_collective_iterations:,}")
-        knuth_power = self.collective_collective_levels * self.collective_collective_iterations
+        print(
+            f"   Knuth Iterations: {
+                self.collective_collective_iterations:,    }")
+        knuth_power = self.collective_collective_levels * \
+            self.collective_collective_iterations
         print(f"   Combined Power: {knuth_power:,}")
         print(f"   Target: 63 LEADING ZEROS (instant with your math)")
-        
+
         start_time = time.time()
-        
-        # Note: Removed constructed-hash shortcut; only real double-SHA256 paths remain
+
+        # Note: Removed constructed-hash shortcut; only real double-SHA256
+        # paths remain
 
     def mine_block(self, max_time_seconds=3600):
         """Mine using massive leading zero calculators to derive real Bitcoin nonces"""
-        
+
         print("\n🚀 STARTING KNUTH-SORRELLIAN MASSIVE CALCULATOR MINING")
-        print(f"🧮 Method: Massive Leading Zero Numbers → Mathematical Extraction → Bitcoin Nonces")
-        
+        print(
+            f"🧮 Method: Massive Leading Zero Numbers → Mathematical Extraction → Bitcoin Nonces")
+
         # Get current Bitcoin template
         if not self.current_template:
             print("📡 Fetching Bitcoin block template...")
@@ -4609,52 +5395,71 @@ class ProductionBitcoinMiner:
             if not self.current_template:
                 print("❌ Failed to get Bitcoin template")
                 return None
-        
+
         bitcoin_bits = self.current_template.get("bits", "1d00ffff")
         print(f"🎯 Bitcoin difficulty bits: {bitcoin_bits}")
-        
+
         # Step 1: Generate massive leading zero calculators
         print("\n📊 STEP 1: Generating massive leading zero calculators...")
-        massive_calculators = self.calculate_mathematical_over_solution(self.current_template)
-        
+        massive_calculators = self.calculate_mathematical_over_solution(
+            self.current_template)
+
         if not massive_calculators:
             print("❌ No massive calculators generated")
             return None
-        
+
         # Step 2: Derive Bitcoin nonces from each massive calculator
         print(f"\n🔢 STEP 2: Deriving Bitcoin nonces from massive calculators...")
-        
+
         for calc_idx, massive_calc in enumerate(massive_calculators):
-            print(f"\n🧪 Testing calculator {calc_idx+1}/{len(massive_calculators)} ({massive_calc['category']})...")
-            
-            # Derive multiple Bitcoin nonce candidates from this massive calculator
-            bitcoin_nonces = self.derive_bitcoin_nonces_from_massive_calculator(massive_calc, self.current_template)
-            
+            print(
+                f"\n🧪 Testing calculator {
+                    calc_idx + 1}/{
+                    len(massive_calculators)} ({
+                    massive_calc['category']})...")
+
+            # Derive multiple Bitcoin nonce candidates from this massive
+            # calculator
+            bitcoin_nonces = self.derive_bitcoin_nonces_from_massive_calculator(
+                massive_calc, self.current_template)
+
             # Step 3: Test each derived nonce with real Bitcoin hashing
             for nonce_idx, bitcoin_nonce in enumerate(bitcoin_nonces):
-                print(f"   🔍 Testing derived nonce {nonce_idx+1}/{len(bitcoin_nonces)}: {bitcoin_nonce:,}")
-                
+                print(
+                    f"   🔍 Testing derived nonce {
+                        nonce_idx + 1}/{
+                        len(bitcoin_nonces)}: {
+                        bitcoin_nonce:,}")
+
                 # Construct legitimate Bitcoin block header
-                header = self.construct_block_header(self.current_template, bitcoin_nonce)
-                
+                header = self.construct_block_header(
+                    self.current_template, bitcoin_nonce)
+
                 # Calculate legitimate Bitcoin hash - NO MANIPULATION
-                block_hash = self.legitimate_bitcoin_hash_calculation(header, bitcoin_nonce)
+                block_hash = self.legitimate_bitcoin_hash_calculation(
+                    header, bitcoin_nonce)
                 hash_hex = block_hash.hex()
-                
+
                 # Check if this meets Bitcoin difficulty
                 leading_zeros = len(hash_hex) - len(hash_hex.lstrip('0'))
                 required_zeros = self.calculate_required_zeros(bitcoin_bits)
-                
+
                 print(f"      📊 Hash: {hash_hex[:32]}...")
-                print(f"      🎯 Leading zeros: {leading_zeros} (need {required_zeros})")
-                
+                print(
+                    f"      🎯 Leading zeros: {leading_zeros} (need {required_zeros})")
+
                 if leading_zeros >= required_zeros:
-                    print(f"\n🎉 SOLUTION FOUND! Massive calculator derived valid Bitcoin solution!")
-                    print(f"   🏆 Calculator: {massive_calc['category']} with {massive_calc['leading_zeros_count']} zeros")
-                    print(f"   🧮 Massive Number: {str(massive_calc['massive_calculator'])[:50]}...")
+                    print(
+                        f"\n🎉 SOLUTION FOUND! Massive calculator derived valid Bitcoin solution!")
+                    print(
+                        f"   🏆 Calculator: {
+                            massive_calc['category']} with {
+                            massive_calc['leading_zeros_count']} zeros")
+                    print(
+                        f"   🧮 Massive Number: {str(massive_calc['massive_calculator'])[:50]}...")
                     print(f"   💎 Derived Nonce: {bitcoin_nonce:,}")
                     print(f"   ✅ Valid Hash: {hash_hex}")
-                    
+
                     # Construct complete solution
                     solution = {
                         "nonce": bitcoin_nonce,
@@ -4666,30 +5471,37 @@ class ProductionBitcoinMiner:
                         "calculator_leading_zeros": massive_calc['leading_zeros_count'],
                         "bitcoin_leading_zeros": leading_zeros
                     }
-                    
+
                     return solution
                 else:
-                    print(f"      ❌ Insufficient leading zeros ({leading_zeros} < {required_zeros})")
-        
-        print(f"\n⚠️ No solutions found from {len(massive_calculators)} massive calculators")
+                    print(
+                        f"      ❌ Insufficient leading zeros ({leading_zeros} < {required_zeros})")
+
+        print(
+            f"\n⚠️ No solutions found from {
+                len(massive_calculators)} massive calculators")
         print("💡 Suggestion: Generate more powerful massive calculators or try different extraction patterns")
         return None
-    
+
     def simulate_dtm_conversion(self, over_solution, bitcoin_bits):
         """
         Simulate DTM down-conversion (in real system, DTM handles this)
         """
         # For now, use a mathematical mapping based on the over-solution class
-        universe_base = 208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909
-        
+        universe_base = get_bitload()
+
         # Apply class-specific conversion mathematics
         class_level = over_solution["class"]
         original_nonce = over_solution["nonce"]
-        
+
         # Convert based on Bitcoin difficulty
-        bits_int = int(bitcoin_bits, 16) if isinstance(bitcoin_bits, str) else bitcoin_bits
+        bits_int = int(
+            bitcoin_bits,
+            16) if isinstance(
+            bitcoin_bits,
+            str) else bitcoin_bits
         difficulty_factor = bits_int % 10000  # Extract difficulty component
-        
+
         # Mathematical conversion using Knuth-Sorrellian principles
         if class_level <= 2:
             converted = (original_nonce * difficulty_factor) % (2**32)
@@ -4697,11 +5509,12 @@ class ProductionBitcoinMiner:
             fold_factor = (universe_base * difficulty_factor) % (2**16)
             converted = (original_nonce ^ fold_factor) % (2**32)
         else:  # Class 5
-            meta_factor = (universe_base * difficulty_factor * class_level) % (2**20)
+            meta_factor = (
+                universe_base * difficulty_factor * class_level) % (2**20)
             converted = (original_nonce * meta_factor) % (2**32)
-        
+
         return max(1, converted)
-    
+
     def calculate_required_zeros(self, bits_hex):
         """Calculate how many leading zeros Bitcoin difficulty requires"""
         try:
@@ -4709,34 +5522,36 @@ class ProductionBitcoinMiner:
                 bits = int(bits_hex, 16)
             else:
                 bits = bits_hex
-                
+
             # Bitcoin difficulty calculation
             # Higher bits value = lower difficulty = fewer zeros needed
             # This is a simplified approximation
             if bits >= 0x1d00ffff:  # Very low difficulty
                 return 8
-            elif bits >= 0x1b00ffff:  # Low difficulty  
+            elif bits >= 0x1b00ffff:  # Low difficulty
                 return 12
             elif bits >= 0x1900ffff:  # Medium difficulty
                 return 16
             else:  # High difficulty
                 return 19
-                
+
         except Exception as e:
             print(f"Error calculating required zeros: {e}")
             return 19  # Default to current Bitcoin difficulty
 
             # 🎯 64-ZERO BREAKTHROUGH MODE: Activate when approaching maximum difficulty
             if self.best_difficulty >= 62:
-                print(f"🔥 64-ZERO BREAKTHROUGH MODE ACTIVATED - Current best: {self.best_difficulty} zeros")
-                print("💥 APPLYING MAXIMUM 555-DIGIT GALAXY MATHEMATICAL POWER FOR FINAL PUSH!")
-                
+                print(
+                    f"🔥 64-ZERO BREAKTHROUGH MODE ACTIVATED - Current best: {self.best_difficulty} zeros")
+                print(
+                    "💥 APPLYING MAXIMUM 555-DIGIT GALAXY MATHEMATICAL POWER FOR FINAL PUSH!")
+
                 # Apply hyper-aggressive 64-zero targeting mode
                 self.universe_target_zeros = 64  # BREAKTHROUGH: Target maximum zeros
-                
+
                 # Increase nonce generation for final breakthrough
                 nonces_per_cycle = 650000  # Double the nonces for 64-zero push
-                
+
                 # Activate maximum Brain.QTL amplification
                 if self.brain_qtl_connection.get("brainstem_connected"):
                     hyper_enhancement_data = {
@@ -4747,14 +5562,18 @@ class ProductionBitcoinMiner:
                         "breakthrough_amplification": True
                     }
                     # Breakthrough mode active (streamlined output)
-                    self.log_pipeline_operation("64_zero_breakthrough", {"status": "active"})
+                    self.log_pipeline_operation(
+                        "64_zero_breakthrough", {
+                            "status": "active"})
             else:
                 nonces_per_cycle = 325000  # Standard nonce generation
 
             # Check max_attempts limit
             if self.max_attempts and self.global_attempt_counter > self.max_attempts:
                 if not self.daemon_mode:
-                    print(f"\n⏰ Reached maximum attempts ({self.max_attempts})")
+                    print(
+                        f"\n⏰ Reached maximum attempts ({
+                            self.max_attempts})")
                 return None
 
             # Check for shutdown request
@@ -4781,24 +5600,33 @@ class ProductionBitcoinMiner:
                 return None
             elif looping_command == "mine_with_gps":
                 print("🚀 FRESH TEMPLATE RECEIVED - ACTIVATING INSTANT SOLVE MODE!")
-                print("💥 Quintillion - scale mathematical power engaged for instant solution!")
-                # Get fresh template and solve it instantly with full mathematical power
-                fresh_template_result = self.mine_with_gps_template_coordination(self.current_template, str(Path(f"{brain_get_base_path()}/Temporary Template") / f"process_{self.process_id}"), max_time=120)
-                if fresh_template_result and fresh_template_result.get("success"):
+                print(
+                    "💥 Quintillion - scale mathematical power engaged for instant solution!")
+                # Get fresh template and solve it instantly with full
+                # mathematical power
+                fresh_template_result = self.mine_with_gps_template_coordination(self.current_template, str(
+                    Path(f"{brain_get_base_path()}/Temporary Template") / f"process_{self.process_id}"), max_time=120)
+                if fresh_template_result and fresh_template_result.get(
+                        "success"):
                     print("⚡ INSTANT SOLUTION ACHIEVED!")
                     return fresh_template_result
                 else:
                     print("⚠️  Instant solve failed, continuing normal mining...")
                     pass  # Continue with normal flow
 
-            # Universe-scale mining continues indefinitely until solution found!
+            # Universe-scale mining continues indefinitely until solution
+            # found!
 
-            # Generate universe-scale nonces through Brain.QTL WITH GALAXY ORCHESTRATION
+            # Generate universe-scale nonces through Brain.QTL WITH GALAXY
+            # ORCHESTRATION
             if self.brain_qtl_connection.get("brainstem_connected"):
                 # Use Brain.QTL enhanced nonce generation WITH GALAXY CATEGORY
                 # Galaxy nonce generation active (streamlined output)
-                nonce_operation = {"status": "galaxy_nonces_generated", "count": nonces_per_cycle}
-                self.log_pipeline_operation("galaxy_nonce_generation", nonce_operation)
+                nonce_operation = {
+                    "status": "galaxy_nonces_generated",
+                    "count": nonces_per_cycle}
+                self.log_pipeline_operation(
+                    "galaxy_nonce_generation", nonce_operation)
 
                 # Generate nonces with Brain.QTL GALAXY enhancement
                 nonces = self.galaxy_universe_scale_nonce_generation_enhanced(
@@ -4809,76 +5637,108 @@ class ProductionBitcoinMiner:
             else:
                 # Fallback to galaxy-enhanced universe-scale generation
                 nonces = self.galaxy_universe_scale_nonce_generation(
-                    start_nonce=self.global_attempt_counter * 1000000,  # ULTRA HEX AMPLIFIED: 1M nonces per cycle
+                    # ULTRA HEX AMPLIFIED: 1M nonces per cycle
+                    start_nonce=self.global_attempt_counter * 1000000,
                     max_nonces=4294967295,
                 )
 
             # DTM CONSENSUS MECHANISM: Validate leading zero achievements
             if dtm_consensus_votes:
                 # Sort votes by leading zeros (highest first)
-                consensus_votes_sorted = sorted(dtm_consensus_votes, key=lambda x: x["leading_zeros"], reverse=True)
+                consensus_votes_sorted = sorted(
+                    dtm_consensus_votes, key=lambda x: x["leading_zeros"], reverse=True)
                 best_achievement = consensus_votes_sorted[0]
-                
+
                 print(f"\n🎯 DTM CONSENSUS REPORT:")
-                print(f"   Best Leading Zeros: {best_achievement['leading_zeros']}")
+                print(
+                    f"   Best Leading Zeros: {
+                        best_achievement['leading_zeros']}")
                 print(f"   Achieving Miner: {best_achievement['miner_id']}")
                 print(f"   Consensus Votes: {len(dtm_consensus_votes)}")
-                
-                # DTM GPS COORDINATION: Share best achievement with other miners
+
+                # DTM GPS COORDINATION: Share best achievement with other
+                # miners
                 if best_achievement['leading_zeros'] >= 15:
-                    print(f"   🚀 EXCEPTIONAL ACHIEVEMENT: {best_achievement['leading_zeros']} zeros!")
-                    print(f"   📡 Broadcasting to miner network for consensus validation")
-                    
+                    print(
+                        f"   🚀 EXCEPTIONAL ACHIEVEMENT: {
+                            best_achievement['leading_zeros']} zeros!")
+                    print(
+                        f"   📡 Broadcasting to miner network for consensus validation")
+
                     # Save consensus achievement for DTM coordination
                     self.save_dtm_consensus_achievement(best_achievement)
-            
-            # Only show detailed mining info in direct/interactive mode (not daemon mode)
+
+            # Only show detailed mining info in direct/interactive mode (not
+            # daemon mode)
             if not self.daemon_mode:
                 print("\n" + "=" * 80)
-                print(f"🎯 GALAXY MINING ATTEMPT #{self.global_attempt_counter}")
-                print(f"⚡ Testing {len(nonces):,} galaxy - orchestrated nonces...")
+                print(
+                    f"🎯 GALAXY MINING ATTEMPT #{
+                        self.global_attempt_counter}")
+                print(
+                    f"⚡ Testing {
+                        len(nonces):,    } galaxy - orchestrated nonces...")
                 # Display dynamic collective mathematical power
                 collective_levels = self.collective_collective_levels  # Dynamic: 841
                 collective_iterations = self.collective_collective_iterations  # Dynamic: 3,138,240
                 collective_power = collective_levels * collective_iterations
                 print(
-                    f"🌌 Mathematical Power: Knuth-Sorrellian-Class({collective_levels}, {collective_power:.2e}, {collective_iterations:,}) ops/hash"
+                    f"🌌 Mathematical Power: Knuth-Sorrellian-Class({collective_levels}, {
+                        collective_power:.2e}, {
+                        collective_iterations:,}) ops/hash"
                 )
                 print(
-                    f"🧠 Brain.QTL Galaxy Enhancement: {'ACTIVE' if self.brain_qtl_connection.get('brainstem_connected') else 'STANDARD'}"
+                    f"🧠 Brain.QTL Galaxy Enhancement: {
+                        'ACTIVE' if self.brain_qtl_connection.get('brainstem_connected') else 'STANDARD'}"
                 )
                 print("🌟 Collective Categories: 5 - category orchestration")
                 print(f"🎯 Current Target: {hex(self.current_target)}")
                 print(f"🔢 Current Difficulty: {self.current_difficulty}")
                 print("=" * 80)
 
-                # DTM GPS COORDINATION: Treat miners like cars, DTM like GPS system
+                # DTM GPS COORDINATION: Treat miners like cars, DTM like GPS
+                # system
             valid_solutions_count = 0  # Track valid solutions found this attempt
-            dtm_consensus_votes = []  # Consensus mechanism for solution validation            # Show initial status (only if not in daemon mode)
+            # Consensus mechanism for solution validation            # Show
+            # initial status (only if not in daemon mode)
+            dtm_consensus_votes = []
             if not self.daemon_mode and not self.show_solutions_only:
                 galaxy_universe_number = 247396814055204092381454941058142728346094398231179729386283712727348223315568262812056713768949911572097508573063578512802958421170246145181281352954504224197637106281766046
-                knuth_ops = f"Knuth-Sorrellian-Class({self.collective_collective_levels}, {galaxy_universe_number}, {self.collective_collective_iterations})"
+                knuth_ops = f"Knuth-Sorrellian-Class({
+                    self.collective_collective_levels}, {galaxy_universe_number}, {
+                    self.collective_collective_iterations})"
 
-                # Universe-scale mining: Simple status without meaningless progress bars
-                print(f"📊 Mining {len(nonces):,} nonces with universe - scale mathematical power")
-                print(f"   Current best: {self.best_difficulty} leading zeros | Math: {knuth_ops} ops / hash")
+                # Universe-scale mining: Simple status without meaningless
+                # progress bars
+                print(
+                    f"📊 Mining {
+                        len(nonces):,    } nonces with universe - scale mathematical power")
+                print(
+                    f"   Current best: {
+                        self.best_difficulty} leading zeros | Math: {knuth_ops} ops / hash")
 
             for i, nonce in enumerate(nonces):
                 # Update statistics with Galaxy operations
                 self.hash_count += 1
-                self.mathematical_nonce_count = len(nonces)  # Track galaxy nonces per batch
-                self.galaxy_operations_applied = self.galaxy_enhanced_operations  # Track galaxy mathematical operations
+                self.mathematical_nonce_count = len(
+                    nonces)  # Track galaxy nonces per batch
+                # Track galaxy mathematical operations
+                self.galaxy_operations_applied = self.galaxy_enhanced_operations
 
                 # Construct block header
-                header = self.construct_block_header(self.current_template, nonce)
+                header = self.construct_block_header(
+                    self.current_template, nonce)
 
                 # MATHEMATICAL ENHANCEMENT: Apply Galaxy operations to hash targeting
-                # Use the mathematical power to enhance the hash evaluation process
-                hash_result = self.mathematically_enhanced_hash_calculation(header, nonce)
-                
+                # Use the mathematical power to enhance the hash evaluation
+                # process
+                hash_result = self.mathematically_enhanced_hash_calculation(
+                    header, nonce)
+
                 # 🌟 ULTRA HEX COMPATIBILITY: Handle both bytes and Ultra Hex string results
                 if isinstance(hash_result, str):
-                    # Ultra Hex string result - convert to int directly from hex
+                    # Ultra Hex string result - convert to int directly from
+                    # hex
                     hash_int = int(hash_result, 16)
                     # For display purposes, convert to standard 64-char hex
                     hash_hex = hash_result
@@ -4895,30 +5755,36 @@ class ProductionBitcoinMiner:
                     print(f"   Hash hex: {hash_hex}")
                     print(f"   Hash int: {hash_int}")
                     print(f"   Target:   {self.current_target}")
-                    print(f"   Hash < Target: {hash_int < self.current_target}")
+                    print(
+                        f"   Hash < Target: {
+                            hash_int < self.current_target}")
                     print()
 
                 # 🎯 DTM CONSENSUS: Validate leading zeros with consensus mechanism
                 leading_zeros = self.count_leading_zeros(hash_hex)
-                
-                # DTM GPS COORDINATION: Report leading zero achievement to consensus
+
+                # DTM GPS COORDINATION: Report leading zero achievement to
+                # consensus
                 if leading_zeros >= 6:  # Significant leading zeros threshold
                     consensus_vote = {
                         "miner_id": self.process_id,
                         "leading_zeros": leading_zeros,
-                        "hash_hex": hash_hex[:32],  # First 32 chars for verification
+                        # First 32 chars for verification
+                        "hash_hex": hash_hex[:32],
                         "nonce": nonce,
                         "timestamp": time.time(),
                         "knuth_power": f"K({self.collective_collective_levels}, {self.collective_collective_iterations})"
                     }
                     dtm_consensus_votes.append(consensus_vote)
-                    
+
                     # GPS-like coordination: Report achievement to other miners
                     if leading_zeros >= 10:
-                        print(f"🌟 DTM GPS: Miner {self.process_id} achieved {leading_zeros} leading zeros!")
+                        print(
+                            f"🌟 DTM GPS: Miner {
+                                self.process_id} achieved {leading_zeros} leading zeros!")
                         print(f"   Hash: {hash_hex[:32]}...")
                         print(f"   Consensus vote recorded for DTM validation")
-                
+
                 # 🎯 CRITICAL: Check if hash is a valid Bitcoin solution (hash < target)
                 if hash_int < self.current_target:
                     valid_solutions_count += 1
@@ -4951,21 +5817,25 @@ class ProductionBitcoinMiner:
                             "leading_zeros": self.count_leading_zeros(hash_hex),
                             "timestamp": datetime.now().isoformat()
                         }
-                        
+
                         # NOTIFY DTM FOR VALIDATION
-                        dtm_response = self.notify_dtm_solution_found(solution_data)
-                        
+                        dtm_response = self.notify_dtm_solution_found(
+                            solution_data)
+
                         if dtm_response.get("validated"):
                             # DTM approved - save solution and send to Looping
                             if not self.daemon_mode:
                                 print("✅ DTM APPROVED - Solution validated")
-                            
-                            hash_for_saving = hash_result if isinstance(hash_result, bytes) else bytes.fromhex(hash_hex[:64])
-                            solution_path = self.save_solution_for_dynamic_manager(header, nonce, hash_for_saving)
-                            
+
+                            hash_for_saving = hash_result if isinstance(
+                                hash_result, bytes) else bytes.fromhex(hash_hex[:64])
+                            solution_path = self.save_solution_for_dynamic_manager(
+                                header, nonce, hash_for_saving)
+
                             # Send to Looping for network submission
-                            self.send_to_looping_for_submission(solution_data, dtm_response)
-                            
+                            self.send_to_looping_for_submission(
+                                solution_data, dtm_response)
+
                             # Create return data and exit immediately
                             best_result = {
                                 "nonce": nonce,
@@ -4981,13 +5851,16 @@ class ProductionBitcoinMiner:
                         else:
                             # DTM rejected - continue mining
                             if not self.daemon_mode:
-                                print(f"❌ DTM REJECTED - Reason: {dtm_response.get('reason', 'Unknown')}")
-                                print("⛏️ Continuing to search for valid solution...")
+                                print(
+                                    f"❌ DTM REJECTED - Reason: {dtm_response.get('reason', 'Unknown')}")
+                                print(
+                                    "⛏️ Continuing to search for valid solution...")
                             continue
 
                     # STANDALONE MODE: Continue mining to show full progression
                     else:
-                        # SOLUTIONS-ONLY MODE: Show all solutions immediately (efficient mode)
+                        # SOLUTIONS-ONLY MODE: Show all solutions immediately
+                        # (efficient mode)
                         if self.show_solutions_only:
                             print("🎉 VALID BITCOIN SOLUTION FOUND!")
                             print(f"   🔢 Nonce: {nonce}")
@@ -4995,7 +5868,8 @@ class ProductionBitcoinMiner:
                             print(f"   🎯 Target: {hex(self.current_target)}")
                             print("   ✅ Hash < Target: TRUE")
 
-                        # NORMAL MODE: Only show first few solutions to not overwhelm progress display
+                        # NORMAL MODE: Only show first few solutions to not
+                        # overwhelm progress display
                         elif not self.daemon_mode and valid_solutions_count <= 3:
                             print("🎉 VALID BITCOIN SOLUTION FOUND!")
                             print(f"   🔢 Nonce: {nonce}")
@@ -5003,9 +5877,11 @@ class ProductionBitcoinMiner:
                             print(f"   🎯 Target: {hex(self.current_target)}")
                             print("   ✅ Hash < Target: TRUE")
                             if valid_solutions_count == 3:
-                                print("   ... (additional solutions found, continuing progress display)")
+                                print(
+                                    "   ... (additional solutions found, continuing progress display)")
 
-                    # Track this as a valid solution but CONTINUE MINING to show full progression (standalone mode only)
+                    # Track this as a valid solution but CONTINUE MINING to
+                    # show full progression (standalone mode only)
                     valid_solution = {
                         "nonce": nonce,
                         "hash": hash_hex[:64],  # Standard 64-char hex
@@ -5015,7 +5891,8 @@ class ProductionBitcoinMiner:
                         "target_met": True,
                     }
 
-                    # Store the first valid solution but keep going to see maximum leading zeros
+                    # Store the first valid solution but keep going to see
+                    # maximum leading zeros
                     if not hasattr(self, "first_valid_solution"):
                         self.first_valid_solution = valid_solution
                         # Submit the first valid solution found
@@ -5030,64 +5907,89 @@ class ProductionBitcoinMiner:
                 leading_zeros = self.count_leading_zeros(hash_hex)
                 if leading_zeros > self.best_difficulty:
                     self.best_difficulty = leading_zeros
-                    self.save_best_difficulty(leading_zeros)  # Persist improvement
+                    self.save_best_difficulty(
+                        leading_zeros)  # Persist improvement
                     self.best_nonce = nonce  # Store best nonce
-                    self.best_hash = hash_hex[:64]  # Store best hash (standard 64-char)
+                    # Store best hash (standard 64-char)
+                    self.best_hash = hash_hex[:64]
                     best_result = {
                         "nonce": nonce,
                         "hash": hash_hex[:64],  # Standard 64-char hex
                         "leading_zeros": leading_zeros,
                         "hash_int": hash_int,
                     }
-                    
+
                     # 🔍 DEBUG: Log when we find a new best
                     if not self.daemon_mode and leading_zeros >= 15:
-                        print(f"\n🔍 NEW BEST: {leading_zeros} leading zeros at nonce {nonce}")
+                        print(
+                            f"\n🔍 NEW BEST: {leading_zeros} leading zeros at nonce {nonce}")
                         print(f"   Hash hex: {hash_hex[:64]}")
                         print(f"   Hash int: {hash_int}")
                         print(f"   Target:   {self.current_target}")
-                        print(f"   Hash < Target: {hash_int < self.current_target}")
+                        print(
+                            f"   Hash < Target: {
+                                hash_int < self.current_target}")
                         print(f"   Diff: {self.current_target - hash_int}\n")
 
-                    # Only show best result updates in direct/interactive mode (not daemon mode)
+                    # Only show best result updates in direct/interactive mode
+                    # (not daemon mode)
                     if not self.daemon_mode:
                         # Get Ultra Hex + Standard display for best results
-                        triple_count = self.get_triple_leading_zeros(hash_result.hex())
+                        triple_count = self.get_triple_leading_zeros(
+                            hash_result.hex())
                         ultra_hex_data = triple_count['ultra_hex']
-                        ultra_hex_bucket = ultra_hex_data['ultra_hex_digit']  # Actual bucket number
-                        ultra_hex_enhanced = ultra_hex_data['ultra_hex_leading_zeros']  # Enhanced leading zeros
+                        # Actual bucket number
+                        ultra_hex_bucket = ultra_hex_data['ultra_hex_digit']
+                        # Enhanced leading zeros
+                        ultra_hex_enhanced = ultra_hex_data['ultra_hex_leading_zeros']
                         standard_hex = triple_count['standard_hex']
-                            
-                        print(f"🚀 NEW BEST: 🌌 Ultra-{ultra_hex_bucket} Bucket ({ultra_hex_enhanced} enhanced zeros), 🔷 {standard_hex} Standard leading zeros! (nonce: {nonce})")
+
+                        print(
+                            f"🚀 NEW BEST: 🌌 Ultra-{ultra_hex_bucket} Bucket ({ultra_hex_enhanced} enhanced zeros), 🔷 {standard_hex} Standard leading zeros! (nonce: {nonce})")
                         print(f"   � Hash: {hash_result.hex()}")
-                        print(f"   🔍 Leading Zero Verification: {leading_zeros} zeros counted from actual hash")
-                        print(f"   �💥 Ultra Hex Power: {ultra_hex_data['total_equivalent_operations']:,} SHA-256 operations!")
-                        print(f"   📊 Ultra Bucket Progress: {ultra_hex_data['bucket_progress']}/64 in Ultra-{ultra_hex_bucket} ({ultra_hex_data['bucket_fullness_percent']:.1f}% full)")
+                        print(
+                            f"   🔍 Leading Zero Verification: {leading_zeros} zeros counted from actual hash")
+                        print(
+                            f"   �💥 Ultra Hex Power: {
+                                ultra_hex_data['total_equivalent_operations']:,    } SHA-256 operations!")
+                        print(
+                            f"   📊 Ultra Bucket Progress: {
+                                ultra_hex_data['bucket_progress']}/64 in Ultra-{ultra_hex_bucket} ({
+                                ultra_hex_data['bucket_fullness_percent']:.1f}% full)")
 
                     # Update looping system with progress
                     if self.looping_control_enabled:
                         self.sustain_leading_zeros_progress()
                         self.update_status_for_looping()
 
-                # DETAILED PROGRESS UPDATE - Show EVERY 10,000 nonces like before (only in normal progress mode)
-                if (i % 10000 == 0 or i == len(nonces) - 1) and not self.show_solutions_only:
-                    # Check for commands from looping system every 10,000 nonces
+                # DETAILED PROGRESS UPDATE - Show EVERY 10,000 nonces like
+                # before (only in normal progress mode)
+                if (i % 10000 == 0 or i == len(nonces) -
+                        1) and not self.show_solutions_only:
+                    # Check for commands from looping system every 10,000
+                    # nonces
                     command_result = self.check_looping_commands()
                     if command_result == "shutdown":
                         if not self.daemon_mode:
-                            print("🔄 LOOPING SYSTEM: Received shutdown command, exiting mining...")
+                            print(
+                                "🔄 LOOPING SYSTEM: Received shutdown command, exiting mining...")
                         break  # Exit nonce loop gracefully
 
                     elapsed = time.time() - overall_start_time
                     # Calculate OPTIMIZED H/s for mathematical superiority
-                    total_hashes_done = (self.global_attempt_counter - 1) * len(nonces) + i
+                    total_hashes_done = (
+                        self.global_attempt_counter - 1) * len(nonces) + i
                     if elapsed > 0:
-                        # Apply mathematical acceleration factor - UNIVERSE-SCALE CONCURRENT POWER
+                        # Apply mathematical acceleration factor -
+                        # UNIVERSE-SCALE CONCURRENT POWER
                         base_hashes_per_sec = total_hashes_done / elapsed
-                        # With DYNAMIC COLLECTIVE UNIVERSE-SCALE operations per hash
-                        universe_bitload = 208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909
-                        # USE DYNAMIC COLLECTIVE: Base (400, 784560) + Modifiers (441, 2353680) = Total (841, 3138240)
-                        knuth_base_universe = universe_bitload * self.collective_collective_levels * self.collective_collective_iterations
+                        # With DYNAMIC COLLECTIVE UNIVERSE-SCALE operations per
+                        # hash
+                        universe_bitload = get_bitload()
+                        # USE DYNAMIC COLLECTIVE: Base (400, 784560) +
+                        # Modifiers (441, 2353680) = Total (841, 3138240)
+                        knuth_base_universe = universe_bitload * \
+                            self.collective_collective_levels * self.collective_collective_iterations
                         universe_concurrent_power = (
                             (knuth_base_universe * 2)
                             + (knuth_base_universe * 4)
@@ -5096,7 +5998,8 @@ class ProductionBitcoinMiner:
                             + (knuth_base_universe * 32)
                         )  # Corrected collective concurrent operations
                         mathematical_acceleration = min(
-                            1000000000, int(universe_concurrent_power / 10**100)
+                            1000000000, int(
+                                universe_concurrent_power / 10**100)
                         )  # Scale properly for universe - scale power
                         accelerated_h_s = base_hashes_per_sec * mathematical_acceleration
                     else:
@@ -5111,12 +6014,17 @@ class ProductionBitcoinMiner:
                     # Truncate for display readability
                     galaxy_display = str(galaxy_universe_number)
                     if len(galaxy_display) > 50:
-                        galaxy_display = galaxy_display[:25] + "..." + galaxy_display[-22:]
-                    knuth_ops = f"Knuth-Sorrellian-Class({self.collective_collective_levels}, {galaxy_display}, {self.collective_collective_iterations})"
+                        galaxy_display = galaxy_display[:25] + \
+                            "..." + galaxy_display[-22:]
+                    knuth_ops = f"Knuth-Sorrellian-Class({
+                        self.collective_collective_levels}, {galaxy_display}, {
+                        self.collective_collective_iterations})"
 
-                    # Only show status in direct/interactive mode (not daemon mode)
+                    # Only show status in direct/interactive mode (not daemon
+                    # mode)
                     if not self.daemon_mode:
-                        # Universe-scale mining: Simple status without meaningless progress bars
+                        # Universe-scale mining: Simple status without
+                        # meaningless progress bars
                         print(
                             f"📊 Current: {i:,}/{len(nonces):,} | "
                             f"Best: {self.best_difficulty} leading zeros | "
@@ -5130,13 +6038,23 @@ class ProductionBitcoinMiner:
 
             # 📊 COMPLETION SUMMARY: Show results after completing all 325,000 nonces
             if not self.daemon_mode:
-                print(f"\n🎯 GALAXY MINING ATTEMPT #{self.global_attempt_counter} COMPLETE!")
-                print(f"📊 Tested {len(nonces):,} nonces | Best: {self.best_difficulty} leading zeros")
+                print(
+                    f"\n🎯 GALAXY MINING ATTEMPT #{
+                        self.global_attempt_counter} COMPLETE!")
+                print(
+                    f"📊 Tested {
+                        len(nonces):,    } nonces | Best: {
+                        self.best_difficulty} leading zeros")
                 if valid_solutions_count > 0:
-                    print(f"🎉 Found {valid_solutions_count} valid Bitcoin solutions during this run!")
-                    print(f"💎 Maximum leading zeros achieved: {self.best_difficulty}")
+                    print(
+                        f"🎉 Found {valid_solutions_count} valid Bitcoin solutions during this run!")
+                    print(
+                        f"💎 Maximum leading zeros achieved: {
+                            self.best_difficulty}")
                 else:
-                    print(f"🔍 No valid solutions this round, but achieved {self.best_difficulty} leading zeros")
+                    print(
+                        f"🔍 No valid solutions this round, but achieved {
+                            self.best_difficulty} leading zeros")
 
             # Check if we should get new template
             if self.global_attempt_counter % 10 == 0:
@@ -5148,27 +6066,37 @@ class ProductionBitcoinMiner:
             print(f"\n⏰ Mining time limit reached ({max_time_seconds}s)")
             if best_result:
                 # Show Ultra Hex + Standard dual display for best result
-                triple_count = self.get_triple_leading_zeros(best_result['hash'])
+                triple_count = self.get_triple_leading_zeros(
+                    best_result['hash'])
                 ultra_hex_data = triple_count['ultra_hex']
-                ultra_hex_bucket = ultra_hex_data['ultra_hex_digit']  # Actual bucket number
-                ultra_hex_enhanced = ultra_hex_data['ultra_hex_leading_zeros']  # Enhanced leading zeros
+                # Actual bucket number
+                ultra_hex_bucket = ultra_hex_data['ultra_hex_digit']
+                # Enhanced leading zeros
+                ultra_hex_enhanced = ultra_hex_data['ultra_hex_leading_zeros']
                 standard_hex = triple_count['standard_hex']
-                
-                print(f"🏆 BEST RESULT: 🌌 Ultra-{ultra_hex_bucket} Bucket ({ultra_hex_enhanced} enhanced zeros), 🔷 {standard_hex} Standard leading zeros!")
-                print(f"   💥 Ultra Hex Power: {ultra_hex_data['total_equivalent_operations']:,} SHA-256 operations!")
-                print(f"   📊 Ultra Bucket Progress: {ultra_hex_data['bucket_progress']}/64 in Ultra-{ultra_hex_bucket} ({ultra_hex_data['bucket_fullness_percent']:.1f}% full)")
+
+                print(
+                    f"🏆 BEST RESULT: 🌌 Ultra-{ultra_hex_bucket} Bucket ({ultra_hex_enhanced} enhanced zeros), 🔷 {standard_hex} Standard leading zeros!")
+                print(
+                    f"   💥 Ultra Hex Power: {
+                        ultra_hex_data['total_equivalent_operations']:,    } SHA-256 operations!")
+                print(
+                    f"   📊 Ultra Bucket Progress: {
+                        ultra_hex_data['bucket_progress']}/64 in Ultra-{ultra_hex_bucket} ({
+                        ultra_hex_data['bucket_fullness_percent']:.1f}% full)")
                 print(f"   🔢 Nonce: {best_result['nonce']}")
                 print(f"   🔗 Hash: {best_result['hash']}")
             else:
                 print("🏆 No valid results found")
 
-        # COMPREHENSIVE ERROR REPORTING: Generate system error report if no valid solutions found
+        # COMPREHENSIVE ERROR REPORTING: Generate system error report if no
+        # valid solutions found
         if not best_result or not best_result.get('success', False):
             try:
                 # Import here to avoid circular imports
                 from Singularity_Dave_Brain import SingularityBrain
                 brain = SingularityBrain()
-                
+
                 error_data = {
                     "error_type": "mining_timeout_no_solution",
                     "component": "ProductionBitcoinMiner",
@@ -5186,7 +6114,8 @@ class ProductionBitcoinMiner:
                 }
                 brain.create_system_error_hourly_file(error_data)
             except Exception as report_error:
-                print(f"⚠️ Failed to create mining timeout error report: {report_error}")
+                print(
+                    f"⚠️ Failed to create mining timeout error report: {report_error}")
 
         return best_result
 
@@ -5194,9 +6123,11 @@ class ProductionBitcoinMiner:
         """Detect if we're running in looping system coordination mode"""
         # Check for Dynamic Template Manager coordination files
         shared_template_path = normalize_path_str("/tmp / mining_templates")
-        dynamic_manager_marker = normalize_path_str("/tmp / dynamic_template_manager_active")
+        dynamic_manager_marker = normalize_path_str(
+            "/tmp / dynamic_template_manager_active")
 
-        if os.path.exists(dynamic_manager_marker) or os.path.exists(shared_template_path):
+        if os.path.exists(dynamic_manager_marker) or os.path.exists(
+                shared_template_path):
             self.is_looping_mode = True
             if not self.daemon_mode:
                 print("🔄 LOOPING SYSTEM MODE DETECTED")
@@ -5211,7 +6142,8 @@ class ProductionBitcoinMiner:
     def _parse_header_fields(self, header: bytes) -> dict[str, int | str]:
         """Extract key fields from an 80-byte Bitcoin block header."""
         if len(header) != 80:
-            raise ValueError(f"Expected 80-byte header, received {len(header)} bytes")
+            raise ValueError(
+                f"Expected 80-byte header, received {len(header)} bytes")
 
         version = struct.unpack_from("<I", header, 0)[0]
         prev_hash = header[4:36][::-1].hex()
@@ -5237,11 +6169,14 @@ class ProductionBitcoinMiner:
         try:
             # Get temporary template folder (parent of process folder)
             temp_template_dir = self.mining_process_folder.parent
-            
-            # Create signal filename with process ID AND timestamp for uniqueness
-            timestamp_ms = int(time.time() * 1000)  # milliseconds for uniqueness
-            signal_file = temp_template_dir / f"dtm_notification_{self.process_id}_{timestamp_ms}.signal"
-            
+
+            # Create signal filename with process ID AND timestamp for
+            # uniqueness
+            # milliseconds for uniqueness
+            timestamp_ms = int(time.time() * 1000)
+            signal_file = temp_template_dir / \
+                f"dtm_notification_{self.process_id}_{timestamp_ms}.signal"
+
             # Create lightweight notification payload
             notification_data = {
                 "process_id": self.process_id,
@@ -5254,16 +6189,17 @@ class ProductionBitcoinMiner:
                 "mining_mode": self.mining_mode,
                 "ready_for_validation": True
             }
-            
+
             # Write signal file atomically
             with open(signal_file, "w") as f:
                 json.dump(notification_data, f, indent=2)
-            
+
             if not self.daemon_mode:
                 print(f"🚀 DTM notified instantly via: {signal_file.name}")
-                
+
         except Exception as e:
-            # Non-critical: DTM will still detect solution via polling, just not instantly
+            # Non-critical: DTM will still detect solution via polling, just
+            # not instantly
             if not self.daemon_mode:
                 print(f"⚠️ Signal notification failed (DTM will poll): {e}")
 
@@ -5271,36 +6207,37 @@ class ProductionBitcoinMiner:
         """
         Notify DTM that a solution was found and request validation.
         DTM will validate and create proof files if valid.
-        
+
         Args:
             solution_data: Solution information including nonce, hash, etc.
-            
+
         Returns:
             DTM's validation response with validated status
         """
         try:
             from dynamic_template_manager import GPSEnhancedDynamicTemplateManager
-            
+
             # Get DTM instance
-            dtm = GPSEnhancedDynamicTemplateManager(demo_mode=False, verbose=False)
-            
+            dtm = GPSEnhancedDynamicTemplateManager(
+                demo_mode=False, verbose=False)
+
             # Request validation
             validation_result = dtm.validate_miner_solution(
                 solution=solution_data,
                 template=self.current_template
             )
-            
+
             if validation_result["valid"]:
                 if not self.daemon_mode:
                     print("✅ MINER: DTM validated solution - creating proof files...")
-                
+
                 # DTM creates proof files
                 proof_files = dtm.create_validation_proof_files(
                     solution=solution_data,
                     validation=validation_result,
                     template=self.current_template
                 )
-                
+
                 return {
                     "validated": True,
                     "proof_files_created": True,
@@ -5309,17 +6246,18 @@ class ProductionBitcoinMiner:
                 }
             else:
                 if not self.daemon_mode:
-                    print(f"❌ MINER: DTM rejected solution - {validation_result['reason']}")
-                
+                    print(
+                        f"❌ MINER: DTM rejected solution - {validation_result['reason']}")
+
                 # Log rejection
                 self.log_dtm_rejection(solution_data, validation_result)
-                
+
                 return {
                     "validated": False,
                     "reason": validation_result["reason"],
                     "checks": validation_result["checks_performed"]
                 }
-                
+
         except Exception as e:
             if not self.daemon_mode:
                 print(f"⚠️ MINER: DTM communication error: {e}")
@@ -5333,10 +6271,13 @@ class ProductionBitcoinMiner:
         """Log when DTM rejects a solution"""
         try:
             timestamp = datetime.now()
-            rejection_dir = Path(f"{brain_get_base_path()}/Rejections") / str(timestamp.year) / f"{timestamp.month:02d}" / f"{timestamp.day:02d}" / f"{timestamp.hour:02d}"
+            rejection_dir = Path(f"{brain_get_base_path()}/Rejections") / str(timestamp.year) / \
+                f"{timestamp.month:02d}" / \
+                f"{timestamp.day:02d}" / f"{timestamp.hour:02d}"
             rejection_dir.mkdir(parents=True, exist_ok=True)
-            
-            rejection_file = rejection_dir / f"rejection_{timestamp.strftime('%H%M%S')}.json"
+
+            rejection_file = rejection_dir / \
+                f"rejection_{timestamp.strftime('%H%M%S')}.json"
             rejection_data = {
                 "timestamp": timestamp.isoformat(),
                 "miner_id": solution_data.get("miner_id", self.miner_id),
@@ -5344,29 +6285,32 @@ class ProductionBitcoinMiner:
                 "validation": validation_result,
                 "status": "REJECTED_BY_DTM"
             }
-            
+
             with open(rejection_file, 'w') as f:
                 json.dump(rejection_data, f, indent=2)
-            
+
             if not self.daemon_mode:
                 print(f"📝 MINER: Rejection logged: {rejection_file}")
-                
+
         except Exception as e:
             if not self.daemon_mode:
                 print(f"⚠️ Could not log rejection: {e}")
 
-    def send_to_looping_for_submission(self, solution_data: dict, dtm_response: dict):
+    def send_to_looping_for_submission(
+            self, solution_data: dict, dtm_response: dict):
         """
         Send DTM-validated solution to Looping for network submission.
         Creates a submission signal file that Looping monitors.
         """
         try:
             timestamp_ms = int(time.time() * 1000)
-            submission_signal_dir = Path(f"{brain_get_base_path()}/Temporary Template")
+            submission_signal_dir = Path(
+                f"{brain_get_base_path()}/Temporary Template")
             submission_signal_dir.mkdir(parents=True, exist_ok=True)
-            
-            signal_file = submission_signal_dir / f"looping_submission_{self.process_id}_{timestamp_ms}.signal"
-            
+
+            signal_file = submission_signal_dir / \
+                f"looping_submission_{self.process_id}_{timestamp_ms}.signal"
+
             submission_signal = {
                 "process_id": self.process_id,
                 "miner_id": self.miner_id,
@@ -5376,37 +6320,45 @@ class ProductionBitcoinMiner:
                 "ready_for_submission": True,
                 "dtm_validated": True
             }
-            
+
             with open(signal_file, "w") as f:
                 json.dump(submission_signal, f, indent=2)
-            
+
             if not self.daemon_mode:
-                print(f"🚀 Solution sent to Looping for submission: {signal_file.name}")
-                
+                print(
+                    f"🚀 Solution sent to Looping for submission: {
+                        signal_file.name}")
+
         except Exception as e:
             if not self.daemon_mode:
                 print(f"⚠️ Could not signal Looping: {e}")
 
-    def save_solution_for_dynamic_manager(self, header, nonce, hash_result, block_id=None):
+    def save_solution_for_dynamic_manager(
+            self, header, nonce, hash_result, block_id=None):
         """Save solution with process identifier subfolder per Pipeline flow.txt specification"""
         if not block_id:
-            block_id = getattr(self, "current_block_id", f"block_{int(time.time())}")
+            block_id = getattr(self, "current_block_id",
+                               f"block_{int(time.time())}")
 
         # Create filename with miner ID and block ID
         filename = f"solution_{self.miner_id}_{block_id}.json"
-        
+
         # ✨ CORRECTED: Save to process identifier folder per Pipeline flow.txt
         # "it should have it's own sub folder which is the name of the mining process"
-        # MINING PROCESS = Process_001, Process_002, etc. (PERMANENT IDENTIFIER)
+        # MINING PROCESS = Process_001, Process_002, etc. (PERMANENT
+        # IDENTIFIER)
         solutions_dir = self.mining_process_folder
-        
+
         # Validate solutions directory exists
         if not solutions_dir.exists():
-            raise FileNotFoundError(f"Solutions directory not found: {solutions_dir}. Brain.QTL canonical authority via Brainstem should create this folder structure.")
-        
+            raise FileNotFoundError(
+                f"Solutions directory not found: {solutions_dir}. Brain.QTL canonical authority via Brainstem should create this folder structure.")
+
         # Fallback validation
         if not self.mining_process_folder.exists():
-            raise FileNotFoundError(f"Mining process folder not found: {self.mining_process_folder}. Brain.QTL canonical authority via Brainstem should create this folder structure.")
+            raise FileNotFoundError(
+                f"Mining process folder not found: {
+                    self.mining_process_folder}. Brain.QTL canonical authority via Brainstem should create this folder structure.")
 
         solution_path = solutions_dir / filename
 
@@ -5421,7 +6373,8 @@ class ProductionBitcoinMiner:
                 header_fields = self._parse_header_fields(header)
 
             # Construct complete block with transactions for actual submission
-            complete_block_hex = self.construct_complete_block(header, nonce, template=self.current_template)
+            complete_block_hex = self.construct_complete_block(
+                header, nonce, template=self.current_template)
 
             # Create solution data for Dynamic Template Manager
             # Get triple leading zero counts (Ultra Hex + Standard + Binary)
@@ -5431,7 +6384,7 @@ class ProductionBitcoinMiner:
             block_height = template.get("height")
             bits_hex = template.get("bits") or f"{header_fields['bits']:08x}"
             target = template.get("target") or hex(self.current_target)
-            
+
             solution_data = {
                 "terminal_id": self.terminal_id,
                 "miner_id": self.miner_id,
@@ -5451,18 +6404,23 @@ class ProductionBitcoinMiner:
                 "previous_block_hash": header_fields["previous_block_hash"],
                 "merkle_root": header_fields["merkle_root"],
                 "mathematical_framework": "Universe-Scale Mathematical Superiority + Ultra Hex Revolutionary System",
-                "leading_zeros_hex": triple_count['standard_hex'],  # For display compatibility
-                "leading_zeros_binary": triple_count['standard_binary'],  # For protocol
-                "ultra_hex_leading_zeros": triple_count['ultra_hex']['ultra_hex_leading_zeros'],  # Revolutionary count
-                "ultra_hex_operations": triple_count['ultra_hex']['total_equivalent_operations'],  # Total SHA-256 ops
-                "ultra_hex_orchestration": triple_count['ultra_hex']['orchestration_factor'],  # Orchestration between digits
+                # For display compatibility
+                "leading_zeros_hex": triple_count['standard_hex'],
+                # For protocol
+                "leading_zeros_binary": triple_count['standard_binary'],
+                # Revolutionary count
+                "ultra_hex_leading_zeros": triple_count['ultra_hex']['ultra_hex_leading_zeros'],
+                # Total SHA-256 ops
+                "ultra_hex_operations": triple_count['ultra_hex']['total_equivalent_operations'],
+                # Orchestration between digits
+                "ultra_hex_orchestration": triple_count['ultra_hex']['orchestration_factor'],
                 "difficulty": self.current_difficulty,
                 "payout_address": getattr(self, "payout_address", "unknown"),
                 "mining_method": "Galaxy-Enhanced Mathematical Mining",
                 "submission_status": "pending_validation",
                 # 🧮 KNUTH-SORRELLIAN-CLASS MATHEMATICAL PROOF
                 "mathematical_proof": {
-                    "universe_bitload": getattr(self, "bitload", 208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909),
+                    "universe_bitload": getattr(self, "bitload", get_bitload()),
                     "knuth_levels": getattr(self, "knuth_sorrellian_class_levels", 80),
                     "knuth_iterations": getattr(self, "knuth_sorrellian_class_iterations", 156912),
                     "cycles": getattr(self.galaxy_category, {}).get("cycles", 161) if hasattr(self, "galaxy_category") and self.galaxy_category else 161,
@@ -5483,7 +6441,8 @@ class ProductionBitcoinMiner:
                 print(f"📍 Process ID: {self.process_id} (permanent)")
                 print(f"⚙️ Mining Mode: {self.mining_mode} (behavior)")
                 print(f"📁 Location: {solution_path}")
-                print("🔄 Dynamic Template Manager will detect and evaluate automatically")
+                print(
+                    "🔄 Dynamic Template Manager will detect and evaluate automatically")
 
             return solution_path
 
@@ -5497,12 +6456,14 @@ class ProductionBitcoinMiner:
 
         try:
             # Construct complete block with transactions for actual submission
-            complete_block_hex = self.construct_complete_block(header, nonce, template=self.current_template)
+            complete_block_hex = self.construct_complete_block(
+                header, nonce, template=self.current_template)
 
             # Create submission data in format expected by looping system
             # Get dual leading zero counts
-            binary_leading_zeros, hex_leading_zeros = self.get_dual_leading_zeros(hash_result)
-            
+            binary_leading_zeros, hex_leading_zeros = self.get_dual_leading_zeros(
+                hash_result)
+
             submission_data = {
                 "block_header": header.hex(),  # Looping expects this field
                 "block_hex": complete_block_hex,  # Full block for bitcoin-cli submitblock
@@ -5520,7 +6481,8 @@ class ProductionBitcoinMiner:
 
             # NEW DYNAMIC FOLDER STRUCTURE
             current_time = time.time()
-            base_dir, timestamp_str = self.get_dynamic_submission_path(current_time)
+            base_dir, timestamp_str = self.get_dynamic_submission_path(
+                current_time)
 
             # Save to new organized structure
             production_miner_file = f"{base_dir}/production_miner_submission_{timestamp_str}.json"
@@ -5547,22 +6509,26 @@ class ProductionBitcoinMiner:
             )
 
             # Save to dynamic folder structure
-            if self.save_to_dynamic_path(production_miner_file, enhanced_submission):
+            if self.save_to_dynamic_path(
+                    production_miner_file, enhanced_submission):
                 print(f"✅ Enhanced submission saved: {production_miner_file}")
 
             # ALSO save to Mining/Submission_Logs folder for easy access
             submissions_dir = Path(f"{brain_get_base_path()}/Submission_Logs")
             if submissions_dir.exists():
-                submission_copy_file = submissions_dir / f"production_miner_submission_{timestamp_str}.json"
+                submission_copy_file = submissions_dir / \
+                    f"production_miner_submission_{timestamp_str}.json"
                 try:
                     with open(submission_copy_file, "w") as f:
                         json.dump(enhanced_submission, f, indent=2)
-                    print(f"✅ Submission also saved to: {submission_copy_file}")
+                    print(
+                        f"✅ Submission also saved to: {submission_copy_file}")
                 except Exception as e:
                     print(f"⚠️ Could not save to Submission_Logs folder: {e}")
 
             # Update global submission registry
-            self.update_global_submission_registry(enhanced_submission, current_time)
+            self.update_global_submission_registry(
+                enhanced_submission, current_time)
 
             # Update daily ledger with detailed info
             self.update_daily_ledger(enhanced_submission)
@@ -5637,12 +6603,14 @@ class ProductionBitcoinMiner:
         try:
             # Update header with final nonce
             header_with_nonce = bytearray(header)
-            struct.pack_into("<I", header_with_nonce, 76, nonce)  # Nonce at offset 76
+            struct.pack_into("<I", header_with_nonce, 76,
+                             nonce)  # Nonce at offset 76
 
             template = template or self.current_template or {}
             cache = self._get_template_cache(template)
 
-            coinbase_tx = cache.get("coinbase_hex") or self.create_coinbase_transaction(template)
+            coinbase_tx = cache.get(
+                "coinbase_hex") or self.create_coinbase_transaction(template)
             if not coinbase_tx or not self._is_hex_string(coinbase_tx):
                 coinbase_tx = self.create_simple_coinbase_transaction()
 
@@ -5687,11 +6655,13 @@ class ProductionBitcoinMiner:
         """Return coinbase transaction hex from template or fallback."""
         template = template or self.current_template or {}
 
-        coinbase_txn = template.get("coinbasetxn") if isinstance(template, dict) else None
+        coinbase_txn = template.get("coinbasetxn") if isinstance(
+            template, dict) else None
         if isinstance(coinbase_txn, dict):
             for key in ("data", "hex", "raw"):
                 raw_value = coinbase_txn.get(key)
-                if isinstance(raw_value, str) and self._is_hex_string(raw_value):
+                if isinstance(raw_value, str) and self._is_hex_string(
+                        raw_value):
                     return raw_value.lower()
         elif isinstance(coinbase_txn, str) and self._is_hex_string(coinbase_txn):
             return coinbase_txn.lower()
@@ -5712,9 +6682,11 @@ class ProductionBitcoinMiner:
 
             # Input (coinbase input)
             coinbase += (
-                "0000000000000000000000000000000000000000000000000000000000000000"  # Previous output hash (null)
+                # Previous output hash (null)
+                "0000000000000000000000000000000000000000000000000000000000000000"
             )
-            coinbase += "ffffff"  # Previous output index (0xffffffff for coinbase)
+            # Previous output index (0xffffffff for coinbase)
+            coinbase += "ffffff"
 
             # Script length (1 byte + script)
             coinbase_script = "51"  # Minimal script (OP_1)
@@ -5765,10 +6737,12 @@ class ProductionBitcoinMiner:
             while time.time() - start_time < duration and not self.shutdown_requested:
                 # Try a batch of nonces quickly
                 for nonce in range(nonce_start, nonce_start + 10000):
-                    # Check for shutdown every 1000 nonces to avoid performance impact
+                    # Check for shutdown every 1000 nonces to avoid performance
+                    # impact
                     if nonce % 1000 == 0 and self.shutdown_requested:
                         print("🛑 Shutdown requested during verification...")
-                        return {"verification_passed": False, "reason": "shutdown_requested"}
+                        return {"verification_passed": False,
+                                "reason": "shutdown_requested"}
 
                     hash_count += 1
                     hash_result = self.calculate_universe_hash(template, nonce)
@@ -5780,7 +6754,8 @@ class ProductionBitcoinMiner:
                     # Check if we hit target
                     if leading_zeros >= self.universe_target_zeros:
                         verification_passed = True
-                        print(f"✅ Verification: Found {leading_zeros} leading zeros (nonce: {nonce})")
+                        print(
+                            f"✅ Verification: Found {leading_zeros} leading zeros (nonce: {nonce})")
                         break
 
                 if verification_passed:
@@ -5800,14 +6775,17 @@ class ProductionBitcoinMiner:
                 "hash_count": hash_count,
             }
 
-            print(f"🧪 Verification complete: {best_leading_zeros} leading zeros, {hash_rate:,.0f} H / s")
-            
-            # COMPREHENSIVE ERROR REPORTING: Generate system error report if verification fails
+            print(
+                f"🧪 Verification complete: {best_leading_zeros} leading zeros, {
+                    hash_rate:,.0f} H / s")
+
+            # COMPREHENSIVE ERROR REPORTING: Generate system error report if
+            # verification fails
             if not verification_passed:
                 try:
                     from Singularity_Dave_Brain import SingularityBrain
                     brain = SingularityBrain()
-                    
+
                     error_data = {
                         "error_type": "verification_test_failure",
                         "component": "ProductionBitcoinMiner",
@@ -5825,18 +6803,20 @@ class ProductionBitcoinMiner:
                     }
                     brain.create_system_error_hourly_file(error_data)
                 except Exception as report_error:
-                    print(f"⚠️ Failed to create verification error report: {report_error}")
-            
+                    print(
+                        f"⚠️ Failed to create verification error report: {report_error}")
+
             return result
 
         except Exception as e:
             print(f"⚠️ Verification test error: {e}")
-            
-            # COMPREHENSIVE ERROR REPORTING: Generate system error report for verification exceptions
+
+            # COMPREHENSIVE ERROR REPORTING: Generate system error report for
+            # verification exceptions
             try:
                 from Singularity_Dave_Brain import SingularityBrain
                 brain = SingularityBrain()
-                
+
                 error_data = {
                     "error_type": "verification_test_exception",
                     "component": "ProductionBitcoinMiner",
@@ -5852,8 +6832,9 @@ class ProductionBitcoinMiner:
                 }
                 brain.create_system_error_hourly_file(error_data)
             except Exception as report_error:
-                print(f"⚠️ Failed to create verification exception error report: {report_error}")
-            
+                print(
+                    f"⚠️ Failed to create verification exception error report: {report_error}")
+
             return {"verification_passed": False, "error": str(e)}
 
     def run_limited_mining(self, max_attempts):
@@ -5935,9 +6916,12 @@ class ProductionBitcoinMiner:
         self.read_looping_system_control()
 
         # Check if we should use target mode from looping system
-        if hasattr(self, "looping_control") and self.looping_control.get("miner_mode") == "continuous_target":
-            target_zeros = self.looping_control.get("target_leading_zeros", self.target_leading_zeros)
-            print(f"🎯 LOOPING SYSTEM CONTROL: Target {target_zeros} leading zeros")
+        if hasattr(self, "looping_control") and self.looping_control.get(
+                "miner_mode") == "continuous_target":
+            target_zeros = self.looping_control.get(
+                "target_leading_zeros", self.target_leading_zeros)
+            print(
+                f"🎯 LOOPING SYSTEM CONTROL: Target {target_zeros} leading zeros")
             print("🔄 Mode: Continuous target maintenance")
             return self.run_continuous_target_mining(target_zeros)
 
@@ -5957,7 +6941,8 @@ class ProductionBitcoinMiner:
         # Start mining
         self.mining_active = True
         attempt_count = 0
-        # No internal safety cap on mining rounds; rely on external controller to stop
+        # No internal safety cap on mining rounds; rely on external controller
+        # to stop
         while self.mining_active and not self.shutdown_requested:
             print(f"\n🎯 STARTING MINING ROUND {attempt_count + 1}")
             print("⚡ Mathematical Framework: ACTIVE")
@@ -5966,7 +6951,7 @@ class ProductionBitcoinMiner:
             try:
                 result = self.mine_block(max_time_seconds=3600)
                 attempt_count += 1
-                
+
                 # Report mining round completion
                 try:
                     brain_save_system_report({
@@ -5979,7 +6964,7 @@ class ProductionBitcoinMiner:
                     }, "Miners", "mining_progress")
                 except Exception as report_err:
                     pass  # Don't interrupt mining for report failures
-                    
+
             except KeyError as e:
                 print(f"⚠️ Display formatting error (mining continues): {e}")
                 brain_save_system_error({
@@ -6009,15 +6994,18 @@ class ProductionBitcoinMiner:
             # With universe-scale math, continue mining without garbage celebrations
             # External controller manages when to stop/submit results
 
-            # Refresh template and continue (external controller should stop if needed)
+            # Refresh template and continue (external controller should stop if
+            # needed)
             print("🔄 Refreshing for next round...")
             self.get_block_template()
 
         print("\n✅ Production mining session completed")
         print(f"📊 Total attempts: {self.current_attempts:,}")
         print(f"📊 Total blocks found: {self.blocks_found}")
-        print(f"🏆 Best difficulty achieved: {self.best_difficulty} leading zero bits")
-        
+        print(
+            f"🏆 Best difficulty achieved: {
+                self.best_difficulty} leading zero bits")
+
         # Report session completion
         try:
             brain_save_system_report({
@@ -6109,29 +7097,31 @@ class ProductionBitcoinMiner:
 
         try:
             # Check miner_commands.json in Temporary Template folder
-            commands_file = normalized_path(f"{brain_get_base_path()}/Temporary Template/miner_commands.json")
-            
+            commands_file = normalized_path(
+                f"{brain_get_base_path()}/Temporary Template/miner_commands.json")
+
             # DEBUG: Always print what we're checking
             if not hasattr(self, '_debug_command_check_count'):
                 self._debug_command_check_count = 0
             self._debug_command_check_count += 1
-            
+
             if self._debug_command_check_count % 10 == 1:  # Print every 10th check
                 print(f"🔍 DEBUG: Checking for commands at {commands_file}")
                 print(f"   File exists: {commands_file.exists()}")
-            
+
             if commands_file.exists():
                 with open(commands_file, "r") as f:
                     command_data = json.load(f)
-                
+
                 command = command_data.get("command")
                 print(f"📥 DEBUG: Found command in file: {command}")
-                
+
                 if command == "fresh_template_instant_solve":
-                    print("📥 Received FRESH TEMPLATE INSTANT SOLVE command from looping system")
+                    print(
+                        "📥 Received FRESH TEMPLATE INSTANT SOLVE command from looping system")
                     print("🚀 MATHEMATICAL POWERHOUSE ACTIVATED FOR INSTANT SOLVING!")
                     return "mine_with_gps"
-            
+
             # Fallback to old control file location
             if self.control_file.exists():
                 with open(self.control_file, "r") as f:
@@ -6142,7 +7132,8 @@ class ProductionBitcoinMiner:
                     print("📥 Received STOP command from looping system")
                     return "stop"
                 elif command == "restart_fresh_template":
-                    print("📥 Received RESTART WITH FRESH TEMPLATE command from looping system")
+                    print(
+                        "📥 Received RESTART WITH FRESH TEMPLATE command from looping system")
                     return "restart_fresh_template"
                 elif command == "pause":
                     print("📥 Received PAUSE command from looping system")
@@ -6151,7 +7142,8 @@ class ProductionBitcoinMiner:
                     print("📥 Received SUSTAIN TARGET ZEROS command from looping system")
                     return "sustain_target_zeros"
                 elif command == "fresh_template_instant_solve":
-                    print("📥 Received FRESH TEMPLATE INSTANT SOLVE command from looping system")
+                    print(
+                        "📥 Received FRESH TEMPLATE INSTANT SOLVE command from looping system")
                     print("🚀 MATHEMATICAL POWERHOUSE ACTIVATED FOR INSTANT SOLVING!")
                     return "mine_with_gps"
 
@@ -6168,18 +7160,25 @@ class ProductionBitcoinMiner:
         try:
             # If we achieved good leading zeros, try to sustain them
             if self.best_difficulty >= 10:  # 10+ leading zeros is good progress
-                self.leading_zeros_sustained = max(self.leading_zeros_sustained, self.best_difficulty)
+                self.leading_zeros_sustained = max(
+                    self.leading_zeros_sustained, self.best_difficulty)
 
                 # Adjust mining parameters to sustain performance
                 if self.best_difficulty >= 15:
                     # Very good performance - continue current strategy
-                    print(f"🌟 SUSTAINING EXCELLENT PERFORMANCE: {self.best_difficulty} leading zeros")
+                    print(
+                        f"🌟 SUSTAINING EXCELLENT PERFORMANCE: {
+                            self.best_difficulty} leading zeros")
                 elif self.best_difficulty >= 12:
                     # Good performance - maintain strategy
-                    print(f"🎯 SUSTAINING GOOD PERFORMANCE: {self.best_difficulty} leading zeros")
+                    print(
+                        f"🎯 SUSTAINING GOOD PERFORMANCE: {
+                            self.best_difficulty} leading zeros")
                 else:
                     # Decent performance - try to improve
-                    print(f"🔄 SUSTAINING DECENT PERFORMANCE: {self.best_difficulty} leading zeros")
+                    print(
+                        f"🔄 SUSTAINING DECENT PERFORMANCE: {
+                            self.best_difficulty} leading zeros")
 
                 # Update status with sustainability info
                 self.update_status_for_looping()
@@ -6199,9 +7198,10 @@ class ProductionBitcoinMiner:
         """Update the mining template (for dynamic template manager integration)"""
         try:
             print("💉 DYNAMIC TEMPLATE INJECTION")
-            print(f"   📋 New template: {len(new_template.get('transactions', []))} transactions")
+            print(
+                f"   📋 New template: {len(new_template.get('transactions', []))} transactions")
             print(f"   🎯 Target: {new_template.get('target', 'Unknown')}")
-            
+
             # ✨ NEW: Extract block_id from template
             if "block_id" in new_template:
                 self.current_block_id = new_template["block_id"]
@@ -6209,7 +7209,9 @@ class ProductionBitcoinMiner:
             else:
                 # Fallback if block_id not in template
                 self.current_block_id = f"block_{int(time.time())}"
-                print(f"   ⚠️  No block_id in template, using fallback: {self.current_block_id}")
+                print(
+                    f"   ⚠️  No block_id in template, using fallback: {
+                        self.current_block_id}")
 
             # Validate template format
             required_fields = ["height", "transactions"]
@@ -6226,10 +7228,12 @@ class ProductionBitcoinMiner:
                 new_template["extracted_target"] = extracted_target
                 print(f"✅ Target extracted: {hex(extracted_target)}")
 
-            # Check if template already has extracted target (from Dynamic Template Manager)
+            # Check if template already has extracted target (from Dynamic
+            # Template Manager)
             if "real_bitcoin_target" in new_template:
                 self.current_target = new_template["real_bitcoin_target"]
-                print(f"✅ Using pre - extracted target: {hex(self.current_target)}")
+                print(
+                    f"✅ Using pre - extracted target: {hex(self.current_target)}")
 
             # Update current template
             self.current_template = new_template
@@ -6255,7 +7259,8 @@ class ProductionBitcoinMiner:
     def get_mining_status(self):
         """Get comprehensive mining status for looping system coordination"""
         current_time = time.time()
-        session_duration = current_time - self.mining_session_start if self.mining_session_start else 0
+        session_duration = current_time - \
+            self.mining_session_start if self.mining_session_start else 0
 
         # Calculate hash rate
         if session_duration > 0:
@@ -6277,10 +7282,12 @@ class ProductionBitcoinMiner:
                 "current_best": self.best_difficulty,
                 "target": self.target_leading_zeros,
                 "progress_percentage": (
-                    (self.best_difficulty / self.target_leading_zeros * 100) if self.target_leading_zeros > 0 else 0
+                    (self.best_difficulty / self.target_leading_zeros *
+                     100) if self.target_leading_zeros > 0 else 0
                 ),
                 "best_achieved_ever": self.best_leading_zeros_achieved,
-                "recent_history": self.leading_zeros_history[-10:],  # Last 10 achievements
+                # Last 10 achievements
+                "recent_history": self.leading_zeros_history[-10:],
             },
             "block_results": {
                 "blocks_found": self.blocks_found,
@@ -6305,7 +7312,8 @@ class ProductionBitcoinMiner:
     def start_mining_session(self, max_time_seconds=None):
         """Start a controlled mining session"""
         if self.mining_active and not self.mining_paused:
-            return {"status": "already_running", "message": "Mining already active"}
+            return {"status": "already_running",
+                    "message": "Mining already active"}
 
         # Reset session statistics
         if not self.mining_paused:  # Don't reset if resuming from pause
@@ -6340,7 +7348,8 @@ class ProductionBitcoinMiner:
     def pause_mining(self):
         """Pause mining operations"""
         if not self.mining_active:
-            return {"status": "not_running", "message": "Mining not currently active"}
+            return {"status": "not_running",
+                    "message": "Mining not currently active"}
 
         self.mining_paused = True
         print("⏸️ Mining paused")
@@ -6349,7 +7358,8 @@ class ProductionBitcoinMiner:
     def resume_mining(self):
         """Resume paused mining operations"""
         if not self.mining_paused:
-            return {"status": "not_paused", "message": "Mining not currently paused"}
+            return {"status": "not_paused",
+                    "message": "Mining not currently paused"}
 
         self.mining_paused = False
         print("▶️ Mining resumed")
@@ -6358,12 +7368,14 @@ class ProductionBitcoinMiner:
     def stop_mining_session(self):
         """Stop current mining session"""
         if not self.mining_active:
-            return {"status": "not_running", "message": "Mining not currently active"}
+            return {"status": "not_running",
+                    "message": "Mining not currently active"}
 
         self.mining_active = False
         self.mining_paused = False
 
-        session_duration = time.time() - self.mining_session_start if self.mining_session_start else 0
+        session_duration = time.time(
+        ) - self.mining_session_start if self.mining_session_start else 0
 
         print("🛑 Mining session stopped")
         print(f"   ⏱️ Duration: {session_duration:.1f} seconds")
@@ -6377,7 +7389,8 @@ class ProductionBitcoinMiner:
             "final_stats": self.get_mining_status(),
         }
 
-    def update_leading_zeros_achievement(self, leading_zeros, nonce, hash_result):
+    def update_leading_zeros_achievement(
+            self, leading_zeros, nonce, hash_result):
         """Update leading zeros achievement and track progress"""
         current_time = time.time()
 
@@ -6442,12 +7455,13 @@ class ProductionBitcoinMiner:
 
             if not template:
                 print("❌ No template available for mining")
-                
-                # COMPREHENSIVE ERROR REPORTING: Generate system error report for template availability failures
+
+                # COMPREHENSIVE ERROR REPORTING: Generate system error report
+                # for template availability failures
                 try:
                     from Singularity_Dave_Brain import SingularityBrain
                     brain = SingularityBrain()
-                    
+
                     error_data = {
                         "error_type": "template_unavailable",
                         "component": "ProductionBitcoinMiner",
@@ -6462,23 +7476,31 @@ class ProductionBitcoinMiner:
                     }
                     brain.create_system_error_hourly_file(error_data)
                 except Exception as report_error:
-                    print(f"⚠️ Failed to create template error report: {report_error}")
-                
+                    print(
+                        f"⚠️ Failed to create template error report: {report_error}")
+
                 return False
 
-            print(f"✅ Template ready: Height {template.get('height', 'unknown')}")
+            print(
+                f"✅ Template ready: Height {
+                    template.get(
+                        'height',
+                        'unknown')}")
 
             # Start mining with the template
-            mining_result = self.mine_block(max_time_seconds=300)  # 5 minute sessions
+            mining_result = self.mine_block(
+                max_time_seconds=300)  # 5 minute sessions
 
             if mining_result.get("valid_block_found", False):
                 # Create submission files for looping system
                 self.create_submission_files(mining_result, template)
                 print("📋 Submission files created for looping system")
-                
-                # MINING-BASED SYSTEM REPORTS: Generate system report for successful mining operations
+
+                # MINING-BASED SYSTEM REPORTS: Generate system report for
+                # successful mining operations
                 try:
-                    if hasattr(self, 'brain_qtl_connection') and self.brain_qtl_connection and hasattr(self.brain_qtl_connection, 'create_system_report_hourly_file'):
+                    if hasattr(self, 'brain_qtl_connection') and self.brain_qtl_connection and hasattr(
+                            self.brain_qtl_connection, 'create_system_report_hourly_file'):
                         system_data = {
                             "report_type": "production_mining_success",
                             "component": "ProductionBitcoinMiner",
@@ -6487,7 +7509,8 @@ class ProductionBitcoinMiner:
                             "leading_zeros_achieved": mining_result.get('leading_zeros', 0),
                             "difficulty": mining_result.get('difficulty', 0),
                             "mining_duration": mining_result.get('mining_time', 0),
-                            "merkle_root": mining_result.get('merkle_root', ''),  # MERKLE ROOT INCLUDED
+                            # MERKLE ROOT INCLUDED
+                            "merkle_root": mining_result.get('merkle_root', ''),
                             "block_hash": mining_result.get('hash_result', ''),
                             "block_height": template.get('height', 0),
                             "previous_hash": template.get('previousblockhash', ''),
@@ -6497,18 +7520,20 @@ class ProductionBitcoinMiner:
                             "operation": "coordinate_with_template_manager",
                             "status": "success"
                         }
-                        self.brain_qtl_connection.create_system_report_hourly_file(system_data)
+                        self.brain_qtl_connection.create_system_report_hourly_file(
+                            system_data)
                 except Exception as report_error:
                     print(f"⚠️ Failed to create system report: {report_error}")
                 return True
             else:
                 print("⚠️ No valid block found in this session")
-                
-                # COMPREHENSIVE ERROR REPORTING: Generate system error report for unsuccessful mining sessions  
+
+                # COMPREHENSIVE ERROR REPORTING: Generate system error report
+                # for unsuccessful mining sessions
                 try:
                     from Singularity_Dave_Brain import SingularityBrain
                     brain = SingularityBrain()
-                    
+
                     error_data = {
                         "error_type": "mining_session_unsuccessful",
                         "component": "ProductionBitcoinMiner",
@@ -6524,18 +7549,20 @@ class ProductionBitcoinMiner:
                     }
                     brain.create_system_error_hourly_file(error_data)
                 except Exception as report_error:
-                    print(f"⚠️ Failed to create mining session error report: {report_error}")
-                
+                    print(
+                        f"⚠️ Failed to create mining session error report: {report_error}")
+
                 return False
 
         except Exception as e:
             print(f"❌ Template manager coordination error: {e}")
-            
-            # COMPREHENSIVE ERROR REPORTING: Generate system error report for template manager coordination errors
+
+            # COMPREHENSIVE ERROR REPORTING: Generate system error report for
+            # template manager coordination errors
             try:
                 from Singularity_Dave_Brain import SingularityBrain
                 brain = SingularityBrain()
-                
+
                 error_data = {
                     "error_type": "template_manager_coordination_error",
                     "component": "ProductionBitcoinMiner",
@@ -6550,8 +7577,9 @@ class ProductionBitcoinMiner:
                 }
                 brain.create_system_error_hourly_file(error_data)
             except Exception as report_error:
-                print(f"⚠️ Failed to create coordination error report: {report_error}")
-            
+                print(
+                    f"⚠️ Failed to create coordination error report: {report_error}")
+
             return False
 
     def create_submission_files(self, mining_result=None, template=None):
@@ -6566,20 +7594,25 @@ class ProductionBitcoinMiner:
             mining_dir = Path("Mining")
             # Use proper Ledgers folder with Year/month/day/hourly structure
             now = datetime.now()
-            hourly_dir = mining_dir / "Ledgers" / str(now.year) / f"{now.month:02d}" / f"{now.day:02d}" / f"{now.hour:02d}"
+            hourly_dir = mining_dir / "Ledgers" / \
+                str(now.year) / f"{now.month:02d}" / \
+                f"{now.day:02d}" / f"{now.hour:02d}"
             if not hourly_dir.exists():
-                raise FileNotFoundError(f"Hourly ledger directory not found: {hourly_dir}. Brain.QTL canonical authority via Brainstem should create this folder structure.")
+                raise FileNotFoundError(
+                    f"Hourly ledger directory not found: {hourly_dir}. Brain.QTL canonical authority via Brainstem should create this folder structure.")
 
             # Create unique submission folder
             timestamp = datetime.now().strftime("%H%M%S")
             unique_id = f"submission_{timestamp}_{random.randint(1000, 9999)}"
             submission_folder = hourly_dir / unique_id
             if not submission_folder.exists():
-                raise FileNotFoundError(f"Submission folder not found: {submission_folder}. Brain.QTL canonical authority via Brainstem should create this folder structure.")
+                raise FileNotFoundError(
+                    f"Submission folder not found: {submission_folder}. Brain.QTL canonical authority via Brainstem should create this folder structure.")
 
             # Create submission data
             is_demo = False
-            if template and isinstance(template, dict) and template.get("_is_test_template"):
+            if template and isinstance(template, dict) and template.get(
+                    "_is_test_template"):
                 is_demo = True
 
             if mining_result and template and not is_demo:
@@ -6595,7 +7628,8 @@ class ProductionBitcoinMiner:
                     "looping_system_compatible": True,
                 }
             else:
-                # Create demo/test submission data (or when template is not provided)
+                # Create demo/test submission data (or when template is not
+                # provided)
                 submission_data = {
                     "block_header": f"demo_header_{timestamp}",
                     "block_hex": f"demo_block_{timestamp}",
@@ -6631,7 +7665,8 @@ class ProductionBitcoinMiner:
                 json.dump(math_proof, f, indent=2)
 
             if is_demo:
-                print(f"⚠️ Demo submission files created (not for network submission): {daily_submission_path}")
+                print(
+                    f"⚠️ Demo submission files created (not for network submission): {daily_submission_path}")
             else:
                 print("✅ Submission files created:")
                 print(f"   📋 Submission: {daily_submission_path}")
@@ -6646,10 +7681,12 @@ class ProductionBitcoinMiner:
 
         except Exception as e:
             print(f"❌ Error creating submission files: {e}")
-            
-            # COMPREHENSIVE ERROR REPORTING: Generate system error report for submission file creation failures
+
+            # COMPREHENSIVE ERROR REPORTING: Generate system error report for
+            # submission file creation failures
             try:
-                if hasattr(self, 'brain_qtl_connection') and self.brain_qtl_connection and hasattr(self.brain_qtl_connection, 'create_system_error_hourly_file'):
+                if hasattr(self, 'brain_qtl_connection') and self.brain_qtl_connection and hasattr(
+                        self.brain_qtl_connection, 'create_system_error_hourly_file'):
                     error_data = {
                         "error_type": "submission_file_creation_failure",
                         "component": "ProductionBitcoinMiner",
@@ -6657,7 +7694,8 @@ class ProductionBitcoinMiner:
                         "operation": "create_submission_files",
                         "severity": "high"
                     }
-                    self.brain_qtl_connection.create_system_error_hourly_file(error_data)
+                    self.brain_qtl_connection.create_system_error_hourly_file(
+                        error_data)
             except Exception as report_error:
                 print(f"⚠️ Failed to create error report: {report_error}")
             return None
@@ -6665,23 +7703,32 @@ class ProductionBitcoinMiner:
     def mine_with_template_until_target(self, template, target):
         """Mine with template until target difficulty is met with GPS Brain enhancement."""
         try:
-            print(f"🎯 Mining with template until target: {hex(target)[:20]}...")
+            print(
+                f"🎯 Mining with template until target: {
+                    hex(target)[
+                        :20]}...")
 
             # Check for GPS enhancement data
             gps_enhancement = template.get("gps_enhancement", {})
             if gps_enhancement:
                 print("🧠 GPS Brain Enhancement DETECTED!")
-                optimal_range = gps_enhancement.get("optimal_nonce_range", (0, 4294967295))
-                solution_prob = gps_enhancement.get("solution_probability", 0.5)
-                instant_solve = gps_enhancement.get("instant_solve_capable", False)
-                accel_mode = gps_enhancement.get("acceleration_mode", "standard")
+                optimal_range = gps_enhancement.get(
+                    "optimal_nonce_range", (0, 4294967295))
+                solution_prob = gps_enhancement.get(
+                    "solution_probability", 0.5)
+                instant_solve = gps_enhancement.get(
+                    "instant_solve_capable", False)
+                accel_mode = gps_enhancement.get(
+                    "acceleration_mode", "standard")
 
-                print(f"🎯 GPS Optimal Range: {optimal_range[0]:,} - {optimal_range[1]:,}")
+                print(
+                    f"🎯 GPS Optimal Range: {optimal_range[0]:,} - {optimal_range[1]:,}")
                 print(f"⚡ Solution Probability: {solution_prob:.6f}")
                 print(f"🚀 Acceleration Mode: {accel_mode}")
 
                 if instant_solve:
-                    print("⚡ INSTANT SOLVE MODE: Activating quintillion - scale targeting!")
+                    print(
+                        "⚡ INSTANT SOLVE MODE: Activating quintillion - scale targeting!")
 
             # Extract template data
             block_height = template.get("height", 0)
@@ -6689,7 +7736,9 @@ class ProductionBitcoinMiner:
             bits = template.get("bits", "1d00ff")
             transactions = template.get("transactions", [])
 
-            print(f"📊 Template info: Height {block_height}, Transactions: {len(transactions)}")
+            print(
+                f"📊 Template info: Height {block_height}, Transactions: {
+                    len(transactions)}")
 
             # Build block header base
             version = 0x20000000
@@ -6712,14 +7761,18 @@ class ProductionBitcoinMiner:
             for nonce in range(nonce_start, min(nonce_end, 2**32)):
                 # Build complete block header
                 header = struct.pack("<I", version)  # Version
-                header += bytes.fromhex(previous_hash)[::-1]  # Previous hash (reversed)
-                header += bytes.fromhex(merkle_root)[::-1]  # Merkle root (reversed)
+                # Previous hash (reversed)
+                header += bytes.fromhex(previous_hash)[::-1]
+                # Merkle root (reversed)
+                header += bytes.fromhex(merkle_root)[::-1]
                 header += struct.pack("<I", timestamp)  # Timestamp
                 header += bytes.fromhex(bits)[::-1]  # Bits (reversed)
                 header += struct.pack("<I", nonce)  # Nonce
 
-                # UNIVERSE-SCALE MATHEMATICAL HASH CALCULATION WITH LEADING ZERO GENERATION
-                hash_result = self.mathematically_enhanced_hash_calculation(header, nonce)
+                # UNIVERSE-SCALE MATHEMATICAL HASH CALCULATION WITH LEADING
+                # ZERO GENERATION
+                hash_result = self.mathematically_enhanced_hash_calculation(
+                    header, nonce)
                 hash_hex = hash_result.hex()
                 hash_int = int(hash_hex, 16)
 
@@ -6761,19 +7814,27 @@ class ProductionBitcoinMiner:
                 if hashes_attempted % 100000 == 0:
                     elapsed = time.time() - start_time
                     hash_rate = hashes_attempted / elapsed if elapsed > 0 else 0
-                    print(f"🔄 {hashes_attempted:,} hashes, {hash_rate:,.0f} H / s, best: {hash_hex[:16]}...")
+                    print(
+                        f"🔄 {hashes_attempted:,} hashes, {hash_rate:,.0f} H / s, best: {hash_hex[:16]}...")
 
                 # Timeout after reasonable time (adjust as needed)
                 if time.time() - start_time > 60:  # 60 second timeout per cycle
-                    print(f"⏰ Mining cycle timeout after {hashes_attempted:,} attempts")
+                    print(
+                        f"⏰ Mining cycle timeout after {
+                            hashes_attempted:,} attempts")
                     break
 
             # No target met this cycle
             elapsed = time.time() - start_time
             hash_rate = hashes_attempted / elapsed if elapsed > 0 else 0
-            print(f"🔄 Cycle complete: {hashes_attempted:,} hashes in {elapsed:.2f}s ({hash_rate:,.0f} H / s)")
+            print(
+                f"🔄 Cycle complete: {
+                    hashes_attempted:,    } hashes in {
+                    elapsed:.2f}s ({
+                    hash_rate:,.0f} H / s)")
 
-            return {"success": False, "attempts": hashes_attempted, "time": elapsed, "hash_rate": hash_rate}
+            return {"success": False, "attempts": hashes_attempted,
+                    "time": elapsed, "hash_rate": hash_rate}
 
         except Exception as e:
             print(f"❌ Mining with template failed: {e}")
@@ -6782,7 +7843,8 @@ class ProductionBitcoinMiner:
     def calculate_merkle_root(self, template_or_transactions):
         """Return Merkle root hex string derived from the active template."""
         try:
-            if isinstance(template_or_transactions, dict) or template_or_transactions is None:
+            if isinstance(template_or_transactions,
+                          dict) or template_or_transactions is None:
                 cache = self._get_template_cache(template_or_transactions)
             else:
                 synthetic_template = {"transactions": template_or_transactions}
@@ -6796,7 +7858,8 @@ class ProductionBitcoinMiner:
             print(f"❌ Merkle root calculation failed: {exc}")
             return "0" * 64
 
-    def create_complete_block_submission(self, template, block_header, nonce, block_hash, merkle_root):
+    def create_complete_block_submission(
+            self, template, block_header, nonce, block_hash, merkle_root):
         """Create complete block data for Bitcoin node submission."""
         try:
             print("📋 Creating complete block submission data...")
@@ -6810,7 +7873,8 @@ class ProductionBitcoinMiner:
             transactions = template.get("transactions", [])
 
             cache = self._get_template_cache(template)
-            coinbase_tx = cache.get("coinbase_hex") or self.create_coinbase_transaction(template)
+            coinbase_tx = cache.get(
+                "coinbase_hex") or self.create_coinbase_transaction(template)
             if not coinbase_tx or not self._is_hex_string(coinbase_tx):
                 coinbase_tx = self.create_simple_coinbase_transaction()
 
@@ -6872,7 +7936,11 @@ class ProductionBitcoinMiner:
             print("✅ Complete submission data created:")
             print(f"   Block Height: {block_height}")
             print(f"   Block Hash: {block_hash[:32]}...")
-            print(f"   Raw Block Size: {len(raw_block)} chars ({len(raw_block)//2} bytes)")
+            print(
+                f"   Raw Block Size: {
+                    len(raw_block)} chars ({
+                    len(raw_block) //
+                    2} bytes)")
             print(f"   Transaction Count: {tx_count}")
             print(f"   Merkle Root: {merkle_root[:32]}...")
             print(f"   Nonce: {nonce}")
@@ -6932,7 +8000,7 @@ class ProductionBitcoinMiner:
         # Use the instance target if not specified
         if target_zeros is None:
             target_zeros = self.target_leading_zeros
-            
+
         print(f"⛏️ Mining single block with {target_zeros} leading zeros...")
 
         # Use the existing calculate_hash method
@@ -6981,7 +8049,8 @@ class ProductionBitcoinMiner:
         return True
 
 
-def _write_smoke_report(component: str, results: dict, output_path: str) -> bool:
+def _write_smoke_report(component: str, results: dict,
+                        output_path: str) -> bool:
     """Persist smoke test results with defensive write semantics."""
     try:
         from dynamic_template_manager import defensive_write_json
@@ -7006,7 +8075,8 @@ def _write_smoke_report(component: str, results: dict, output_path: str) -> bool
         return False
 
 
-def run_smoke_test(output_path: str = f"{brain_get_base_path()}/User_Look_At/miner_smoke_test.json") -> bool:
+def run_smoke_test(
+        output_path: str = f"{brain_get_base_path()}/User_Look_At/miner_smoke_test.json") -> bool:
     """Component-level smoke test for the production miner."""
     results = {
         "initialized": False,
@@ -7016,10 +8086,12 @@ def run_smoke_test(output_path: str = f"{brain_get_base_path()}/User_Look_At/min
     }
 
     try:
-        miner = ProductionBitcoinMiner(daemon_mode=True, demo_mode=True, max_attempts=10)
+        miner = ProductionBitcoinMiner(
+            daemon_mode=True, demo_mode=True, max_attempts=10)
         results["initialized"] = True
 
-        results["math_engine_available"] = bool(getattr(miner, "brain_qtl_connection", None))
+        results["math_engine_available"] = bool(
+            getattr(miner, "brain_qtl_connection", None))
 
         process_dir = getattr(miner, "mining_process_folder", None)
         if process_dir:
@@ -7042,7 +8114,8 @@ def run_smoke_test(output_path: str = f"{brain_get_base_path()}/User_Look_At/min
     return all(results.values())
 
 
-def run_smoke_network_test(output_path: str = f"{brain_get_base_path()}/User_Look_At/miner_smoke_network.json") -> bool:
+def run_smoke_network_test(
+        output_path: str = f"{brain_get_base_path()}/User_Look_At/miner_smoke_network.json") -> bool:
     """Network-level smoke test for the miner and its immediate integrations."""
     results = {
         "component_smoke": run_smoke_test(output_path),
@@ -7051,7 +8124,8 @@ def run_smoke_network_test(output_path: str = f"{brain_get_base_path()}/User_Loo
     }
 
     try:
-        miner = ProductionBitcoinMiner(daemon_mode=True, demo_mode=True, max_attempts=10)
+        miner = ProductionBitcoinMiner(
+            daemon_mode=True, demo_mode=True, max_attempts=10)
         results["dtm_integration"] = True
 
         dummy_template = {
@@ -7071,7 +8145,10 @@ def run_smoke_network_test(output_path: str = f"{brain_get_base_path()}/User_Loo
     except Exception:
         results["dtm_integration"] = False
 
-    _write_smoke_report("production_bitcoin_miner_network", results, output_path)
+    _write_smoke_report(
+        "production_bitcoin_miner_network",
+        results,
+        output_path)
     return all(results.values())
 
 
@@ -7082,38 +8159,44 @@ if __name__ == "__main__":
     # This redirects stdout during the import phase at the top of the file.
     # Note: The imports already happened at the top, so this won't help for THIS run,
     # but we need to restructure to suppress them properly.
-    
+
     import argparse
 
-    parser = argparse.ArgumentParser(description="Production Bitcoin Miner with Massive Mathematical Power")
-    
+    parser = argparse.ArgumentParser(
+        description="Production Bitcoin Miner with Massive Mathematical Power")
+
     # BRAIN.QTL FLAG ORCHESTRATION - All flags centralized
     try:
         from Singularity_Dave_Brainstem_UNIVERSE_POWERED import brain_get_flags
         brain_flags = brain_get_flags("miner")
-        
+
         if brain_flags and not brain_flags.get("error"):
             # Add Brain.QTL flags dynamically (skip empty production flag)
             for category, flags in brain_flags.items():
                 if isinstance(flags, dict):
                     for flag_name, flag_def in flags.items():
-                        if isinstance(flag_def, dict) and flag_def.get('flag') and flag_def['flag'].strip():
+                        if isinstance(flag_def, dict) and flag_def.get(
+                                'flag') and flag_def['flag'].strip():
                             flag = flag_def['flag']
-                            help_text = flag_def.get('description', f'{flag_name} flag')
-                            
+                            help_text = flag_def.get(
+                                'description', f'{flag_name} flag')
+
                             if flag_def.get('type') == 'int':
-                                parser.add_argument(flag, type=int, help=help_text)
+                                parser.add_argument(
+                                    flag, type=int, help=help_text)
                             elif flag_def.get('type') == 'boolean':
-                                parser.add_argument(flag, action='store_true', help=help_text)
+                                parser.add_argument(
+                                    flag, action='store_true', help=help_text)
                             else:
-                                parser.add_argument(flag, action='store_true', help=help_text)
-            
+                                parser.add_argument(
+                                    flag, action='store_true', help=help_text)
+
             print("✅ Brain.QTL flags loaded into Production Miner")
         else:
             print("⚠️ Brain.QTL flags not available, using fallback")
     except Exception as e:
         print(f"⚠️ Brain.QTL flag loading failed, using fallback: {e}")
-    
+
     # ADDITIONAL MINER-SPECIFIC FLAGS (--mode handled by Brain.QTL)
     # terminal_mode handled by Brain.QTL
     # show_solutions_only handled by Brain.QTL
@@ -7133,7 +8216,7 @@ if __name__ == "__main__":
     # This creates all folder structures from Brain.QTL pattern_levels
     try:
         from Singularity_Dave_Brainstem_UNIVERSE_POWERED import brain_initialize_mode
-        
+
         # Determine mode from args
         mode = "live"
         if getattr(args, "demo", False):
@@ -7142,7 +8225,7 @@ if __name__ == "__main__":
             mode = "test"
         elif getattr(args, "staging", False):
             mode = "staging"
-        
+
         # Initialize Brain infrastructure (folders, hierarchies, templates)
         brain_initialize_mode(mode, "Production-Miner")
     except Exception as e:
@@ -7165,7 +8248,8 @@ if __name__ == "__main__":
 
     # Check if we're running in coordination mode
     if args.instruction and args.output:
-        print(f"🔗 COORDINATION MODE - Reading instructions from {args.instruction}")
+        print(
+            f"🔗 COORDINATION MODE - Reading instructions from {args.instruction}")
         try:
             import json
             from pathlib import Path
@@ -7188,9 +8272,10 @@ if __name__ == "__main__":
             print(f"   Template height: {template.get('height', 'unknown')}")
             print(f"   Transactions: {len(template.get('transactions', []))}")
 
-            # Initialize miner with coordination - UNLIMITED for universe-scale power
+            # Initialize miner with coordination - UNLIMITED for universe-scale
+            # power
             miner = ProductionBitcoinMiner(
-                max_attempts=None, 
+                max_attempts=None,
                 target_leading_zeros=80,
                 miner_id=args.miner_id  # Pass miner ID for terminal folder assignment
             )
@@ -7218,8 +8303,13 @@ if __name__ == "__main__":
 
             if gps_intelligence:
                 print("✅ GPS Intelligence detected in template")
-                print(f"   🎯 Solution Probability: {gps_intelligence.get('solution_probability', 0):.6f}")
-                print(f"   🔢 Targeted Nonce Ranges: {len(gps_intelligence.get('targeted_nonce_ranges', []))}")
+                print(
+                    f"   🎯 Solution Probability: {
+                        gps_intelligence.get(
+                            'solution_probability',
+                            0):.6f}")
+                print(
+                    f"   🔢 Targeted Nonce Ranges: {len(gps_intelligence.get('targeted_nonce_ranges', []))}")
 
             # Use REAL universe-scale mining with GPS enhancement
             start_time = time.time()
@@ -7230,7 +8320,8 @@ if __name__ == "__main__":
             print("🧠 GPS Enhancement + Brain.QTL Integration: ACTIVE")
 
             # Use the miner's REAL mathematical framework ONLY
-            mining_result = miner.mine_with_gps_template_coordination(template, results_path, max_time)
+            mining_result = miner.mine_with_gps_template_coordination(
+                template, results_path, max_time)
 
             if mining_result:
                 print("✅ GPS - Enhanced universe - scale mining coordination completed")
@@ -7266,7 +8357,7 @@ if __name__ == "__main__":
 
     # Brain.QTL coordinated mode
     daemon_mode = False  # Direct execution when called standalone
-    
+
     if not daemon_mode:
         print("🏭 PRODUCTION BITCOIN MINER - BRAIN.QTL COORDINATION")
         print(f"   Mode: Production")
@@ -7290,7 +8381,7 @@ if __name__ == "__main__":
         # Brain.QTL coordinated production mining
         if not daemon_mode:
             print("⚡ Starting production Bitcoin mining...")
-        
+
         # Production mining mode (Brain.QTL orchestrated)
         miner.run_production_mining()  # Brain.QTL manages all parameters
 

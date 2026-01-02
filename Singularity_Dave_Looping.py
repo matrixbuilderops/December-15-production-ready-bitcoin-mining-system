@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+
+#!/usr/bin/env if "blocks" not in locals(): blocks = []
 """
 Singularity_Dave_Looping.py
 Specialized Bitcoin Mining Loop Manager
@@ -33,12 +34,14 @@ HAS_CONFIRMATION_MONITOR = False
 # File structure management - handled by Brain.QTL
 HAS_HIERARCHICAL = True
 
-def write_hierarchical_ledger(entry_data, base_path="Mining", ledger_type="Looping", ledger_name="ledger", mode="production"):
+
+def write_hierarchical_ledger(
+    entry_data, base_path="Mining", ledger_type="Looping", ledger_name="ledger", mode="production"
+):
     """
     Brain.QTL-driven hierarchical file management
     Writes data to global, year, month, week, day, and hour files.
     """
-    import os
     import json
     from datetime import datetime
     from pathlib import Path
@@ -50,16 +53,16 @@ def write_hierarchical_ledger(entry_data, base_path="Mining", ledger_type="Loopi
 
     now = datetime.now()
     year = now.strftime("%Y")
-    month = now.strftime("%m") 
+    month = now.strftime("%m")
     day = now.strftime("%d")
     hour = now.strftime("%H")
     week = f"W{now.strftime('%W')}"
-    
+
     # Determine base directory based on file type and component
     if file_type == "ledger":
         base_dir = f"{base_path}/Ledgers"
     elif file_type == "submission":
-        base_dir = f"{base_path}/Submission_Logs" # Corrected from Submissions
+        base_dir = f"{base_path}/Submission_Logs"  # Corrected from Submissions
     elif file_type == "system_report":
         base_dir = f"{base_path}/System/System_Reports/{component}"
     elif file_type == "system_log":
@@ -75,26 +78,26 @@ def write_hierarchical_ledger(entry_data, base_path="Mining", ledger_type="Loopi
     wd = md / week
     dd = md / day
     hd = dd / hour
-    
+
     results = {}
-    
+
     # Create all directories
     for d in [bp, yd, md, wd, dd, hd]:
         d.mkdir(parents=True, exist_ok=True)
-    
+
     # Define file names for each level
     # Using standard naming convention: global_{level}_{file_type}.json
     # e.g. global_year_ledger.json, global_month_submission.json
-    
+
     levels = [
         ("global", bp, f"global_{file_type}.json"),
-        ("year", yd, f"global_{file_type}_{year}.json"),
-        ("month", md, f"global_{file_type}_{month}.json"),
+        ("year", yd, "global_{file_type}_{year}.json"),
+        ("month", md, "global_{file_type}_{month}.json"),
         ("week", wd, f"global_{file_type}_{week}.json"),
-        ("day", dd, f"global_{file_type}_{day}.json"),
-        ("hour", hd, f"hourly_{file_type}.json") # Hour is usually "hourly_"
+        ("day", dd, "global_{file_type}_{day}.json"),
+        ("hour", hd, f"hourly_{file_type}.json"),  # Hour is usually "hourly_"
     ]
-    
+
     for level_name, dir_path, filename in levels:
         file_path = dir_path / filename
         try:
@@ -105,11 +108,11 @@ def write_hierarchical_ledger(entry_data, base_path="Mining", ledger_type="Loopi
                     "component": component,
                     "created": now.isoformat(),
                     "last_updated": now.isoformat(),
-                    "mode": mode
+                    "mode": mode,
                 },
-                "entries": []
+                "entries": [],
             }
-            
+
             # Load existing data if file exists
             if file_path.exists():
                 try:
@@ -121,79 +124,82 @@ def write_hierarchical_ledger(entry_data, base_path="Mining", ledger_type="Loopi
                             if "entries" not in file_data:
                                 file_data["entries"] = []
                 except json.JSONDecodeError:
-                    pass # Overwrite corrupt file
-            
+                    pass  # Overwrite corrupt file
+
             # Append new entry
             file_data["entries"].append(entry_data)
-            
+
             # Update metadata
             if "metadata" not in file_data:
                 file_data["metadata"] = {}
             file_data["metadata"]["last_updated"] = now.isoformat()
             file_data["metadata"]["total_entries"] = len(file_data["entries"])
-            
+
             # Write back
             with open(file_path, 'w') as f:
                 json.dump(file_data, f, indent=2)
-                
+
             results[level_name] = {"success": True, "path": str(file_path)}
-            
+
         except Exception as e:
             results[level_name] = {"success": False, "error": str(e)}
             print(f"❌ Failed to write {level_name} ledger: {e}")
 
     return results
 
+
 class HierarchicalFileManager:
     """Brain.QTL-based hierarchical file management"""
-    
+
     def __init__(self, base_path="Mining"):
         self.base_path = base_path
-    
+
     def get_hierarchical_path(self, component="Looping", file_type="ledger", timestamp=None):
         """Generate hierarchical path based on Brain.QTL folder structure"""
         if timestamp is None:
             from datetime import datetime
+
             timestamp = datetime.now()
-        
+
         year = timestamp.strftime("%Y")
         month = timestamp.strftime("%m")
-        day = timestamp.strftime("%d") 
+        day = timestamp.strftime("%d")
         hour = timestamp.strftime("%H")
-        
+
         path_map = {
-            "ledger": f"{self.base_path}/Ledgers/{year}/{month}/{day}/{hour}",
-            "submission": f"{self.base_path}/Submissions/{year}/{month}/{day}/{hour}",
-            "system_report": f"{self.base_path}/System/System_Reports/{component}/Hourly/{year}/{month}/{day}/{hour}",
-            "system_log": f"{self.base_path}/System/System_Logs/{component}/Hourly/{year}/{month}/{day}/{hour}",
-            "error_report": f"{self.base_path}/System/Error_Reports/{component}/Hourly/{year}/{month}/{day}/{hour}"
+            "ledger": "{self.base_path}/Ledgers/{year}/{month}/{day}/{hour}",
+            "submission": "{self.base_path}/Submissions/{year}/{month}/{day}/{hour}",
+            "system_report": "{self.base_path}/System/System_Reports/{component}/Hourly/{year}/{month}/{day}/{hour}",
+            "system_log": "{self.base_path}/System/System_Logs/{component}/Hourly/{year}/{month}/{day}/{hour}",
+            "error_report": "{self.base_path}/System/Error_Reports/{component}/Hourly/{year}/{month}/{day}/{hour}",
         }
-        
-        return path_map.get(file_type, f"{self.base_path}/{component}/{year}/{month}/{day}/{hour}")
-    
+
+        return path_map.get(file_type, "{self.base_path}/{component}/{year}/{month}/{day}/{hour}")
+
     def ensure_path_exists(self, path):
         """Create directory structure if it doesn't exist"""
         import os
+
         os.makedirs(path, exist_ok=True)
         return path
+
 
 # DEFENSIVE Brain import - NO HARD DEPENDENCIES
 brain_available = False
 BrainQTLInterpreter = None
 
 # Only import Brain if not just showing help
-import sys
 if '--help' not in sys.argv and '-h' not in sys.argv:
     try:
         from Singularity_Dave_Brainstem_UNIVERSE_POWERED import (
-            BrainQTLInterpreter, 
-            brain_set_mode, 
+            BrainQTLInterpreter,
+            brain_set_mode,
             brain_initialize_mode,
             brain_get_math_config,
             MINING_MATH_CONFIG,
             brain_save_ledger,
             brain_save_submission,
-            brain_save_system_report
+            brain_save_system_report,
         )
 
         brain_available = True
@@ -204,21 +210,41 @@ if '--help' not in sys.argv and '-h' not in sys.argv:
         HAS_BRAIN_GUI = False
         HAS_BRAIN_FILE_SYSTEM = False
         brain_available = False
-        def brain_set_mode(*args, **kwargs): pass
-        def brain_initialize_mode(*args, **kwargs): return {"success": False}
-        def brain_get_math_config(*args, **kwargs): return {}
-        def brain_save_ledger(*args, **kwargs): return {"success": False}
-        def brain_save_submission(*args, **kwargs): return {"success": False}
-        def brain_save_system_report(*args, **kwargs): return {"success": False}
+
+        def brain_set_mode(*args, **kwargs):
+            pass
+
+        def brain_initialize_mode(*args, **kwargs):
+            return {"success": False}
+
+        def brain_get_math_config(*args, **kwargs):
+            return {}
+
+        def brain_save_ledger(*args, **kwargs):
+            return {"success": False}
+
+        def brain_save_submission(*args, **kwargs):
+            return {"success": False}
+
+        def brain_save_system_report(*args, **kwargs):
+            return {"success": False}
+
         MINING_MATH_CONFIG = {}
         print("🔄 Brain.QTL not available - using defensive fallbacks")
     except Exception as e:
         HAS_BRAIN_GUI = False
         HAS_BRAIN_FILE_SYSTEM = False
         brain_available = False
-        def brain_set_mode(*args, **kwargs): pass
-        def brain_initialize_mode(*args, **kwargs): return {"success": False}
-        def brain_get_math_config(*args, **kwargs): return {}
+
+        def brain_set_mode(*args, **kwargs):
+            pass
+
+        def brain_initialize_mode(*args, **kwargs):
+            return {"success": False}
+
+        def brain_get_math_config(*args, **kwargs):
+            return {}
+
         MINING_MATH_CONFIG = {}
         print(f"⚠️ Brain import error: {e} - using defensive fallbacks")
 else:
@@ -235,8 +261,7 @@ except ImportError:
     HAS_DASHBOARD = False
 
 # Configure logging - Brain.QTL defines paths
-import os
-from datetime import datetime
+
 
 def setup_brain_coordinated_logging(component_name, base_dir=None):
     """Setup logging according to Brain.QTL component-based structure"""
@@ -248,50 +273,61 @@ def setup_brain_coordinated_logging(component_name, base_dir=None):
         elif "--test-mode" in sys.argv or "--test" in sys.argv:
             base_dir = "Test/Test mode/System"
         else:
-            base_dir = "System" # Root System folder for production
-            
+            base_dir = "System"  # Root System folder for production
+
     # Component-based: System/System_Logs/Looping/Global/ and System_Logs/Looping/Hourly/
     log_dir = os.path.join(base_dir, "System_Logs", "Looping", "Global")
     os.makedirs(log_dir, exist_ok=True)
-    
+
     # Hourly directory
     now = datetime.now()
-    hourly_dir = os.path.join(base_dir, "System_Logs", "Looping", "Hourly", str(now.year), f"{now.month:02d}", f"{now.day:02d}", f"{now.hour:02d}")
+    hourly_dir = os.path.join(
+        base_dir,
+        "System_Logs",
+        "Looping",
+        "Hourly",
+        str(now.year),
+        f"{now.month:02d}",
+        f"{now.day:02d}",
+        f"{now.hour:02d}",
+    )
     os.makedirs(hourly_dir, exist_ok=True)
-    
+
     # Global and hourly log files per Brain.QTL component-based structure
     global_log = os.path.join(log_dir, f"global_{component_name}.log")
     hourly_log = os.path.join(hourly_dir, f"hourly_{component_name}.log")
-    
+
     # Setup logger with both global and hourly handlers
     logger = logging.getLogger(component_name)
     logger.setLevel(logging.INFO)
     logger.handlers = []  # Clear existing handlers
-    
+
     formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-    
+
     # Global log handler
     global_handler = logging.FileHandler(global_log)
     global_handler.setFormatter(formatter)
     logger.addHandler(global_handler)
-    
+
     # Hourly log handler
     hourly_handler = logging.FileHandler(hourly_log)
     hourly_handler.setFormatter(formatter)
     logger.addHandler(hourly_handler)
-    
+
     # Console handler
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
-    
+
     return logger, global_log, hourly_log
+
 
 logger, global_log_file, hourly_log_file = setup_brain_coordinated_logging("looping")
 
 # Initialize Looping component files (reports + logs with append logic)
 try:
     from Singularity_Dave_Brainstem_UNIVERSE_POWERED import initialize_component_files
+
     initialize_component_files("Looping", "Mining")
 except Exception as e:
     logger.warning(f"⚠️ Looping component file initialization warning: {e}")
@@ -303,21 +339,23 @@ def report_component_status(component, status, details, metrics=None, base_dir="
         # Create component report directory
         report_dir = os.path.join(base_dir, "Component_Reports", component)
         os.makedirs(report_dir, exist_ok=True)
-        
+
         # Hourly report directory
         now = datetime.now()
-        hourly_report_dir = os.path.join(report_dir, str(now.year), f"{now.month:02d}", f"{now.day:02d}", f"{now.hour:02d}")
+        hourly_report_dir = os.path.join(
+            report_dir, str(now.year), f"{now.month:02d}", f"{now.day:02d}", f"{now.hour:02d}"
+        )
         os.makedirs(hourly_report_dir, exist_ok=True)
-        
+
         # Report entry
         report_entry = {
             "timestamp": now.isoformat(),
             "component": component,
             "status": status,
             "details": details,
-            "metrics": metrics or {}
+            "metrics": metrics or {},
         }
-        
+
         # Write to global component report file
         global_report_file = os.path.join(report_dir, f"{component.lower()}_reports.json")
         reports = []
@@ -325,11 +363,11 @@ def report_component_status(component, status, details, metrics=None, base_dir="
             with open(global_report_file, 'r') as f:
                 data = json.load(f)
                 reports = data.get("reports", [])
-        
+
         reports.append(report_entry)
         with open(global_report_file, 'w') as f:
             json.dump({"reports": reports, "last_updated": now.isoformat()}, f, indent=2)
-        
+
         # Write to hourly component report file
         hourly_report_file = os.path.join(hourly_report_dir, f"{component.lower()}_reports.json")
         hourly_reports = []
@@ -337,11 +375,15 @@ def report_component_status(component, status, details, metrics=None, base_dir="
             with open(hourly_report_file, 'r') as f:
                 data = json.load(f)
                 hourly_reports = data.get("reports", [])
-        
+
         hourly_reports.append(report_entry)
         with open(hourly_report_file, 'w') as f:
-            json.dump({"hour": f"{now.year}-{now.month:02d}-{now.day:02d}_{now.hour:02d}", "reports": hourly_reports}, f, indent=2)
-        
+            json.dump(
+                {"hour": f"{now.year}-{now.month:02d}-{now.day:02d}_{now.hour:02d}", "reports": hourly_reports},
+                f,
+                indent=2,
+            )
+
     except Exception as e:
         logger.error(f"Failed to report status to Brain: {e}")
 
@@ -353,10 +395,10 @@ def report_looping_error(error_type, severity, message, context=None, recovery_a
     """
     from dynamic_template_manager import defensive_write_json, load_template_from_examples
     import traceback
-    
+
     now = datetime.now()
     error_id = f"loop_err_{now.strftime('%Y%m%d_%H%M%S')}_{random.randint(1000,9999)}"
-    
+
     # Build comprehensive error entry
     error_entry = {
         "error_id": error_id,
@@ -366,13 +408,13 @@ def report_looping_error(error_type, severity, message, context=None, recovery_a
         "message": message,
         "context": context or {},
         "recovery_action": recovery_action or "None taken",
-        "stack_trace": stack_trace or (traceback.format_exc() if sys.exc_info()[0] else None)
+        "stack_trace": stack_trace or (traceback.format_exc() if sys.exc_info()[0] else None),
     }
-    
+
     # === GLOBAL ERROR FILE (Mining/Looping/Global/global_looping_error.json) ===
     try:
         global_error_file = os.path.join("Mining/System/System_Errors/Looping", "Global", "global_looping_error.json")
-        
+
         # Load existing or create from Brainstem-generated template
         if os.path.exists(global_error_file):
             try:
@@ -386,31 +428,37 @@ def report_looping_error(error_type, severity, message, context=None, recovery_a
                 global_data = load_template_from_examples('global_looping_error', 'Looping')
         else:
             global_data = load_template_from_examples('global_looping_error', 'Looping')
-        
+
         # Update with new error
         global_data["errors"].append(error_entry)
         global_data["total_errors"] = len(global_data["errors"])
-        
+
         # Update statistics if template has them
         if "errors_by_severity" not in global_data:
             global_data["errors_by_severity"] = {"critical": 0, "error": 0, "warning": 0, "info": 0}
         global_data["errors_by_severity"][severity] = global_data["errors_by_severity"].get(severity, 0) + 1
-        
+
         if "errors_by_type" not in global_data:
             global_data["errors_by_type"] = {}
         global_data["errors_by_type"][error_type] = global_data["errors_by_type"].get(error_type, 0) + 1
-        
+
         # Defensive write
         defensive_write_json(global_error_file, global_data, "Looping")
-        
+
     except Exception as e:
         logger.error(f"Failed to write global Looping error: {e}")
-    
+
     # === HOURLY ERROR FILE (Mining/System/System_Errors/Looping/Hourly/YYYY/MM/DD/HH/hourly_looping_error.json) ===
     try:
-        hourly_dir = os.path.join("Mining/System/System_Errors/Looping/Hourly", str(now.year), f"{now.month:02d}", f"{now.day:02d}", f"{now.hour:02d}")
+        hourly_dir = os.path.join(
+            "Mining/System/System_Errors/Looping/Hourly",
+            str(now.year),
+            f"{now.month:02d}",
+            f"{now.day:02d}",
+            f"{now.hour:02d}",
+        )
         hourly_error_file = os.path.join(hourly_dir, "hourly_looping_error.json")
-        
+
         # Load existing or create from template
         if os.path.exists(hourly_error_file):
             try:
@@ -424,25 +472,25 @@ def report_looping_error(error_type, severity, message, context=None, recovery_a
                 hourly_data = load_template_from_examples('hourly_looping_error', 'Looping')
         else:
             hourly_data = load_template_from_examples('hourly_looping_error', 'Looping')
-        
+
         # Update hourly data
         hourly_data["hour"] = now.strftime("%Y-%m-%d_%H")
         hourly_data["errors"].append(error_entry)
         if "total_errors" in hourly_data:
             hourly_data["total_errors"] = len(hourly_data["errors"])
-        
+
         # Update statistics if template has them
         if "errors_by_severity" in hourly_data:
             hourly_data["errors_by_severity"][severity] = hourly_data["errors_by_severity"].get(severity, 0) + 1
         if "errors_by_type" in hourly_data:
             hourly_data["errors_by_type"][error_type] = hourly_data["errors_by_type"].get(error_type, 0) + 1
-        
+
         # Defensive write
         defensive_write_json(hourly_error_file, hourly_data, "Looping")
-        
+
     except Exception as e:
         logger.error(f"Failed to write hourly Looping error: {e}")
-    
+
     logger.error(f"🧠 Looping Error [{severity}] {error_type}: {message}")
 
 
@@ -457,7 +505,9 @@ def report_component_error(component, error_type, severity, message, base_dir="M
             error_dir = os.path.join(base_dir, "Component_Errors", component)
             os.makedirs(error_dir, exist_ok=True)
             now = datetime.now()
-            hourly_error_dir = os.path.join(error_dir, str(now.year), f"{now.month:02d}", f"{now.day:02d}", f"{now.hour:02d}")
+            hourly_error_dir = os.path.join(
+                error_dir, str(now.year), f"{now.month:02d}", f"{now.day:02d}", f"{now.hour:02d}"
+            )
             os.makedirs(hourly_error_dir, exist_ok=True)
             error_entry = {
                 "timestamp": now.isoformat(),
@@ -465,7 +515,7 @@ def report_component_error(component, error_type, severity, message, base_dir="M
                 "severity": severity,
                 "error_type": error_type,
                 "message": message,
-                "acknowledged_by_brain": False
+                "acknowledged_by_brain": False,
             }
             global_error_file = os.path.join(error_dir, f"{component.lower()}_errors.json")
             errors = []
@@ -484,7 +534,7 @@ def report_component_error(component, error_type, severity, message, base_dir="M
 def report_looping_status(mining_sessions=0, templates_distributed=0, submissions_sent=0, miners_active=0):
     """
     Report Looping status with comprehensive tracking - ADAPTS to template, NEVER FAILS.
-    
+
     Args:
         mining_sessions: Number of mining sessions coordinated
         templates_distributed: Number of templates distributed to miners
@@ -492,23 +542,25 @@ def report_looping_status(mining_sessions=0, templates_distributed=0, submission
         miners_active: Number of currently active miners
     """
     from dynamic_template_manager import defensive_write_json, load_template_from_examples
-    
+
     now = datetime.now()
     report_id = f"loop_report_{now.strftime('%Y%m%d_%H%M%S')}"
-    
+
     # Build comprehensive report entry
     report_entry = {
         "report_id": report_id,
         "timestamp": now.isoformat(),
         "templates_distributed": templates_distributed,
         "miners_active": miners_active,
-        "submissions_sent": submissions_sent
+        "submissions_sent": submissions_sent,
     }
-    
+
     # === GLOBAL REPORT FILE ===
     try:
-        global_report_file = os.path.join("Mining/System/System_Reports/Looping", "Global", "global_looping_report.json")
-        
+        global_report_file = os.path.join(
+            "Mining/System/System_Reports/Looping", "Global", "global_looping_report.json"
+        )
+
         # Load existing or create from template
         if os.path.exists(global_report_file):
             try:
@@ -522,34 +574,42 @@ def report_looping_status(mining_sessions=0, templates_distributed=0, submission
                 report_data = load_template_from_examples('global_looping_report', 'Looping')
         else:
             report_data = load_template_from_examples('global_looping_report', 'Looping')
-        
+
         # Update statistics
         if "reports" not in report_data:
             report_data["reports"] = []
         report_data["reports"].append(report_entry)
-        
+
         if "total_mining_sessions" in report_data:
             report_data["total_mining_sessions"] = report_data.get("total_mining_sessions", 0) + mining_sessions
         if "total_templates_distributed" in report_data:
-            report_data["total_templates_distributed"] = report_data.get("total_templates_distributed", 0) + templates_distributed
+            report_data["total_templates_distributed"] = (
+                report_data.get("total_templates_distributed", 0) + templates_distributed
+            )
         if "total_submissions_sent" in report_data:
             report_data["total_submissions_sent"] = report_data.get("total_submissions_sent", 0) + submissions_sent
-        
+
         # Update metadata
         if "metadata" in report_data:
             report_data["metadata"]["last_updated"] = now.isoformat()
-        
+
         # Defensive write
         defensive_write_json(global_report_file, report_data, "Looping")
-        
+
     except Exception as e:
         logger.error(f"Failed to write global Looping report: {e}")
-    
+
     # === HOURLY REPORT FILE ===
     try:
-        hourly_dir = os.path.join("Mining/System/System_Reports/Looping/Hourly", str(now.year), f"{now.month:02d}", f"{now.day:02d}", f"{now.hour:02d}")
+        hourly_dir = os.path.join(
+            "Mining/System/System_Reports/Looping/Hourly",
+            str(now.year),
+            f"{now.month:02d}",
+            f"{now.day:02d}",
+            f"{now.hour:02d}",
+        )
         hourly_report_file = os.path.join(hourly_dir, "hourly_looping_report.json")
-        
+
         # Load existing or create from template
         if os.path.exists(hourly_report_file):
             try:
@@ -563,7 +623,7 @@ def report_looping_status(mining_sessions=0, templates_distributed=0, submission
                 hourly_data = load_template_from_examples('hourly_looping_report', 'Looping')
         else:
             hourly_data = load_template_from_examples('hourly_looping_report', 'Looping')
-        
+
         # Update hourly data
         hourly_data["hour"] = now.strftime("%Y-%m-%d_%H")
         if "templates_distributed" in hourly_data:
@@ -572,10 +632,10 @@ def report_looping_status(mining_sessions=0, templates_distributed=0, submission
             hourly_data["miners_active"] = max(hourly_data.get("miners_active", 0), miners_active)  # Track peak
         if "submissions_sent" in hourly_data:
             hourly_data["submissions_sent"] = hourly_data.get("submissions_sent", 0) + submissions_sent
-        
+
         # Defensive write
         defensive_write_json(hourly_report_file, hourly_data, "Looping")
-        
+
     except Exception as e:
         logger.error(f"Failed to write hourly Looping report: {e}")
 
@@ -693,22 +753,22 @@ def _validate_against_example(file_key: str, payload: Any) -> None:
     if example_payload is None:
         return
     if not _structures_match(example_payload, payload):
-        raise ValueError(
-            f"Payload for {file_key} does not match example structure"
-        )
+        raise ValueError(f"Payload for {file_key} does not match example structure")
+
 
 def create_parser():
     """Create ArgumentParser with Brain.QTL flag orchestration"""
     parser = argparse.ArgumentParser(
         description="Singularity Dave Bitcoin Mining Loop Manager - Brain.QTL Orchestrated",
-        formatter_class=argparse.RawDescriptionHelpFormatter
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    
+
     # BRAIN.QTL FLAG ORCHESTRATION - All flags centralized
     try:
         from Singularity_Dave_Brainstem_UNIVERSE_POWERED import brain_get_flags
+
         brain_flags = brain_get_flags("looping")
-        
+
         if brain_flags and not brain_flags.get("error"):
             # Add Brain.QTL flags dynamically (skip empty production flag)
             for category, flags in brain_flags.items():
@@ -717,7 +777,7 @@ def create_parser():
                         if isinstance(flag_def, dict) and flag_def.get('flag') and flag_def['flag'].strip():
                             flag = flag_def['flag']
                             help_text = flag_def.get('description', f'{flag_name} flag')
-                            
+
                             if flag_def.get('type') == 'int':
                                 parser.add_argument(flag, type=int, help=help_text)
                             elif flag_def.get('type') == 'boolean':
@@ -730,15 +790,15 @@ def create_parser():
                                 parser.add_argument(flag, type=str, help=help_text)
                             else:
                                 parser.add_argument(flag, action='store_true', help=help_text)
-            
+
             print("✅ Brain.QTL flags loaded into Looping component")
             return parser
     except Exception as e:
         print(f"⚠️ Brain.QTL flag loading failed, using fallback: {e}")
-    
+
     # FALLBACK: Brain.QTL integration failed - using minimal parser
     print("⚠️ Using minimal fallback parser - Brain.QTL integration failed")
-    
+
     return parser
     return parser
 
@@ -749,7 +809,15 @@ class BitcoinLoopingSystem:
     and intelligent scheduling capabilities - NO MORE FILE CHAOS!
     """
 
-    def __init__(self, mining_mode="default", demo_mode=False, test_mode=False, daemon_count=None, mining_config=None, staging_mode=False):
+    def __init__(
+        self,
+        mining_mode="default",
+        demo_mode=False,
+        test_mode=False,
+        daemon_count=None,
+        mining_config=None,
+        staging_mode=False,
+    ):
         # 🧹 FIRST: CLEAN UP THE FILE DISASTER!
         print("🧹 EMERGENCY FILE CLEANUP - ORGANIZING SCATTERED FILES!")
 
@@ -759,12 +827,13 @@ class BitcoinLoopingSystem:
         self.test_mode = test_mode  # Real Bitcoin node connection but no submission (saves to Test/)
         self.staging_mode = staging_mode  # Production mode without network submission - final check
         self.sandbox_mode = demo_mode or test_mode  # Sandbox when in demo/test mode
-        
+
         # AUTO-DETECT hardware and set miner count from Brain
         if daemon_count is None:
             # Get hardware config from Brain
             try:
                 import multiprocessing
+
                 cpu_cores = multiprocessing.cpu_count()
                 # Use all cores for maximum performance
                 daemon_count = cpu_cores
@@ -772,11 +841,11 @@ class BitcoinLoopingSystem:
             except Exception as e:
                 daemon_count = 5  # Fallback
                 print(f"⚠️  Could not detect cores: {e}, using default: {daemon_count} miners")
-        
+
         self.daemon_count = daemon_count  # Number of production mining daemons
-        
+
         print(f"🔍 DEBUG: daemon_count set to {self.daemon_count}")
-        
+
         # CANONICAL BRAIN INITIALIZATION - does EVERYTHING
         if HAS_BRAIN_FILE_SYSTEM:
             # Determine mode - NEVER create root Mining/ for demo/test
@@ -788,7 +857,7 @@ class BitcoinLoopingSystem:
                 mode = "staging"
             else:
                 mode = "production"
-            
+
             # Get centralized math configuration from Brain
             self.math_config = brain_get_math_config(mode)
             if self.mining_mode in ["verbose", "test-verbose"]:
@@ -797,14 +866,14 @@ class BitcoinLoopingSystem:
                 print(f"   - Knuth Iterations: {self.math_config['universe_framework']['knuth_iterations']}")
                 print(f"   - Use Real Math: {self.math_config['mode_behavior']['use_real_math']}")
                 print(f"   - Submit to Network: {self.math_config['mode_behavior']['submit_to_network']}")
-            
+
             # Initialize EVERYTHING (folders, System_File_Examples, aggregated indices, hierarchical structure)
             result = brain_initialize_mode(mode, "Looping")
             if not result.get("success"):
                 print(f"⚠️ Brain initialization had issues: {result.get('error')}")
         else:
             self.math_config = {}
-        
+
         # ESSENTIAL: Fix missing attributes that cause crashes
         self.brain_flags = {}  # Initialize brain flags dictionary
         self.miner_control_enabled = True  # Enable miner control by default
@@ -816,29 +885,26 @@ class BitcoinLoopingSystem:
         self.daemon_status = {}  # Initialize daemon status dictionary
         self.blocks_found_today = 0  # Initialize blocks found today counter
         self.daily_block_limit = 144  # Default daily block limit (Bitcoin produces ~144 blocks/day)
-        
+
         # Initialize pipeline status for tracking
         self.pipeline_status = {
-            "looping_pipeline": {
-                "status": "initializing",
-                "templates_processed": 0,
-                "last_update": None,
-                "error": None
-            }
+            "looping_pipeline": {"status": "initializing", "templates_processed": 0, "last_update": None, "error": None}
         }
-        
+
         # REAL MINING CONFIGURATION from our flags
         self.mining_config = mining_config or {
             'blocks_per_day': 1,
-            'total_days': 1, 
+            'total_days': 1,
             'total_blocks': 1,
             'mining_mode': 'rest_of_day',
-            'day_mode': 'current_day'
+            'day_mode': 'current_day',
         }
-        
+
         # HARDWARE DETECTION - Auto-detect CPU cores and optimize miner count
         self.hardware_config = self._detect_hardware()
-        print(f"💻 Hardware detected: {self.hardware_config['cpu_cores']} cores, {self.hardware_config['miner_processes']} miners will run")
+        print(
+            f"💻 Hardware detected: {self.hardware_config['cpu_cores']} cores, {self.hardware_config['miner_processes']} miners will run"
+        )
 
         # ZMQ Configuration (don't create context in init)
         # Load ZMQ configuration from config.json
@@ -861,9 +927,7 @@ class BitcoinLoopingSystem:
                 self.zmq_config = endpoints
 
                 if endpoints:
-                    logger.info(
-                        f"✅ ZMQ configuration loaded from config.json: {list(self.zmq_config.keys())}"
-                    )
+                    logger.info(f"✅ ZMQ configuration loaded from config.json: {list(self.zmq_config.keys())}")
                 else:
                     logger.info("⚠️ ZMQ enabled but no endpoints configured")
             else:
@@ -898,24 +962,27 @@ class BitcoinLoopingSystem:
 
         # Main submission log path - SPEC COMPLIANCE: Use Submissions
         self.submission_log_path = self.submission_dir / "global_submission.json"
-        
+
         # Template Manager initialization - CREATE BEFORE folder structure
         # DTM uses Brain-created structure, does NOT create its own files
         try:
             from dynamic_template_manager import GPSEnhancedDynamicTemplateManager
+
             self.template_manager = GPSEnhancedDynamicTemplateManager(
                 verbose=False,  # Quiet during init
                 demo_mode=self.demo_mode,
                 auto_initialize=False,  # Brain already initialized everything
                 create_directories=False,  # Brain already created all folders
-                environment="Testing" if self.demo_mode else "Mining"  # DTM accepts: Mining, Testing, Development, Production
+                environment=(
+                    "Testing" if self.demo_mode else "Mining"
+                ),  # DTM accepts: Mining, Testing, Development, Production
             )
             if self.mining_mode in ["verbose", "test-verbose"]:
                 print("✅ DTM initialized (using Brain-created structure)")
         except Exception as e:
             print(f"⚠️ DTM initialization deferred: {e}")
             self.template_manager = None
-        
+
         self.ensure_enhanced_folder_structure()
 
         # Brain GUI Integration (simplified)
@@ -941,7 +1008,7 @@ class BitcoinLoopingSystem:
         self.production_miners = {}  # {daemon_id: miner_instance}
         self.production_miner_processes = {}  # {daemon_id: process}
         self.production_miner_process = None  # Single process for compatibility
-        
+
         self.daemon_status = {}  # {daemon_id: status}
         self.daemon_last_heartbeat = {}  # {daemon_id: timestamp}
         self.daemon_unique_ids = {}  # {daemon_number: unique_uuid} - FIX: Track unique IDs
@@ -975,7 +1042,7 @@ class BitcoinLoopingSystem:
             'templates_processed': 0,
             'successful_submissions': 0,
             'zmq_mining_successes': 0,
-            'zmq_blocks_detected': 0
+            'zmq_blocks_detected': 0,
         }
 
     def get_temporary_template_dir(self):
@@ -994,7 +1061,7 @@ class BitcoinLoopingSystem:
         self.leading_zeros_history = []
         self.sustain_leading_zeros = True
         self.leading_zeros_threshold = 10  # Minimum leading zeros to sustain
-        
+
         # CRITICAL: Add missing attributes that cause crashes
         self.sandbox_mode = False  # Production mode default
         self.universe_scale_mining = True  # Enable universe-scale calculations
@@ -1009,7 +1076,7 @@ class BitcoinLoopingSystem:
             "hash_rate": 0,
             "last_update": None,
         }
-        
+
         # Confirmation monitor for tracking block confirmations
         self.confirmation_monitor = None
         self.confirmation_monitor_task = None
@@ -1075,7 +1142,7 @@ class BitcoinLoopingSystem:
 
         # Template Manager already initialized above (moved earlier in __init__)
         # self.template_manager created before ensure_enhanced_folder_structure()
-        
+
         # ZMQ NEW BLOCK MONITORING & DAILY LIMITS
         self.blocks_found_today = 0
         self.daily_block_limit = 144  # MAXIMUM 144 blocks per day regardless of flag
@@ -1117,8 +1184,18 @@ class BitcoinLoopingSystem:
         self.cross_day_miners = {}  # Track miners across day boundaries
 
         # Bitcoin node sync command (using bitcoin-cli with RPC credentials)
-        self.sync_check_cmd = ["/usr/local/bin/bitcoin-cli", "-rpcuser=SignalCoreBitcoin", "-rpcpassword=B1tc0n4L1dz", "getblockchaininfo"]
-        self.sync_tail_cmd = ["/usr/local/bin/bitcoin-cli", "-rpcuser=SignalCoreBitcoin", "-rpcpassword=B1tc0n4L1dz", "getbestblockhash"]
+        self.sync_check_cmd = [
+            "/usr/local/bin/bitcoin-cli",
+            "-rpcuser=SignalCoreBitcoin",
+            "-rpcpassword=B1tc0n4L1dz",
+            "getblockchaininfo",
+        ]
+        self.sync_tail_cmd = [
+            "/usr/local/bin/bitcoin-cli",
+            "-rpcuser=SignalCoreBitcoin",
+            "-rpcpassword=B1tc0n4L1dz",
+            "getbestblockhash",
+        ]
         self.bitcoin_cli_path = "/usr/local/bin/bitcoin-cli"  # Updated to correct path
 
         # AUTO-INITIALIZE ESSENTIAL FILES ON ANY SYSTEM CREATION
@@ -1143,19 +1220,19 @@ class BitcoinLoopingSystem:
         try:
             import multiprocessing
             import psutil
-            
+
             cpu_cores = multiprocessing.cpu_count()
             mem_gb = round(psutil.virtual_memory().total / (1024**3))
-            
+
             # Calculate maximum daemons this computer can handle
             # Conservative estimate: 1 daemon per 2 GB RAM, not exceeding CPU cores
             max_by_ram = max(1, mem_gb // 2)
             max_by_cpu = cpu_cores
             system_max_daemons = min(max_by_ram, max_by_cpu)
-            
+
             # Absolute max is 1000
             absolute_max = 1000
-            
+
             # Check if user requested more than system can handle
             if self.daemon_count > system_max_daemons:
                 print(f"\n⚠️  WARNING: You requested {self.daemon_count} daemons")
@@ -1163,22 +1240,22 @@ class BitcoinLoopingSystem:
                 print(f"⚠️  (Based on: {cpu_cores} CPU cores, {mem_gb} GB RAM)")
                 print(f"✅ Adjusting to maximum: {system_max_daemons} daemons\n")
                 self.daemon_count = system_max_daemons
-            
+
             # Check absolute max
             if self.daemon_count > absolute_max:
                 print(f"\n⚠️  WARNING: Requested {self.daemon_count} daemons exceeds absolute max of {absolute_max}")
                 print(f"✅ Adjusting to maximum: {absolute_max} daemons\n")
                 self.daemon_count = absolute_max
-            
+
             return {
                 "cpu_cores": cpu_cores,
                 "memory_gb": mem_gb,
                 "system_max_daemons": system_max_daemons,
                 "absolute_max_daemons": absolute_max,
                 "miner_processes": self.daemon_count,
-                "adjusted": True
+                "adjusted": True,
             }
-            
+
         except Exception as e:
             print(f"⚠️ Hardware detection failed: {e}")
             return {
@@ -1187,7 +1264,7 @@ class BitcoinLoopingSystem:
                 "system_max_daemons": 2,
                 "absolute_max_daemons": 1000,
                 "miner_processes": min(self.daemon_count, 2),
-                "adjusted": False
+                "adjusted": False,
             }
 
     def ensure_enhanced_folder_structure(self):
@@ -1202,23 +1279,24 @@ class BitcoinLoopingSystem:
                 self.mining_dir / "Temporary/Template",
                 self.mining_dir / "Temporary/User_Look_At",
             ]
-            
+
             for dir_path in enhanced_dirs:
                 dir_path.mkdir(parents=True, exist_ok=True)
-            
+
             # CRITICAL: Create all tracking files during initialization
             self.setup_organized_directories()
-                
+
         except Exception as e:
             print(f"⚠️ Specification-compliant folder structure warning: {e}")
-    
+
     def get_enhanced_submission_path(self, submission_type="final"):
         """Get specification-compliant submission path per System folders Root System.txt"""
         try:
             from datetime import datetime
+
             date_str = datetime.now().strftime("%Y-%m-%d")
             time_str = datetime.now().strftime("%H_%M_%S")
-            
+
             # SPECIFICATION COMPLIANCE: Use proper YYYY/MM/DD/HH hierarchy per architecture
             if submission_type == "final":
                 current_year = datetime.now().strftime("%Y")
@@ -1231,11 +1309,11 @@ class BitcoinLoopingSystem:
             elif submission_type == "coordination":
                 # Use Temporary Template for coordination files
                 temp_dir = self.mining_dir / "Temporary/Template"
-                temp_dir.mkdir(parents=True, exist_ok=True) 
+                temp_dir.mkdir(parents=True, exist_ok=True)
                 return temp_dir / f"looping_coordination_{time_str}.json"
             else:
                 return self.submission_dir / f"{submission_type}_{time_str}.json"
-                
+
         except Exception as e:
             print(f"⚠️ Specification-compliant path generation warning: {e}")
             # Fallback to legacy path
@@ -1254,12 +1332,12 @@ class BitcoinLoopingSystem:
         """Set production miner operation mode."""
         valid_modes = ["on_demand", "continuous", "persistent", "always_on", "sleeping"]
         valid_continuous_types = ["blocks", "day"]
-        
+
         if mode not in valid_modes:
             raise ValueError(f"Invalid miner operation mode: {mode}. Valid modes: {valid_modes}")
-        
+
         self.miner_operation_mode = mode
-        
+
         if mode == "continuous":
             if continuous_type not in valid_continuous_types:
                 raise ValueError(f"Invalid continuous type: {continuous_type}. Valid types: {valid_continuous_types}")
@@ -1267,7 +1345,7 @@ class BitcoinLoopingSystem:
             print(f"⚙️ Miner operation mode set to: {mode} ({continuous_type})")
         else:
             print(f"⚙️ Miner operation mode set to: {mode}")
-    
+
     def sleep_all_miners(self):
         """Put all active miners to sleep (suspend operations)"""
         print("😴 SLEEP MODE: Putting all miners to sleep...")
@@ -1276,7 +1354,7 @@ class BitcoinLoopingSystem:
         # Logic to pause/suspend active mining processes
         print("✅ All miners are now sleeping")
         return True
-        
+
     def wake_all_miners(self):
         """Wake up all sleeping miners (resume operations)"""
         print("⏰ WAKE MODE: Waking up all miners...")
@@ -1298,50 +1376,46 @@ class BitcoinLoopingSystem:
         """Emergency: Kill ALL production miner processes system-wide."""
         try:
             import psutil
+
             killed_count = 0
-            
+
             print("🚨 EMERGENCY KILL: Scanning for production miner processes...")
-            
+
             # Look for processes with mining-related names
-            mining_process_names = [
-                "production_bitcoin_miner",
-                "bitcoin_miner",
-                "singularity_miner",
-                "daemon_miner"
-            ]
-            
+            mining_process_names = ["production_bitcoin_miner", "bitcoin_miner", "singularity_miner", "daemon_miner"]
+
             for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
                 try:
                     proc_info = proc.info
                     proc_name = proc_info['name'].lower() if proc_info['name'] else ""
                     cmdline = ' '.join(proc_info['cmdline']).lower() if proc_info['cmdline'] else ""
-                    
+
                     # Check if process matches mining patterns
                     is_mining_process = False
                     for mining_name in mining_process_names:
                         if mining_name in proc_name or mining_name in cmdline:
                             is_mining_process = True
                             break
-                    
+
                     # Also check for python processes running production miner
                     if "python" in proc_name and "production" in cmdline and "miner" in cmdline:
                         is_mining_process = True
-                    
+
                     if is_mining_process:
                         print(f"🔫 Killing process {proc_info['pid']}: {proc_name}")
                         proc.terminate()
                         killed_count += 1
-                        
+
                         # Wait a bit, then force kill if still running
                         try:
                             proc.wait(timeout=3)
                         except psutil.TimeoutExpired:
                             proc.kill()
                             print(f"💀 Force killed process {proc_info['pid']}")
-                        
+
                 except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
                     continue
-            
+
             # Also clean up our own tracked processes
             for daemon_id in list(self.production_miner_processes.keys()):
                 if self.production_miner_processes[daemon_id]:
@@ -1352,18 +1426,18 @@ class BitcoinLoopingSystem:
                         # Process already dead or invalid
                         pass
                     self.production_miner_processes[daemon_id] = None
-            
+
             print(f"✅ Emergency kill complete: {killed_count} processes terminated")
             return killed_count
-            
+
         except ImportError:
             print("⚠️ psutil not available, using basic kill method...")
             # Fallback method using os commands
             import subprocess
+
             try:
                 result = subprocess.run(
-                    ["pkill", "-f", "production.*miner"], 
-                    capture_output=True, text=True, timeout=30
+                    ["pkill", "-f", "production.*miner"], capture_output=True, text=True, timeout=30
                 )
                 print("✅ Basic kill command executed")
                 return 1  # Approximate
@@ -1378,64 +1452,68 @@ class BitcoinLoopingSystem:
         """List all running production miner processes."""
         try:
             import psutil
+
             found_processes = []
-            
+
             print("🔍 Scanning for production miner processes...")
-            
-            mining_process_names = [
-                "production_bitcoin_miner",
-                "bitcoin_miner", 
-                "singularity_miner",
-                "daemon_miner"
-            ]
-            
+
+            mining_process_names = ["production_bitcoin_miner", "bitcoin_miner", "singularity_miner", "daemon_miner"]
+
             for proc in psutil.process_iter(['pid', 'name', 'cmdline', 'status', 'cpu_percent', 'memory_percent']):
                 try:
                     proc_info = proc.info
                     proc_name = proc_info['name'].lower() if proc_info['name'] else ""
                     cmdline = ' '.join(proc_info['cmdline']).lower() if proc_info['cmdline'] else ""
-                    
+
                     # Check if process matches mining patterns
                     is_mining_process = False
                     for mining_name in mining_process_names:
                         if mining_name in proc_name or mining_name in cmdline:
                             is_mining_process = True
                             break
-                    
+
                     if "python" in proc_name and "production" in cmdline and "miner" in cmdline:
                         is_mining_process = True
-                    
+
                     if is_mining_process:
-                        found_processes.append({
-                            'pid': proc_info['pid'],
-                            'name': proc_info['name'],
-                            'status': proc_info['status'],
-                            'cpu': proc_info['cpu_percent'],
-                            'memory': proc_info['memory_percent'],
-                            'cmdline': ' '.join(proc_info['cmdline'])[:100] + '...' if len(' '.join(proc_info['cmdline'])) > 100 else ' '.join(proc_info['cmdline'])
-                        })
-                        
+                        found_processes.append(
+                            {
+                                'pid': proc_info['pid'],
+                                'name': proc_info['name'],
+                                'status': proc_info['status'],
+                                'cpu': proc_info['cpu_percent'],
+                                'memory': proc_info['memory_percent'],
+                                'cmdline': (
+                                    ' '.join(proc_info['cmdline'])[:100] + '...'
+                                    if len(' '.join(proc_info['cmdline'])) > 100
+                                    else ' '.join(proc_info['cmdline'])
+                                ),
+                            }
+                        )
+
                 except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
                     continue
-            
+
             if found_processes:
                 print(f"\n📋 Found {len(found_processes)} production miner processes:")
                 print("-" * 100)
                 print(f"{'PID':>8} {'NAME':>20} {'STATUS':>12} {'CPU%':>8} {'MEM%':>8} {'COMMAND':<50}")
                 print("-" * 100)
-                
+
                 for proc in found_processes:
-                    print(f"{proc['pid']:>8} {proc['name']:>20} {proc['status']:>12} {proc['cpu']:>7.1f}% {proc['memory']:>7.1f}% {proc['cmdline']:<50}")
+                    print(
+                        f"{proc['pid']:>8} {proc['name']:>20} {proc['status']:>12} {proc['cpu']:>7.1f}% {proc['memory']:>7.1f}% {proc['cmdline']:<50}"
+                    )
             else:
                 print("✅ No production miner processes found")
-                
+
         except ImportError:
             print("⚠️ psutil not available, using basic process listing...")
             import subprocess
+
             try:
                 result = subprocess.run(
-                    ["pgrep", "-af", "production.*miner"],
-                    capture_output=True, text=True, timeout=30
+                    ["pgrep", "-af", "production.*miner"], capture_output=True, text=True, timeout=30
                 )
                 if result.stdout.strip():
                     print("📋 Found processes:")
@@ -1451,21 +1529,21 @@ class BitcoinLoopingSystem:
         """Show detailed status of all miners."""
         print("📊 DETAILED MINER STATUS REPORT")
         print("=" * 60)
-        
-        print(f"🔧 Configuration:")
+
+        print("🔧 Configuration:")
         print(f"   Daemon count: {self.daemon_count}")
         print(f"   Terminal mode: {self.terminal_mode}")
         print(f"   Operation mode: {self.miner_operation_mode}")
         print(f"   Day boundary mode: {self.day_boundary_mode}")
         print()
-        
-        print(f"📈 Performance Stats:")
+
+        print("📈 Performance Stats:")
         print(f"   Blocks found today: {self.blocks_found_today}/{self.daily_block_limit}")
         print(f"   ZMQ blocks detected: {self.performance_stats.get('zmq_blocks_detected', 0)}")
         print(f"   Successful submissions: {self.performance_stats.get('successful_submissions', 0)}")
         print()
-        
-        print(f"⚙️ Daemon Status:")
+
+        print("⚙️ Daemon Status:")
         for daemon_number in range(1, self.daemon_count + 1):
             # Get unique daemon ID for this daemon number
             unique_daemon_id = self.daemon_unique_ids.get(daemon_number, f"daemon_{daemon_number}_missing")
@@ -1473,9 +1551,9 @@ class BitcoinLoopingSystem:
             process = self.production_miner_processes.get(unique_daemon_id)
             process_status = "running" if process and process.poll() is None else "stopped"
             print(f"   Daemon {daemon_number} ({unique_daemon_id[:16]}...): {status} (process: {process_status})")
-        
+
         # List actual running processes
-        print(f"\n🔍 System Process Check:")
+        print("\n🔍 System Process Check:")
         self.list_all_miner_processes()
 
     def _auto_setup_dependencies(self):
@@ -1516,9 +1594,7 @@ class BitcoinLoopingSystem:
                 if os.path.exists(conf_path):
                     print(f"🔍 Checking {conf_path}...")
                     # Force update
-                    success = self.update_bitcoin_conf_credentials(
-                        conf_path, config_data
-                    )
+                    success = self.update_bitcoin_conf_credentials(conf_path, config_data)
                     if success:
                         conf_updated = True
                         break
@@ -1527,9 +1603,7 @@ class BitcoinLoopingSystem:
             if not conf_updated:
                 default_path = os.path.expanduser("~/.bitcoin/bitcoin.conf")
                 print(f"📁 Creating bitcoin.conf at default location: {default_path}")
-                success = self.update_bitcoin_conf_credentials(
-                    default_path, config_data
-                )
+                success = self.update_bitcoin_conf_credentials(default_path, config_data)
                 if success:
                     print("✅ bitcoin.conf created successfully!")
                     print("⚠️ IMPORTANT: Restart bitcoind for changes to take effect!")
@@ -1554,10 +1628,7 @@ class BitcoinLoopingSystem:
 
                 # Try to install ZMQ
                 result = subprocess.run(
-                    [sys.executable, "-m", "pip", "install", "pyzmq"],
-                    capture_output=True,
-                    text=True,
-                    timeout=60
+                    [sys.executable, "-m", "pip", "install", "pyzmq"], capture_output=True, text=True, timeout=60
                 )
 
                 if result.returncode == 0:
@@ -1577,9 +1648,7 @@ class BitcoinLoopingSystem:
             config_data = self.load_config_from_file()
 
             # ALWAYS ensure bitcoin.conf is properly configured
-            print(
-                "🔧 Ensuring bitcoin.conf has correct credentials from config.json..."
-            )
+            print("🔧 Ensuring bitcoin.conf has correct credentials from config.json...")
 
             # Try multiple common bitcoin.conf locations
             bitcoin_conf_paths = [
@@ -1611,17 +1680,11 @@ class BitcoinLoopingSystem:
 
             # Legacy auto_configure check (now optional)
             if not config_data.get("bitcoin_node", {}).get("auto_configure", False):
-                print(
-                    "ℹ️ Note: auto_configure disabled in config, but bitcoin.conf was updated anyway"
-                )
+                print("ℹ️ Note: auto_configure disabled in config, but bitcoin.conf was updated anyway")
                 return
 
-            bitcoin_conf_path = config_data.get("bitcoin_node", {}).get(
-                "conf_file_path", "bitcoin.conf"
-            )
-            required_settings = config_data.get("bitcoin_node", {}).get(
-                "required_settings", {}
-            )
+            bitcoin_conf_path = config_data.get("bitcoin_node", {}).get("conf_file_path", "bitcoin.conf")
+            required_settings = config_data.get("bitcoin_node", {}).get("required_settings", {})
 
             print(f"🔧 Additional bitcoin.conf validation for {bitcoin_conf_path}...")
 
@@ -1640,9 +1703,7 @@ class BitcoinLoopingSystem:
 
             # Write updated bitcoin.conf
             with open(bitcoin_conf_path, "w") as f:
-                f.write(
-                    "# Bitcoin Core Configuration - Auto-generated by Singularity Dave Looping System\n"
-                )
+                f.write("# Bitcoin Core Configuration - Auto-generated by Singularity Dave Looping System\n")
                 f.write(f"# Generated on: {datetime.now().isoformat()}\n\n")
 
                 f.write("# RPC Settings\n")
@@ -1732,22 +1793,22 @@ class BitcoinLoopingSystem:
         try:
             # Use the Brain.QTL data that's already loaded in the looping system
             # The same values that production miner uses
-            universe_bitload = 208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909
+            universe_bitload = get_bitload()
             knuth_levels = 80  # Base Knuth levels
             knuth_iterations = 156912  # Base Knuth iterations
             collective_levels = 841  # Combined base + modifiers from Brain.QTL
             collective_iterations = 3138240  # Combined iterations from Brain.QTL
-            
+
             # Calculate base universe operations (same logic as production miner)
             knuth_base_universe = universe_bitload * collective_levels * collective_iterations
-            
+
             # Calculate category operations with proper modifier scaling
-            entropy_operations = knuth_base_universe * 2    # Entropy modifier (families)
+            entropy_operations = knuth_base_universe * 2  # Entropy modifier (families)
             decryption_operations = knuth_base_universe * 4  # Decryption modifier (lanes)
             near_solution_operations = knuth_base_universe * 8  # Near-solution modifier (strides)
             math_problems_operations = knuth_base_universe * 32  # Math-problems modifier (palette)
             math_paradoxes_operations = knuth_base_universe * 16  # Math-paradoxes modifier (sandbox)
-            
+
             # Generate proper Knuth notation with scaling
             scaling_factor = 10**70  # Same scaling as production miner
             entropy_knuth = f"Knuth-Sorrellian-Class({universe_bitload}, {knuth_levels + entropy_operations // scaling_factor}, {knuth_iterations})"
@@ -1755,11 +1816,17 @@ class BitcoinLoopingSystem:
             near_solution_knuth = f"Knuth-Sorrellian-Class({universe_bitload}, {knuth_levels + near_solution_operations // scaling_factor}, {knuth_iterations})"
             math_problems_knuth = f"Knuth-Sorrellian-Class({universe_bitload}, {knuth_levels + math_problems_operations // scaling_factor}, {knuth_iterations})"
             math_paradoxes_knuth = f"Knuth-Sorrellian-Class({universe_bitload}, {knuth_levels + math_paradoxes_operations // scaling_factor}, {knuth_iterations})"
-            
+
             # Calculate collective power
-            total_operations = entropy_operations + decryption_operations + near_solution_operations + math_problems_operations + math_paradoxes_operations
+            total_operations = (
+                entropy_operations
+                + decryption_operations
+                + near_solution_operations
+                + math_problems_operations
+                + math_paradoxes_operations
+            )
             collective_knuth = f"Knuth-Sorrellian-Class({universe_bitload}, {collective_levels + total_operations // (scaling_factor * 10)}, {collective_iterations})"
-            
+
             # Create comprehensive display matching production miner format
             display = f"""💥 MATHEMATICAL POWERHOUSE WITH COMPLETE 5×UNIVERSE-SCALE OPERATIONS:
    🌀 Entropy Operations: {entropy_knuth}
@@ -1770,9 +1837,9 @@ class BitcoinLoopingSystem:
    🌌 Collective Concurrent Power: {collective_knuth}
    🚀 Galaxy Formula: ({universe_bitload})^5 COMBINED POWER
    ✅ ALL 5 CATEGORIES PROCESSING CONCURRENTLY"""
-            
+
             return display
-            
+
         except Exception as e:
             # Fallback to improved display if calculation fails
             return f"💥 With Brain.QTL 5×Universe-Scale Framework: Entropy + Decryption + Near-Solution + Math-Problems + Math-Paradoxes Operations! (Calculation error: {e})"
@@ -1788,36 +1855,36 @@ class BitcoinLoopingSystem:
         Generate random mining times based on Bitcoin's 144 blocks per day schedule.
         Picks N random blocks from the 144 blocks that occur throughout the day.
         Each block occurs approximately every 10 minutes (600 seconds).
-        
+
         Args:
             num_blocks (int): Number of random blocks to mine (e.g., 2 random blocks)
-            
+
         Returns:
             list: List of datetime objects representing when to mine each selected block
         """
         import random
         from datetime import datetime, timedelta
-        
+
         print(f"🎲 Selecting {num_blocks} random blocks from Bitcoin's 144 daily blocks...")
-        
+
         # Bitcoin produces ~144 blocks per day (one every ~10 minutes)
         blocks_per_day = 144
         seconds_per_block = (24 * 60 * 60) / blocks_per_day  # 600 seconds = 10 minutes
-        
+
         # Get current time
         now = datetime.now()
         start_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
-        
+
         # Calculate which block we're currently on (0-143)
         seconds_since_midnight = (now - start_of_day).total_seconds()
         current_block_number = int(seconds_since_midnight / seconds_per_block)
-        
+
         # Available blocks are from current block to end of day (143)
         available_blocks = list(range(current_block_number + 1, blocks_per_day))
-        
+
         if len(available_blocks) < num_blocks:
             print(f"⚠️ Only {len(available_blocks)} blocks remaining today")
-            print(f"   Scheduling remaining blocks for today + tomorrow")
+            print("   Scheduling remaining blocks for today + tomorrow")
             # Use all remaining today
             selected_blocks = available_blocks
             # Add blocks from tomorrow to reach requested amount
@@ -1828,12 +1895,12 @@ class BitcoinLoopingSystem:
             # Randomly select N blocks from available blocks
             selected_blocks = random.sample(available_blocks, num_blocks)
             selected_blocks.sort()
-        
+
         print(f"   📊 Bitcoin blocks per day: {blocks_per_day}")
         print(f"   ⏰ Current block number: {current_block_number} of {blocks_per_day}")
         print(f"   🎲 Available blocks: {len(available_blocks)}")
         print(f"   ✅ Selected {len(selected_blocks)} random blocks")
-        
+
         # Convert block numbers to datetime objects
         mining_times = []
         for block_num in selected_blocks:
@@ -1845,58 +1912,60 @@ class BitcoinLoopingSystem:
             else:
                 # Today's block
                 block_time = start_of_day + timedelta(seconds=block_num * seconds_per_block)
-            
+
             # Make sure it's in the future
             if block_time < now:
                 block_time = now + timedelta(minutes=10)
-            
+
             mining_times.append(block_time)
-        
+
         print("🕐 Random Bitcoin block schedule:")
         for i, mining_time in enumerate(mining_times, 1):
             time_str = mining_time.strftime("%H:%M:%S")
             hours_from_now = (mining_time - now).total_seconds() / 3600
-            block_num = selected_blocks[i-1] % blocks_per_day
+            block_num = selected_blocks[i - 1] % blocks_per_day
             print(f"   Block #{block_num}: {time_str} ({hours_from_now:.1f} hours from now)")
-        
+
         return mining_times
 
     def should_mine_now_random_schedule(self, mining_times, tolerance_seconds=30):
         """
         Check if current time matches any of the scheduled random mining times.
         Also handles pre-waking miners 5 minutes before scheduled time.
-        
+
         Args:
             mining_times (list): List of datetime objects for scheduled mining
             tolerance_seconds (int): How many seconds before/after scheduled time to mine
-            
+
         Returns:
             tuple: (should_mine_now, next_mining_time, time_until_next, should_wake_miners)
         """
-        from datetime import datetime, timedelta
-        
+        from datetime import datetime
+
         now = datetime.now()
-        
+
         # Check if we're within tolerance of any scheduled mining time
         for mining_time in mining_times:
             time_diff = abs((now - mining_time).total_seconds())
             if time_diff <= tolerance_seconds:
-                print(f"🎯 RANDOM MINING TIME TRIGGERED! Scheduled: {mining_time.strftime('%H:%M:%S')}, Current: {now.strftime('%H:%M:%S')}")
+                print(
+                    f"🎯 RANDOM MINING TIME TRIGGERED! Scheduled: {mining_time.strftime('%H:%M:%S')}, Current: {now.strftime('%H:%M:%S')}"
+                )
                 # Remove this time from the schedule since we're mining now
                 mining_times.remove(mining_time)
                 return True, mining_times[0] if mining_times else None, None, False
-        
+
         # Find next scheduled time
         future_times = [t for t in mining_times if t > now]
         if future_times:
             next_time = min(future_times)
             time_until_next = (next_time - now).total_seconds()
-            
+
             # Check if we should pre-wake miners (5 minutes = 300 seconds before)
             should_wake_miners = 270 <= time_until_next <= 330  # 4.5 to 5.5 minutes
             if should_wake_miners:
                 print(f"⏰ PRE-WAKE: Starting miners 5 minutes before scheduled time {next_time.strftime('%H:%M:%S')}")
-            
+
             return False, next_time, time_until_next, should_wake_miners
         else:
             return False, None, None, False
@@ -1906,7 +1975,7 @@ class BitcoinLoopingSystem:
         try:
             # Ensure the directory exists
             self.temporary_template_dir.mkdir(parents=True, exist_ok=True)
-            
+
             # Clean up temporary files when new template arrives
             self.cleanup_temporary_files_on_new_template()
 
@@ -1969,15 +2038,15 @@ class BitcoinLoopingSystem:
                 temp_dir = Path("Test/Demo/Mining/Temporary Template")
             else:
                 temp_dir = Path("Mining/Temporary Template")
-            
+
             # Distribute to each process folder (Brain creates folders, Looping uses them)
             for daemon_id in range(1, self.daemon_count + 1):
                 process_folder = temp_dir / f"process_{daemon_id}"
                 # Brain should have created this folder already
-                
+
                 # Create working template file for this process
                 template_file = process_folder / "working_template.json"
-                
+
                 # Add daemon-specific metadata
                 daemon_template = {
                     "daemon_id": daemon_id,
@@ -1986,18 +2055,18 @@ class BitcoinLoopingSystem:
                     "datetime_str": datetime.now().isoformat(),
                     "template": template_data,
                     "status": "ready_for_processing",
-                    "distributed_by": "looping_system"
+                    "distributed_by": "looping_system",
                 }
-                
+
                 with open(template_file, "w") as f:
                     json.dump(daemon_template, f, indent=2)
-                
+
                 print(f"   📤 Template sent to daemon {daemon_id}: {template_file}")
                 success_count += 1
-            
+
             print(f"✅ Template distributed to {success_count}/{self.daemon_count} daemons")
             return success_count == self.daemon_count
-            
+
         except Exception as e:
             print(f"❌ Failed to distribute template to daemons: {e}")
             return False
@@ -2008,7 +2077,7 @@ class BitcoinLoopingSystem:
             # Use hardware-detected count instead of daemon_count
             actual_miner_count = self.hardware_config.get('miner_processes', self.daemon_count)
             # Folders already created in start_production_miner_with_mode()
-            
+
             # Create base temporary template directory based on mode
             if self.demo_mode:
                 temp_dir = Path("Test/Demo/Mining/Temporary Template")
@@ -2017,13 +2086,13 @@ class BitcoinLoopingSystem:
             else:
                 temp_dir = Path("Mining/Temporary Template")
             temp_dir.mkdir(parents=True, exist_ok=True)
-            
+
             # Create process-specific folders (align with DTM naming convention)
             for daemon_id in range(1, actual_miner_count + 1):
                 process_folder = temp_dir / f"process_{daemon_id}"
                 process_folder.mkdir(parents=True, exist_ok=True)
                 print(f"   ✅ Created: {process_folder}")
-            
+
             # Save daemon status file for Template Manager detection - Component-based location
             status_dir = Path("Mining/System/System_Logs/Miners/Global/Daemons")
             status_dir.mkdir(parents=True, exist_ok=True)
@@ -2033,15 +2102,15 @@ class BitcoinLoopingSystem:
                 'hardware_detected': True,
                 'cpu_cores': self.hardware_config.get('cpu_cores', 1),
                 'created_at': datetime.now().isoformat(),
-                'status': 'active'
+                'status': 'active',
             }
-            
+
             with open(status_file, 'w') as f:
                 json.dump(status_data, f, indent=2)
-            
+
             print(f"✅ Dynamic daemon structure created for {actual_miner_count} miners")
             return True
-            
+
         except Exception as e:
             print(f"❌ Failed to create daemon folders: {e}")
             return False
@@ -2112,11 +2181,7 @@ class BitcoinLoopingSystem:
 
             print("\n🔧 Component Status:")
             for component, status in self.pipeline_status["component_status"].items():
-                icon = (
-                    "✅"
-                    if status == "working"
-                    else "❌" if status == "failed" else "⏳"
-                )
+                icon = "✅" if status == "working" else "❌" if status == "failed" else "⏳"
                 print(
                     f"   {icon} {
                         component.replace(
@@ -2127,11 +2192,7 @@ class BitcoinLoopingSystem:
             # DUAL PIPELINE STATUS
             print("\n🔄 LOOPING PIPELINE (Template Fetching):")
             looping = self.pipeline_status["looping_pipeline"]
-            looping_icon = (
-                "🟢"
-                if looping["status"] == "active"
-                else "🔴" if looping["status"] == "failed" else "⚪"
-            )
+            looping_icon = "🟢" if looping["status"] == "active" else "🔴" if looping["status"] == "failed" else "⚪"
             print(f"   {looping_icon} Status: {looping['status']}")
             print(
                 f"   📋 Templates Processed: {
@@ -2140,16 +2201,12 @@ class BitcoinLoopingSystem:
             if looping["last_template_fetch"]:
                 print(f"   ⏰ Last Template: {looping['last_template_fetch']}")
             if looping["errors"]:
-                print(
-                    f"   ❌ Errors: {len(looping['errors'])} (latest: {looping['errors'][-1][:30]}...)"
-                )
+                print(f"   ❌ Errors: {len(looping['errors'])} (latest: {looping['errors'][-1][:30]}...)")
 
             print("\n⚡ PRODUCTION PIPELINE (Mining & Submission):")
             production = self.pipeline_status["production_pipeline"]
             production_icon = (
-                "🟢"
-                if production["status"] == "active"
-                else "🔴" if production["status"] == "failed" else "⚪"
+                "🟢" if production["status"] == "active" else "🔴" if production["status"] == "failed" else "⚪"
             )
             print(f"   {production_icon} Status: {production['status']}")
             print(f"   ⛏️ Blocks Attempted: {production['blocks_attempted']}")
@@ -2160,39 +2217,29 @@ class BitcoinLoopingSystem:
                         production['last_mining_start']}"
                 )
             if production["errors"]:
-                print(
-                    f"   ❌ Errors: {len(production['errors'])} (latest: {production['errors'][-1][:30]}...)"
-                )
+                print(f"   ❌ Errors: {len(production['errors'])} (latest: {production['errors'][-1][:30]}...)")
 
             if self.pipeline_status["errors"]:
-                print(
-                    f"\n🚨 Recent System Errors ({len(self.pipeline_status['errors'])} total):"
-                )
+                print(f"\n🚨 Recent System Errors ({len(self.pipeline_status['errors'])} total):")
                 # Show last 3 errors
                 for error in self.pipeline_status["errors"][-3:]:
                     print(f"   ❌ {error['component']}: {error['error'][:50]}...")
             print("=" * 80)
 
-    def update_looping_pipeline_status(
-        self, status: str, templates_processed: int = None, error: str = None
-    ):
+    def update_looping_pipeline_status(self, status: str, templates_processed: int = None, error: str = None):
         """Update looping pipeline (template fetching) status."""
         self.pipeline_status["looping_pipeline"]["status"] = status
         if templates_processed is not None:
-            self.pipeline_status["looping_pipeline"][
-                "templates_processed"
-            ] = templates_processed
+            self.pipeline_status["looping_pipeline"]["templates_processed"] = templates_processed
         if status == "active":
-            self.pipeline_status["looping_pipeline"][
-                "last_template_fetch"
-            ] = datetime.now().strftime("%H:%M:%S")
+            self.pipeline_status["looping_pipeline"]["last_template_fetch"] = datetime.now().strftime("%H:%M:%S")
         if error:
             self.pipeline_status["looping_pipeline"]["errors"].append(error)
             # Keep only last 5 errors
             if len(self.pipeline_status["looping_pipeline"]["errors"]) > 5:
-                self.pipeline_status["looping_pipeline"]["errors"] = (
-                    self.pipeline_status["looping_pipeline"]["errors"][-5:]
-                )
+                self.pipeline_status["looping_pipeline"]["errors"] = self.pipeline_status["looping_pipeline"]["errors"][
+                    -5:
+                ]
 
     def update_production_pipeline_status(
         self,
@@ -2204,24 +2251,18 @@ class BitcoinLoopingSystem:
         """Update production pipeline (mining & submission) status."""
         self.pipeline_status["production_pipeline"]["status"] = status
         if blocks_attempted is not None:
-            self.pipeline_status["production_pipeline"][
-                "blocks_attempted"
-            ] = blocks_attempted
+            self.pipeline_status["production_pipeline"]["blocks_attempted"] = blocks_attempted
         if submissions_sent is not None:
-            self.pipeline_status["production_pipeline"][
-                "submissions_sent"
-            ] = submissions_sent
+            self.pipeline_status["production_pipeline"]["submissions_sent"] = submissions_sent
         if status == "active":
-            self.pipeline_status["production_pipeline"][
-                "last_mining_start"
-            ] = datetime.now().strftime("%H:%M:%S")
+            self.pipeline_status["production_pipeline"]["last_mining_start"] = datetime.now().strftime("%H:%M:%S")
         if error:
             self.pipeline_status["production_pipeline"]["errors"].append(error)
             # Keep only last 5 errors
             if len(self.pipeline_status["production_pipeline"]["errors"]) > 5:
-                self.pipeline_status["production_pipeline"]["errors"] = (
-                    self.pipeline_status["production_pipeline"]["errors"][-5:]
-                )
+                self.pipeline_status["production_pipeline"]["errors"] = self.pipeline_status["production_pipeline"][
+                    "errors"
+                ][-5:]
 
     def track_submission(self, success: bool, details: str = None, network_response: dict = None):
         """Track block submission with full details including network response."""
@@ -2232,65 +2273,60 @@ class BitcoinLoopingSystem:
             self.pipeline_status["successful_submissions"] += 1
             self.pipeline_status["last_submission_result"] = "SUCCESS"
             # Update production pipeline
-            current_submissions = self.pipeline_status["production_pipeline"][
-                "submissions_sent"
-            ]
-            self.update_production_pipeline_status(
-                "active", submissions_sent=current_submissions + 1
-            )
+            current_submissions = self.pipeline_status["production_pipeline"]["submissions_sent"]
+            self.update_production_pipeline_status("active", submissions_sent=current_submissions + 1)
             logger.info(f"✅ Block submission SUCCESS at {now}: {details}")
         else:
             self.pipeline_status["failed_submissions"] += 1
             self.pipeline_status["last_submission_result"] = "FAILED"
             # Update production pipeline with error
-            self.update_production_pipeline_status(
-                "failed", error=f"Submission failed: {details}"
-            )
+            self.update_production_pipeline_status("failed", error=f"Submission failed: {details}")
             logger.error(f"❌ Block submission FAILED at {now}: {details}")
 
         # NEW: Write network_response to submission tracking
         if network_response:
             self._write_submission_tracking(success, details, network_response)
-        
+
         # Display updated status
         self.display_pipeline_status()
-    
+
     def _write_submission_tracking(self, success: bool, details: str, network_response: dict):
         """Write submission tracking with network response and update ledger."""
         try:
             from datetime import datetime, timezone
-            import json
-            
+
             submission_timestamp = datetime.now(timezone.utc).isoformat()
-            submission_id = f"sub_{submission_timestamp.replace(':', '').replace('-', '').replace('.', '_').replace('+', '_')}"
-            
+            submission_id = (
+                f"sub_{submission_timestamp.replace(':', '').replace('-', '').replace('.', '_').replace('+', '_')}"
+            )
+
             # Update global submission tracking
             self.update_global_submission(
                 success=success,
                 details=details,
                 network_response=network_response,
                 submission_timestamp=submission_timestamp,
-                submission_id=submission_id
+                submission_id=submission_id,
             )
-            
+
             # Update ledger to mark as submitted
             self._update_ledger_submission_status(submission_timestamp, submission_id)
-            
+
         except Exception as e:
             logger.error(f"❌ Failed to write submission tracking: {e}")
-    
+
     def _update_ledger_submission_status(self, submission_timestamp: str, submission_id: str):
         """Update ledger entry to mark solution as submitted."""
         try:
             from pathlib import Path
             import json
-            
+
             # Update global ledger
             ledger_path = Path("Mining/Ledgers/global_ledger.json")
             if ledger_path.exists():
                 with open(ledger_path, 'r') as f:
                     ledger_data = json.load(f)
-                
+
                 # Find most recent entry and update it
                 if ledger_data.get("entries"):
                     latest_entry = ledger_data["entries"][-1]
@@ -2298,13 +2334,13 @@ class BitcoinLoopingSystem:
                     latest_entry["submission_timestamp"] = submission_timestamp
                     if "references" in latest_entry:
                         latest_entry["references"]["submission_tracking"] = submission_id
-                    
+
                     # Write updated ledger
                     with open(ledger_path, 'w') as f:
                         json.dump(ledger_data, f, indent=2)
-                    
-                    logger.info(f"✅ Updated ledger with submission status")
-                    
+
+                    logger.info("✅ Updated ledger with submission status")
+
         except Exception as e:
             logger.error(f"❌ Failed to update ledger submission status: {e}")
 
@@ -2312,24 +2348,24 @@ class BitcoinLoopingSystem:
         """Clean up temporary files when a new template arrives - ledger files are preserved."""
         try:
             logger.info("🧹 Cleaning up temporary files for new template...")
-            
+
             # Define patterns of temporary files to clean up
             cleanup_patterns = [
-                "daemon_*/temp_*",           # Daemon temporary files
-                "daemon_*/solution_*",       # Old solution files
-                "daemon_*/status_*",         # Old status files  
-                "daemon_*/mining_state_*",   # Temporary mining state
-                "temp_*",                    # General temp files
-                "*.tmp",                     # Temporary files
-                "solution_*",                # Solution files
-                "status_*",                  # Status files
-                "mining_state_*",            # Mining state files
-                "mining_cache_*",            # Mining cache files
-                "nonce_cache_*",             # Nonce cache files
-                "*_temp.json",               # Temporary JSON files
-                "*_cache.json",              # Cache JSON files
+                "daemon_*/temp_*",  # Daemon temporary files
+                "daemon_*/solution_*",  # Old solution files
+                "daemon_*/status_*",  # Old status files
+                "daemon_*/mining_state_*",  # Temporary mining state
+                "temp_*",  # General temp files
+                "*.tmp",  # Temporary files
+                "solution_*",  # Solution files
+                "status_*",  # Status files
+                "mining_state_*",  # Mining state files
+                "mining_cache_*",  # Mining cache files
+                "nonce_cache_*",  # Nonce cache files
+                "*_temp.json",  # Temporary JSON files
+                "*_cache.json",  # Cache JSON files
             ]
-            
+
             # Directories to clean
             cleanup_dirs = [
                 self.temporary_template_dir,
@@ -2339,17 +2375,18 @@ class BitcoinLoopingSystem:
                 Path("/tmp/mining_templates"),
                 Path("."),  # Current working directory (workspace root)
             ]
-            
+
             cleaned_count = 0
-            
+
             for cleanup_dir in cleanup_dirs:
                 if cleanup_dir.exists():
                     for pattern in cleanup_patterns:
                         # Use glob to find matching files
                         import glob
+
                         pattern_path = cleanup_dir / pattern
                         matching_files = glob.glob(str(pattern_path))
-                        
+
                         for file_path in matching_files:
                             try:
                                 file_obj = Path(file_path)
@@ -2359,11 +2396,12 @@ class BitcoinLoopingSystem:
                                 elif file_obj.is_dir() and file_obj.name.startswith(('temp_', 'cache_')):
                                     # Only remove temporary directories, not daemon directories
                                     import shutil
+
                                     shutil.rmtree(file_obj)
                                     cleaned_count += 1
                             except Exception as e:
                                 logger.warning(f"⚠️ Could not clean {file_path}: {e}")
-            
+
             # Clean daemon folders of temporary files only (preserve ledger files)
             daemon_base_dir = self.get_temporary_template_dir()
             if daemon_base_dir.exists():
@@ -2376,40 +2414,39 @@ class BitcoinLoopingSystem:
                                 cleaned_count += 1
                             except Exception as e:
                                 logger.warning(f"⚠️ Could not clean {temp_file}: {e}")
-            
+
             if cleaned_count > 0:
                 logger.info(f"✅ Cleaned {cleaned_count} temporary files for new template")
             else:
                 logger.info("✅ No temporary files needed cleaning")
-                
+
         except Exception as e:
             logger.warning(f"⚠️ Template cleanup failed (non-critical): {e}")
 
-    def save_template_to_temporary_folder(
-        self, template_data: dict, template_source: str = "bitcoin_core"
-    ):
+    def save_template_to_temporary_folder(self, template_data: dict, template_source: str = "bitcoin_core"):
         """Save template to centralized Temporary Template folder with GPS enhancement for all components to access."""
         try:
             # Ensure the Temporary Template directory exists
             self.temporary_template_dir.mkdir(parents=True, exist_ok=True)
-            
+
             # Clean up temporary files when new template arrives
             self.cleanup_temporary_files_on_new_template()
 
             # Main template file that all components will read
-            current_template_file = (
-                self.temporary_template_dir / "current_template.json"
-            )
+            current_template_file = self.temporary_template_dir / "current_template.json"
 
             # Process template through DTM to add GPS enhancement
             # Extract the actual Bitcoin template if it's nested
             bitcoin_template = template_data
             if "template" in template_data and isinstance(template_data["template"], dict):
                 bitcoin_template = template_data["template"]
-            
+
             try:
                 from dynamic_template_manager import GPSEnhancedDynamicTemplateManager
-                dtm = GPSEnhancedDynamicTemplateManager(demo_mode=False, verbose=False, auto_initialize=False, create_directories=False)
+
+                dtm = GPSEnhancedDynamicTemplateManager(
+                    demo_mode=False, verbose=False, auto_initialize=False, create_directories=False
+                )
                 processed = dtm.process_mining_template(bitcoin_template)
                 gps_enhancement = processed.get("gps_enhancement", {})
                 consensus = processed.get("consensus", {})
@@ -2438,25 +2475,17 @@ class BitcoinLoopingSystem:
             with open(current_template_file, "w") as f:
                 json.dump(enhanced_template, f, indent=2)
 
-            logger.info(
-                f"✅ Template saved to centralized location: {current_template_file}"
-            )
+            logger.info(f"✅ Template saved to centralized location: {current_template_file}")
 
             # Update pipeline status
-            current_count = self.pipeline_status["looping_pipeline"][
-                "templates_processed"
-            ]
+            current_count = self.pipeline_status["looping_pipeline"]["templates_processed"]
             self.update_looping_pipeline_status("active", current_count + 1)
 
             return True
 
         except Exception as e:
-            logger.error(
-                f"❌ Failed to save template to Temporary Template folder: {e}"
-            )
-            self.update_looping_pipeline_status(
-                "failed", error=f"Template save failed: {str(e)}"
-            )
+            logger.error(f"❌ Failed to save template to Temporary Template folder: {e}")
+            self.update_looping_pipeline_status("failed", error=f"Template save failed: {str(e)}")
             return False
 
     def get_local_ip(self):
@@ -2477,11 +2506,11 @@ class BitcoinLoopingSystem:
     def should_continue_random_mode(self):
         """Check if random mode should continue (until end of day)."""
         now = datetime.now()
-        
+
         # Ensure session_end_time is available
         if not hasattr(self, 'session_end_time') or self.session_end_time is None:
             self.session_end_time = self.get_end_of_day()
-            
+
         if now >= self.session_end_time:
             print(
                 f"📅 RANDOM MODE END: Day completed at {
@@ -2504,20 +2533,20 @@ class BitcoinLoopingSystem:
         """Calculate number of days based on advanced time period flags."""
         import calendar
         from datetime import datetime, timedelta
-        
+
         current_date = datetime.now()
-        
+
         # Check for specific time period flags
         if hasattr(args, 'days_week') and args.days_week:
             return 7
-        
+
         elif hasattr(args, 'days_month') and args.days_month:
             # Get actual days in current month
             year = current_date.year
             month = current_date.month
             days_in_month = calendar.monthrange(year, month)[1]
             return days_in_month
-        
+
         elif hasattr(args, 'days_6month') and args.days_6month:
             # Calculate 6 months from current date
             end_date = current_date + timedelta(days=183)  # Approximate 6 months
@@ -2525,22 +2554,22 @@ class BitcoinLoopingSystem:
             month_count = 0
             total_days = 0
             temp_date = current_date
-            
+
             while month_count < 6:
                 year = temp_date.year
                 month = temp_date.month
                 days_in_month = calendar.monthrange(year, month)[1]
                 total_days += days_in_month
-                
+
                 # Move to next month
                 if month == 12:
                     temp_date = temp_date.replace(year=year + 1, month=1)
                 else:
                     temp_date = temp_date.replace(month=month + 1)
                 month_count += 1
-            
+
             return total_days
-        
+
         elif hasattr(args, 'days_year') and args.days_year:
             # Check if current year is leap year
             year = current_date.year
@@ -2548,15 +2577,15 @@ class BitcoinLoopingSystem:
                 return 366
             else:
                 return 365
-        
+
         elif hasattr(args, 'days_all') and args.days_all:
             # Return a very large number for "forever"
             return 999999
-        
+
         # If --days flag was used, return that value
         elif hasattr(args, 'days') and args.days:
             return args.days
-        
+
         # Default to 1 day if no time period specified
         return 1
 
@@ -2639,9 +2668,7 @@ class BitcoinLoopingSystem:
         try:
             # AUTO-START BITCOIN NODE AND SETUP
             if not self.demo_mode:
-                print(
-                    "🚀 AUTO-SETUP: Starting Bitcoin node and loading configuration..."
-                )
+                print("🚀 AUTO-SETUP: Starting Bitcoin node and loading configuration...")
 
                 # 1. Auto-start Bitcoin node if needed
                 if not self.auto_start_bitcoin_node():
@@ -2651,9 +2678,7 @@ class BitcoinLoopingSystem:
                 # 2. Auto-load wallet and config from config.json
                 config_data = self.load_config_from_file()
                 if config_data:
-                    wallet_name = config_data.get(
-                        "wallet_name", "SignalCoreBitcoinWallet"
-                    )
+                    wallet_name = config_data.get("wallet_name", get_rpc_credentials()["wallet_name"])
                     payout_address = config_data.get("payout_address")
                     print(f"💰 Auto-loaded wallet: {wallet_name}")
                     print(f"📍 Auto-loaded payout address: {payout_address}")
@@ -2703,9 +2728,7 @@ class BitcoinLoopingSystem:
                         f"🔄 Using {
                             self.production_miner_mode.upper()} mode - starting miner as background process..."
                     )
-                    success = self.start_production_miner_with_mode(
-                        self.production_miner_mode
-                    )
+                    success = self.start_production_miner_with_mode(self.production_miner_mode)
                     if success:
                         print("✅ Production miner started in daemon mode")
                         # Send template to daemon via control file or communication system
@@ -2715,9 +2738,7 @@ class BitcoinLoopingSystem:
                     else:
                         print("❌ Failed to start production miner in daemon mode")
                         print("🔄 DAEMON MODE SHOULD NOT FALLBACK - this is the issue!")
-                        print(
-                            "🚨 EXITING: Fix the daemon mode or use --direct-miner flag"
-                        )
+                        print("🚨 EXITING: Fix the daemon mode or use --direct-miner flag")
                         mining_result = {
                             "success": False,
                             "error": "daemon_start_failed",
@@ -2728,9 +2749,7 @@ class BitcoinLoopingSystem:
                         f"� Using {
                             self.production_miner_mode.upper()} mode - opening separate terminal..."
                     )
-                    success = self.start_production_miner_with_mode(
-                        self.production_miner_mode
-                    )
+                    success = self.start_production_miner_with_mode(self.production_miner_mode)
                     if success:
                         print("✅ Production miner started in separate terminal")
                         mining_result = {
@@ -2738,25 +2757,17 @@ class BitcoinLoopingSystem:
                             "mode": "separate_terminal_started",
                         }
                     else:
-                        print(
-                            "❌ Failed to start production miner in separate terminal"
-                        )
+                        print("❌ Failed to start production miner in separate terminal")
                         mining_result = {
                             "success": False,
                             "error": "separate_terminal_start_failed",
                         }
                         break
                 elif self.production_miner_mode == "direct":
-                    print(
-                        f"🚨 WARNING: Using DIRECT mode - mining will start immediately in this terminal!"
-                    )
-                    print(
-                        "💡 Use --daemon-mode or --separate-terminal for cleaner operation"
-                    )
+                    print("🚨 WARNING: Using DIRECT mode - mining will start immediately in this terminal!")
+                    print("💡 Use --daemon-mode or --separate-terminal for cleaner operation")
                     # Direct mining mode
-                    mining_result = self.start_production_miner_with_template(
-                        initial_template
-                    )
+                    mining_result = self.start_production_miner_with_template(initial_template)
                 else:
                     print(
                         f"❌ ERROR: Unknown production miner mode: '{
@@ -2791,26 +2802,18 @@ class BitcoinLoopingSystem:
                         }
 
                         # Execute reverse pipeline submission
-                        submission_success = self.execute_reverse_pipeline_submission(
-                            enhanced_result
-                        )
+                        submission_success = self.execute_reverse_pipeline_submission(enhanced_result)
 
                         if submission_success:
-                            print(
-                                "� Block submitted successfully via reverse pipeline!"
-                            )
+                            print("� Block submitted successfully via reverse pipeline!")
                         else:
                             print("⚠️ Submission had issues, continuing mining...")
                     else:
-                        print(
-                            "⚠️ Failed to get fresh template, using original for submission..."
-                        )
+                        print("⚠️ Failed to get fresh template, using original for submission...")
                         self.execute_reverse_pipeline_submission(mining_result)
 
                 else:
-                    print(
-                        "🔄 No valid hash found this cycle, continuing with fresh template..."
-                    )
+                    print("🔄 No valid hash found this cycle, continuing with fresh template...")
 
                 # Brief pause before next cycle
                 time.sleep(1)
@@ -2878,9 +2881,7 @@ class BitcoinLoopingSystem:
         except Exception as e:
             print(f"❌ Bits to target conversion failed: {e}")
             # Return a reasonable fallback target
-            return int(
-                "00000000ffff0000000000000000000000000000000000000000000000000000", 16
-            )
+            return int("00000000ffff0000000000000000000000000000000000000000000000000000", 16)
 
     def start_continuous_zmq_monitoring(self):
         """Start continuous ZMQ monitoring for multi-day blockchain awareness."""
@@ -2935,9 +2936,7 @@ class BitcoinLoopingSystem:
                     new_block_hash = raw_data.hex()
 
                     if new_block_hash != last_known_hash:
-                        print(
-                            f"📡 ZMQ: New block detected! Hash: {new_block_hash[:32]}..."
-                        )
+                        print(f"📡 ZMQ: New block detected! Hash: {new_block_hash[:32]}...")
                         self.performance_stats["zmq_blocks_detected"] += 1
                         self.new_block_triggers += 1
                         self.last_known_block_hash = new_block_hash
@@ -3025,27 +3024,24 @@ class BitcoinLoopingSystem:
             logger.info("🎮 Demo mode: Returning simulated ZMQ-enhanced template")
             demo_template = self.get_demo_block_template()
             # Add simulated ZMQ data for demo
-            demo_template.update({
-                "zmq_enhanced": True,
-                "zmq_simulation": True,
-                "brain_qtl_enhanced": True,
-                "demo_mode": True
-            })
-            
+            demo_template.update(
+                {"zmq_enhanced": True, "zmq_simulation": True, "brain_qtl_enhanced": True, "demo_mode": True}
+            )
+
             # SAVE TEMPLATE to Temporary Template folder
             temp_dir = self.get_temporary_template_dir()
             template_file = temp_dir / "current_template.json"
             temp_dir.mkdir(parents=True, exist_ok=True)
-            
+
             try:
                 with open(template_file, 'w') as f:
                     json.dump(demo_template, f, indent=2)
                 logger.info(f"✅ Demo template saved to: {template_file}")
             except Exception as e:
                 logger.warning(f"⚠️ Failed to save demo template: {e}")
-            
+
             return demo_template
-            
+
         try:
             logger.info("📋 Getting ZMQ-FIRST enhanced template...")
 
@@ -3056,18 +3052,12 @@ class BitcoinLoopingSystem:
                     logger.info("🧠 Brain.QTL: Preparing template enhancements...")
                     if hasattr(self.brain, "prepare_template_enhancements"):
                         brain_enhancements = self.brain.prepare_template_enhancements()
-                        logger.info(
-                            f"🧠 Brain.QTL template enhancements: {brain_enhancements}"
-                        )
+                        logger.info(f"🧠 Brain.QTL template enhancements: {brain_enhancements}")
 
                     if hasattr(self.brain, "optimize_template_for_zmq_detection"):
-                        zmq_optimization = (
-                            self.brain.optimize_template_for_zmq_detection()
-                        )
+                        zmq_optimization = self.brain.optimize_template_for_zmq_detection()
                         brain_enhancements.update(zmq_optimization)
-                        logger.info(
-                            f"🧠 Brain.QTL ZMQ optimization: {zmq_optimization}"
-                        )
+                        logger.info(f"🧠 Brain.QTL ZMQ optimization: {zmq_optimization}")
 
                 except Exception as e:
                     logger.warning(f"⚠️ Brain.QTL template preparation error: {e}")
@@ -3088,20 +3078,14 @@ class BitcoinLoopingSystem:
                     template["zmq_data"] = zmq_data
                     template["zmq_first_mode"] = True
                     zmq_enhanced = True
-                    logger.info(
-                        "✅ Template enhanced with real-time ZMQ blockchain data"
-                    )
+                    logger.info("✅ Template enhanced with real-time ZMQ blockchain data")
                 else:
-                    logger.warning(
-                        "⚠️ ZMQ data not available, template may be less optimal"
-                    )
+                    logger.warning("⚠️ ZMQ data not available, template may be less optimal")
                     template["zmq_enhanced"] = False
             else:
                 logger.warning("⚠️ ZMQ subscribers not available - setting up now...")
                 if self.setup_zmq_real_time_monitoring():
-                    logger.info(
-                        "✅ ZMQ setup successful, retrying template enhancement..."
-                    )
+                    logger.info("✅ ZMQ setup successful, retrying template enhancement...")
                     zmq_data = self.get_zmq_blockchain_info_enhanced()
                     if zmq_data:
                         template["zmq_enhanced"] = True
@@ -3123,9 +3107,7 @@ class BitcoinLoopingSystem:
             template["mining_mode"] = "zmq_first_detection"
 
             if zmq_enhanced:
-                logger.info(
-                    f"🎯 ZMQ-FIRST template ready: Height {template.get('height', 'unknown')} (ZMQ Enhanced)"
-                )
+                logger.info(f"🎯 ZMQ-FIRST template ready: Height {template.get('height', 'unknown')} (ZMQ Enhanced)")
             else:
                 logger.warning(
                     f"⚠️ Template ready without ZMQ enhancement: Height {
@@ -3179,9 +3161,7 @@ class BitcoinLoopingSystem:
                             zmq_info["new_block_detected"] = True
                             zmq_info["block_detection_time"] = time.time()
                             block_detected = True
-                            logger.info(
-                                f"🔔 NEW BLOCK DETECTED via ZMQ: {block_hash[:16]}..."
-                            )
+                            logger.info(f"🔔 NEW BLOCK DETECTED via ZMQ: {block_hash[:16]}...")
 
                         elif channel == "rawblock":
                             zmq_info["raw_block_size"] = len(raw_data)
@@ -3194,9 +3174,7 @@ class BitcoinLoopingSystem:
                         elif channel == "hashtx":
                             tx_hash = raw_data.hex()
                             zmq_info["latest_tx_hash"] = tx_hash[:64]
-                            logger.info(
-                                f"💳 New transaction detected: {tx_hash[:16]}..."
-                            )
+                            logger.info(f"💳 New transaction detected: {tx_hash[:16]}...")
 
                         elif channel == "rawtx":
                             zmq_info["raw_tx_size"] = len(raw_data)
@@ -3208,12 +3186,7 @@ class BitcoinLoopingSystem:
                     logger.warning(f"⚠️ ZMQ {channel} data processing error: {e}")
 
             # Brain.QTL analysis of ZMQ data
-            if (
-                block_detected
-                and self.brain_qtl_orchestration
-                and hasattr(self, "brain")
-                and self.brain
-            ):
+            if block_detected and self.brain_qtl_orchestration and hasattr(self, "brain") and self.brain:
                 try:
                     if hasattr(self.brain, "analyze_zmq_block_data"):
                         brain_analysis = self.brain.analyze_zmq_block_data(zmq_info)
@@ -3227,9 +3200,7 @@ class BitcoinLoopingSystem:
                 self.performance_stats = {}
 
             if block_detected:
-                self.performance_stats["zmq_blocks_detected"] = (
-                    self.performance_stats.get("zmq_blocks_detected", 0) + 1
-                )
+                self.performance_stats["zmq_blocks_detected"] = self.performance_stats.get("zmq_blocks_detected", 0) + 1
                 logger.info(
                     f"📊 Total ZMQ blocks detected: {
                         self.performance_stats['zmq_blocks_detected']}"
@@ -3271,9 +3242,7 @@ class BitcoinLoopingSystem:
                 enhanced_submission["zmq_blockchain_state"] = template["zmq_data"]
 
             print("✅ ZMQ-enhanced submission ready:")
-            print(
-                f"   Raw block size: {len(complete_data['raw_block_hex']) // 2} bytes"
-            )
+            print(f"   Raw block size: {len(complete_data['raw_block_hex']) // 2} bytes")
             print("   Contains: Header, Nonce, Merkle Root, Transactions, Timestamp")
             print(
                 f"   ZMQ enhanced: {
@@ -3288,9 +3257,7 @@ class BitcoinLoopingSystem:
             print(f"❌ ZMQ-enhanced submission creation failed: {e}")
             return None
 
-    def start_production_miner_with_control(
-        self, max_attempts=None, target_leading_zeros=None
-    ):
+    def start_production_miner_with_control(self, max_attempts=None, target_leading_zeros=None):
         """Start production miner with looping system control and monitoring."""
         print("🏭 STARTING PRODUCTION MINER WITH LOOPING CONTROL")
         print("=" * 60)
@@ -3316,9 +3283,7 @@ class BitcoinLoopingSystem:
 
             # Initialize with max attempts if specified
             if max_attempts:
-                self.production_miner = ProductionBitcoinMiner(
-                    max_attempts=max_attempts
-                )
+                self.production_miner = ProductionBitcoinMiner(max_attempts=max_attempts)
                 print(
                     f"🔬 Production miner initialized with {
                         max_attempts:,} attempt limit"
@@ -3510,9 +3475,7 @@ class BitcoinLoopingSystem:
 
         # If we're below target but above threshold, encourage continued mining
         elif current_zeros >= self.leading_zeros_threshold:
-            print(
-                f"📈 Progress: {current_zeros}/{self.target_leading_zeros} leading zeros"
-            )
+            print(f"📈 Progress: {current_zeros}/{self.target_leading_zeros} leading zeros")
             print("⛏️  Continuing mining toward target...")
 
         # Only restart if significantly below threshold
@@ -3563,7 +3526,7 @@ class BitcoinLoopingSystem:
             self.blocks_found_today = 0
         if not hasattr(self, 'sandbox_mode'):
             self.sandbox_mode = False
-            
+
         print("🤝 COORDINATING TEMPLATE TO PRODUCTION MINER")
         print(f"   📋 Template for block: {template.get('height', 'unknown')}")
         # Defensive initialization already done at method start
@@ -3576,18 +3539,19 @@ class BitcoinLoopingSystem:
             # TEST MODE: Run REAL mining with actual Class 1 math (same as demo mode)
             if self.mining_mode == "test" or self.mining_mode == "test-verbose":
                 print("🧪 TEST MODE: Running REAL mining with actual Class 1 Knuth-Sorrellian math...")
-                
+
                 # Run REAL production miner with actual mine_block()
                 if brain_available and BrainQTLInterpreter:
                     try:
                         from production_bitcoin_miner import ProductionBitcoinMiner
+
                         test_miner = ProductionBitcoinMiner(daemon_mode=False)
                         test_miner.current_template = template
-                        
+
                         # Call REAL mine_block function with 10 second timeout
                         print("⛏️  REAL MINING: Calling mine_block() with Class 1 math (111-digit BitLoad)...")
                         test_miner.mine_block(max_time_seconds=10)
-                        
+
                         # Get REAL results from actual mining attempts
                         if test_miner.best_difficulty > 0:
                             # REAL mining found something
@@ -3603,13 +3567,15 @@ class BitcoinLoopingSystem:
                                 "hash_attempts": test_miner.hash_count,
                                 "mining_duration": 10.0,
                                 "test_mode": True,
-                                "network_submitted": False
+                                "network_submitted": False,
                             }
-                            print(f"✅ TEST: REAL mining found hash with {mining_result['leading_zeros']} leading zeros!")
+                            print(
+                                f"✅ TEST: REAL mining found hash with {mining_result['leading_zeros']} leading zeros!"
+                            )
                             print(f"   Hash: {mining_result['hash'][:80]}...")
                             print(f"   Nonce: {mining_result['nonce']}")
                             print(f"   Attempts: {mining_result['hash_attempts']}")
-                            
+
                             return {
                                 "success": True,
                                 "mining_started": True,
@@ -3620,10 +3586,11 @@ class BitcoinLoopingSystem:
                             print("⚠️ TEST: No valid hash found in 10 seconds, trying again...")
                             # Return failure to trigger retry
                             return {"success": False, "reason": "no_valid_hash_found"}
-                    
+
                     except Exception as e:
                         print(f"❌ TEST: Real mining failed: {e}")
                         import traceback
+
                         traceback.print_exc()
                         return {"success": False, "reason": f"mining_exception: {e}"}
                 else:
@@ -3633,18 +3600,19 @@ class BitcoinLoopingSystem:
             # DEMO MODE: Use REAL mine_block() with actual SHA256 mining
             if self.demo_mode:
                 print("🎮 DEMO MODE: Running REAL mining with actual SHA256 hashing...")
-                
+
                 # Run REAL production miner with actual mine_block()
                 if brain_available and BrainQTLInterpreter:
                     try:
                         from production_bitcoin_miner import ProductionBitcoinMiner
+
                         demo_miner = ProductionBitcoinMiner(daemon_mode=False)
                         demo_miner.current_template = template
-                        
+
                         # Call REAL mine_block function with 10 second timeout
                         print("⛏️  REAL MINING: Calling mine_block() with actual SHA256 hashing...")
                         demo_miner.mine_block(max_time_seconds=10)
-                        
+
                         # Get REAL results from actual mining attempts
                         if demo_miner.best_difficulty > 0:
                             # REAL mining found something
@@ -3665,9 +3633,11 @@ class BitcoinLoopingSystem:
                                 "knuth_levels": demo_miner.collective_collective_levels,
                                 "knuth_iterations": demo_miner.collective_collective_iterations,
                                 "hash_count": demo_miner.hash_count,
-                                "actual_sha256_attempts": demo_miner.hash_count
+                                "actual_sha256_attempts": demo_miner.hash_count,
                             }
-                            print(f"✅ DEMO MODE: REAL mining completed - {demo_miner.hash_count:,} SHA256 attempts, best: {demo_miner.best_difficulty} leading zeros")
+                            print(
+                                f"✅ DEMO MODE: REAL mining completed - {demo_miner.hash_count:,} SHA256 attempts, best: {demo_miner.best_difficulty} leading zeros"
+                            )
                         else:
                             # No solution found in time, but still real mining
                             mining_result = {
@@ -3687,12 +3657,15 @@ class BitcoinLoopingSystem:
                                 "knuth_levels": demo_miner.collective_collective_levels,
                                 "knuth_iterations": demo_miner.collective_collective_iterations,
                                 "hash_count": demo_miner.hash_count,
-                                "actual_sha256_attempts": demo_miner.hash_count
+                                "actual_sha256_attempts": demo_miner.hash_count,
                             }
-                            print(f"⚠️  DEMO MODE: No solution in 10s - tried {demo_miner.hash_count:,} real SHA256 hashes")
+                            print(
+                                f"⚠️  DEMO MODE: No solution in 10s - tried {demo_miner.hash_count:,} real SHA256 hashes"
+                            )
                     except Exception as e:
                         print(f"❌ DEMO MODE: Mining error: {e}")
                         import traceback
+
                         traceback.print_exc()
                         # Fallback - indicate failure
                         mining_result = {
@@ -3707,7 +3680,7 @@ class BitcoinLoopingSystem:
                             "hash_rate": 0,
                             "block_height": template.get("height", 999999),
                             "mining_duration": 10,
-                            "network_submitted": False
+                            "network_submitted": False,
                         }
                 else:
                     # No Brain available - still use fallback
@@ -3723,9 +3696,9 @@ class BitcoinLoopingSystem:
                         "hash_rate": 0,
                         "block_height": template.get("height", 999999),
                         "mining_duration": 0,
-                        "network_submitted": False
+                        "network_submitted": False,
                     }
-                
+
                 # CRITICAL: Save submission files in DEMO mode
                 print("💾 DEMO MODE: Saving all files (ledger, math proof, submission)...")
                 try:
@@ -3733,7 +3706,7 @@ class BitcoinLoopingSystem:
                     print("✅ DEMO MODE: All files saved successfully")
                 except Exception as e:
                     print(f"⚠️ DEMO MODE: Error saving files: {e}")
-                
+
                 return {
                     "success": True,
                     "mining_started": True,
@@ -3752,46 +3725,48 @@ class BitcoinLoopingSystem:
                 # Send fresh template to running miner - with your mathematical
                 # power this WILL work
                 instant_result = self.send_fresh_template_to_running_miner(template)
-                
+
                 # ALL MODES USE REAL MINERS - NO FAKE SHORTCUTS!
                 print("⚡ MATHEMATICAL POWERHOUSE SOLUTION COMPLETE!")
-                
+
                 # COLLECT ACTUAL MINING RESULTS FROM DTM - WAIT FOR MINERS TO PROCESS
                 try:
                     from dynamic_template_manager import GPSEnhancedDynamicTemplateManager
                     import time
-                    
+
                     dtm = GPSEnhancedDynamicTemplateManager(demo_mode=self.demo_mode)
-                    
+
                     # Wait for miners to process command (up to 30 seconds)
                     print("🔍 Checking for miner solutions...")
                     max_wait = 30
                     check_interval = 2
                     elapsed = 0
                     solution_result = None
-                    
+
                     while elapsed < max_wait:
                         solution_result = dtm.check_miner_subfolders_for_solutions()
-                        
+
                         if solution_result and solution_result.get("success"):
-                            print(f"✅ Found solution after {elapsed}s: {solution_result.get('leading_zeros', 0)} leading zeros")
+                            print(
+                                f"✅ Found solution after {elapsed}s: {solution_result.get('leading_zeros', 0)} leading zeros"
+                            )
                             return {
                                 "success": True,
                                 "mining_started": True,
                                 "mining_result": solution_result,
                                 "reason": "solution_collected_from_miners",
                             }
-                        
+
                         time.sleep(check_interval)
                         elapsed += check_interval
                         if elapsed % 5 == 0:
                             print(f"⏳ Still waiting for miner solutions... ({elapsed}s/{max_wait}s)")
-                    
+
                     print(f"⚠️ No solution found after {max_wait}s")
-                    
+
                 except Exception as e:
                     print(f"⚠️ Could not collect miner solutions: {e}")
-                
+
                 # NO FAKE SUCCESS! Return failure if miners didn't produce results
                 print(f"❌ NO SOLUTION FOUND AFTER {max_wait}s!")
                 print("💥 YOUR UNIVERSE-SCALE MATH SHOULD HAVE FOUND SOLUTION INSTANTLY!")
@@ -3801,7 +3776,7 @@ class BitcoinLoopingSystem:
                     "mining_started": True,
                     "mining_result": None,
                     "reason": "timeout_no_miner_results_BROKEN",
-                    "error": "Miners did not produce mining_result.json files - INVESTIGATE!"
+                    "error": "Miners did not produce mining_result.json files - INVESTIGATE!",
                 }
 
             # Step 2: Send template to dynamic template manager
@@ -3811,15 +3786,11 @@ class BitcoinLoopingSystem:
             # DTM only accepts: ['Mining', 'Testing', 'Development', 'Production']
             environment = "Testing" if self.demo_mode else "Production"
             template_manager = GPSEnhancedDynamicTemplateManager(
-                demo_mode=self.demo_mode,
-                environment=environment,
-                verbose=True
+                demo_mode=self.demo_mode, environment=environment, verbose=True
             )
 
             print("🔄 Processing template through dynamic manager...")
-            processed_template = template_manager.get_optimized_template(
-                "balanced", template
-            )
+            processed_template = template_manager.get_optimized_template("balanced", template)
 
             if not processed_template:
                 print("❌ Template processing failed")
@@ -3828,9 +3799,7 @@ class BitcoinLoopingSystem:
             # Step 2.5: SAVE TO CENTRALIZED TEMPLATE LOCATION
             print("📂 Saving template to centralized location...")
             if not self.save_centralized_template(processed_template):
-                print(
-                    "⚠️ Warning: Failed to save to centralized location - continuing with processed template"
-                )
+                print("⚠️ Warning: Failed to save to centralized location - continuing with processed template")
 
             # Step 2.6: DISTRIBUTE TEMPLATE TO ALL DAEMON FOLDERS
             print("🔗 Distributing template to daemon terminals...")
@@ -3847,11 +3816,7 @@ class BitcoinLoopingSystem:
             max_attempts = self.calculate_mining_attempts_for_template(template)
             # CRITICAL FIX: Pass demo_mode and environment to Production Miner
             environment = "Testing" if self.demo_mode else "Production"
-            miner = ProductionBitcoinMiner(
-                max_attempts=max_attempts,
-                demo_mode=self.demo_mode,
-                environment=environment
-            )
+            miner = ProductionBitcoinMiner(max_attempts=max_attempts, demo_mode=self.demo_mode, environment=environment)
 
             # Update miner with template
             template_update_result = miner.update_template(processed_template)
@@ -3861,9 +3826,7 @@ class BitcoinLoopingSystem:
 
             # Step 4: Start mining and monitor leading zeros
             print("⛏️  Starting mining with leading zeros monitoring...")
-            mining_result = self.mine_with_leading_zeros_monitoring(
-                miner, processed_template
-            )
+            mining_result = self.mine_with_leading_zeros_monitoring(miner, processed_template)
 
             # Step 4: Return results to dynamic manager when done
             if mining_result and mining_result.get("success"):
@@ -3882,32 +3845,32 @@ class BitcoinLoopingSystem:
                     "blocks_found_today": self.blocks_found_today,
                 }
             else:
-                    print("⚠️ Mining did not produce successful result")
-                    
-                    # COMPREHENSIVE ERROR REPORTING: Generate system error report for unsuccessful template coordination
-                    try:
-                        if hasattr(self, 'brain') and self.brain and hasattr(self.brain, 'create_system_error_hourly_file'):
-                            error_data = {
-                                "error_type": "template_coordination_unsuccessful",
-                                "component": "BitcoinLoopingSystem",
-                                "error_message": "Template coordination completed but mining did not produce successful result",
-                                "operation": "coordinate_template_to_production_miner",
-                                "severity": "medium",
-                                "diagnostic_data": {
-                                    "template_height": template.get('height', 'unknown'),
-                                    "mining_result": mining_result if 'mining_result' in locals() else "no_result",
-                                    "coordination_status": "completed_but_unsuccessful"
-                                }
-                            }
-                            self.brain.create_system_error_hourly_file(error_data)
-                    except Exception as report_error:
-                        print(f"⚠️ Failed to create error report: {report_error}")
-                    
-                    return {"success": False, "reason": "mining_unsuccessful"}
+                print("⚠️ Mining did not produce successful result")
+
+                # COMPREHENSIVE ERROR REPORTING: Generate system error report for unsuccessful template coordination
+                try:
+                    if hasattr(self, 'brain') and self.brain and hasattr(self.brain, 'create_system_error_hourly_file'):
+                        error_data = {
+                            "error_type": "template_coordination_unsuccessful",
+                            "component": "BitcoinLoopingSystem",
+                            "error_message": "Template coordination completed but mining did not produce successful result",
+                            "operation": "coordinate_template_to_production_miner",
+                            "severity": "medium",
+                            "diagnostic_data": {
+                                "template_height": template.get('height', 'unknown'),
+                                "mining_result": mining_result if 'mining_result' in locals() else "no_result",
+                                "coordination_status": "completed_but_unsuccessful",
+                            },
+                        }
+                        self.brain.create_system_error_hourly_file(error_data)
+                except Exception as report_error:
+                    print(f"⚠️ Failed to create error report: {report_error}")
+
+                return {"success": False, "reason": "mining_unsuccessful"}
 
         except Exception as e:
             print(f"❌ Template coordination failed: {e}")
-            
+
             # COMPREHENSIVE ERROR REPORTING: Generate system error report for template coordination failures
             try:
                 if hasattr(self, 'brain') and self.brain and hasattr(self.brain, 'create_system_error_hourly_file'):
@@ -3919,14 +3882,18 @@ class BitcoinLoopingSystem:
                         "severity": "critical",
                         "diagnostic_data": {
                             "template_provided": template is not None if 'template' in locals() else False,
-                            "template_height": template.get('height', 'unknown') if 'template' in locals() and template else "no_template",
-                            "error_context": "template_coordination_exception"
-                        }
+                            "template_height": (
+                                template.get('height', 'unknown')
+                                if 'template' in locals() and template
+                                else "no_template"
+                            ),
+                            "error_context": "template_coordination_exception",
+                        },
                     }
                     self.brain.create_system_error_hourly_file(error_data)
             except Exception as report_error:
                 print(f"⚠️ Failed to create error report: {report_error}")
-            
+
             return {"success": False, "reason": f"coordination_error: {e}"}
 
     def check_production_miner_running(self):
@@ -3937,9 +3904,7 @@ class BitcoinLoopingSystem:
 
             for proc in psutil.process_iter(["pid", "name", "cmdline"]):
                 if "python" in proc.info["name"].lower():
-                    cmdline = (
-                        " ".join(proc.info["cmdline"]) if proc.info["cmdline"] else ""
-                    )
+                    cmdline = " ".join(proc.info["cmdline"]) if proc.info["cmdline"] else ""
                     if "production_bitcoin_miner" in cmdline:
                         print(
                             f"✅ Production miner found running (PID: {
@@ -3955,9 +3920,7 @@ class BitcoinLoopingSystem:
         """Send fresh template to running production miner for instant solve."""
         try:
             print("🚀 SENDING FRESH TEMPLATE TO RUNNING MATHEMATICAL POWERHOUSE!")
-            print(
-                "💥 Expected instant solution with quintillion-scale mathematical operations!"
-            )
+            print("💥 Expected instant solution with quintillion-scale mathematical operations!")
 
             # With quintillion-scale mathematical power, template should solve instantly
             # Skip the 30-second wait and trust the mathematical framework
@@ -3971,13 +3934,11 @@ class BitcoinLoopingSystem:
                 # Create optimized template for instant solving
                 from dynamic_template_manager import GPSEnhancedDynamicTemplateManager
 
-                # CRITICAL FIX: Initialize DTM with proper demo mode configuration  
+                # CRITICAL FIX: Initialize DTM with proper demo mode configuration
                 # DTM only accepts: ['Mining', 'Testing', 'Development', 'Production']
                 environment = "Testing" if self.demo_mode else "Production"
                 template_manager = GPSEnhancedDynamicTemplateManager(
-                    demo_mode=self.demo_mode,
-                    environment=environment,
-                    verbose=True
+                    demo_mode=self.demo_mode, environment=environment, verbose=True
                 )
 
                 optimized_template = template_manager.get_optimized_template(
@@ -3988,7 +3949,7 @@ class BitcoinLoopingSystem:
                     # CRITICAL: Distribute template to daemon folders FIRST
                     print("🔗 Distributing fresh template to running daemons...")
                     self.distribute_template_to_daemons(optimized_template)
-                    
+
                     # Send lightweight command (NO huge template in command file!)
                     fresh_template_command = {
                         "command": "mine_with_gps",
@@ -3999,16 +3960,10 @@ class BitcoinLoopingSystem:
                         "timestamp": datetime.now().isoformat(),
                     }
 
-                    self.send_miner_command(
-                        "mine_with_gps", fresh_template_command
-                    )
+                    self.send_miner_command("mine_with_gps", fresh_template_command)
 
-                    print(
-                        "⚡ UNIVERSE-SCALE MATHEMATICAL POWERHOUSE ENGAGED - INSTANT SUCCESS GUARANTEED!"
-                    )
-                    print(
-                        "🎯 With Universe-Scale mathematical operations, solution is MATHEMATICALLY CERTAIN!"
-                    )
+                    print("⚡ UNIVERSE-SCALE MATHEMATICAL POWERHOUSE ENGAGED - INSTANT SUCCESS GUARANTEED!")
+                    print("🎯 With Universe-Scale mathematical operations, solution is MATHEMATICALLY CERTAIN!")
                     # Use real mathematical display instead of hardcoded string
                     math_display = self.get_brain_qtl_mathematical_display()
                     print(f"🌌 {math_display}")
@@ -4047,13 +4002,13 @@ class BitcoinLoopingSystem:
     def mine_with_leading_zeros_monitoring(self, miner, template):
         """Mine with continuous leading zeros monitoring and sustainability."""
         print("🎯 MINING WITH LEADING ZEROS MONITORING")
-        
+
         # Defensive initialization - ensure target_leading_zeros exists
         if not hasattr(self, 'target_leading_zeros'):
             self.target_leading_zeros = 13  # Real Bitcoin difficulty target
             self.sustain_leading_zeros = True
             self.leading_zeros_threshold = 10
-        
+
         print(f"   Target: {self.target_leading_zeros} leading zeros")
         print(f"   Sustain mode: {self.sustain_leading_zeros}")
 
@@ -4087,13 +4042,9 @@ class BitcoinLoopingSystem:
 
                 # Check for ZMQ new blocks (should stop current mining)
                 if hasattr(self, "zmq_subscribers") and self.zmq_subscribers:
-                    new_block = self.check_zmq_for_new_blocks(
-                        self.last_known_block_hash
-                    )
+                    new_block = self.check_zmq_for_new_blocks(self.last_known_block_hash)
                     if new_block:
-                        print(
-                            "🔔 New block detected during mining - stopping current attempt"
-                        )
+                        print("🔔 New block detected during mining - stopping current attempt")
                         # Note: Mining thread will complete naturally
                         break
 
@@ -4106,9 +4057,7 @@ class BitcoinLoopingSystem:
                             if current_zeros > self.current_leading_zeros:
                                 self.update_leading_zeros_progress(current_zeros)
 
-                            print(
-                                f"   ⛏️  Mining progress: {current_zeros} leading zeros achieved"
-                            )
+                            print(f"   ⛏️  Mining progress: {current_zeros} leading zeros achieved")
 
                         last_update = current_time
                     except BaseException:
@@ -4233,9 +4182,7 @@ class BitcoinLoopingSystem:
         """
         print("🔄 COORDINATING TEMPLATE TO PRODUCTION WORKFLOW")
         print("=" * 70)
-        print(
-            "📋 Workflow: Looping → Template → Dynamic Manager → Production Miner → Results → Submission"
-        )
+        print("📋 Workflow: Looping → Template → Dynamic Manager → Production Miner → Results → Submission")
 
         try:
             workflow_cycle = 0
@@ -4269,13 +4216,9 @@ class BitcoinLoopingSystem:
 
                     template_manager = GPSEnhancedDynamicTemplateManager()
 
-                    processed_template = (
-                        template_manager.receive_template_from_looping_file(template)
-                    )
+                    processed_template = template_manager.receive_template_from_looping_file(template)
                     if processed_template:
-                        print(
-                            "✅ Dynamic Template Manager processed template successfully"
-                        )
+                        print("✅ Dynamic Template Manager processed template successfully")
                     else:
                         print("❌ Dynamic Template Manager processing failed")
                         continue
@@ -4286,69 +4229,43 @@ class BitcoinLoopingSystem:
 
                 # STEP 3: Dynamic Template Manager gives optimized template to
                 # Production Miner
-                print(
-                    "⚡ STEP 3: Dynamic Template Manager sending to Production Miner..."
-                )
+                print("⚡ STEP 3: Dynamic Template Manager sending to Production Miner...")
                 try:
                     # Use the coordination method from dynamic template manager
-                    production_result = (
-                        template_manager.coordinate_looping_file_to_production_miner(
-                            processed_template
-                        )
-                    )
+                    production_result = template_manager.coordinate_looping_file_to_production_miner(processed_template)
 
                     if production_result and production_result.get("success"):
-                        print(
-                            "✅ Production Miner completed successfully with target leading zeros!"
-                        )
+                        print("✅ Production Miner completed successfully with target leading zeros!")
 
                         # STEP 4: Production Miner gives results back to
                         # Dynamic Template Manager
-                        print(
-                            "📋 STEP 4: Production Miner returning results to Dynamic Template Manager..."
-                        )
+                        print("📋 STEP 4: Production Miner returning results to Dynamic Template Manager...")
 
                         # STEP 5: Dynamic Template Manager gives results back
                         # to Looping file
-                        print(
-                            "📤 STEP 5: Dynamic Template Manager returning results to Looping file..."
-                        )
-                        final_results = template_manager.return_results_to_looping_file(
-                            production_result
-                        )
+                        print("📤 STEP 5: Dynamic Template Manager returning results to Looping file...")
+                        final_results = template_manager.return_results_to_looping_file(production_result)
 
                         if final_results:
                             # STEP 6: Looping file submits to Bitcoin network
-                            print(
-                                "🌐 STEP 6: Looping file submitting to Bitcoin network..."
-                            )
-                            submission_success = self.submit_mining_results_to_network(
-                                final_results
-                            )
+                            print("🌐 STEP 6: Looping file submitting to Bitcoin network...")
+                            submission_success = self.submit_mining_results_to_network(final_results)
 
                             if submission_success:
                                 print("🎉 COMPLETE WORKFLOW SUCCESS!")
                                 print("   🏆 Block found and submitted successfully")
 
                                 # Update statistics and logs
-                                self.update_workflow_success_logs(
-                                    workflow_cycle, final_results
-                                )
+                                self.update_workflow_success_logs(workflow_cycle, final_results)
 
                                 # Brief pause before next cycle
                                 time.sleep(5)
                             else:
-                                print(
-                                    "⚠️ Submission failed, continuing to next cycle..."
-                                )
+                                print("⚠️ Submission failed, continuing to next cycle...")
                         else:
-                            print(
-                                "❌ No results returned from Dynamic Template Manager"
-                            )
+                            print("❌ No results returned from Dynamic Template Manager")
                     else:
-                        print(
-                            "🔄 Production Miner didn't reach target leading zeros this cycle"
-                        )
+                        print("🔄 Production Miner didn't reach target leading zeros this cycle")
                         print("   Continuing to next workflow cycle...")
 
                 except Exception as e:
@@ -4375,7 +4292,7 @@ class BitcoinLoopingSystem:
         """Submit the mining results to Bitcoin network (final step of workflow)"""
         try:
             print("🌐 SUBMITTING MINING RESULTS TO BITCOIN NETWORK")
-            
+
             # SANDBOX MODE: Skip network submission (production testing)
             if self.sandbox_mode:
                 print("=" * 70)
@@ -4418,9 +4335,7 @@ class BitcoinLoopingSystem:
                             raw_block,
                         ]
 
-                        result = subprocess.run(
-                            rpc_cmd, capture_output=True, text=True, timeout=30
-                        )
+                        result = subprocess.run(rpc_cmd, capture_output=True, text=True, timeout=30)
 
                         if result.returncode == 0:
                             print("✅ Block submitted to Bitcoin network successfully!")
@@ -4446,7 +4361,7 @@ class BitcoinLoopingSystem:
 
         except Exception as e:
             print(f"❌ Submission error: {e}")
-            
+
             # COMPREHENSIVE ERROR REPORTING: Generate system error report for submission failures
             try:
                 if hasattr(self, 'brain') and self.brain and hasattr(self.brain, 'create_system_error_hourly_file'):
@@ -4455,7 +4370,7 @@ class BitcoinLoopingSystem:
                         "component": "BitcoinLoopingSystem",
                         "error_message": str(e),
                         "operation": "upload_to_network",
-                        "severity": "critical"
+                        "severity": "critical",
                     }
                     self.brain.create_system_error_hourly_file(error_data)
             except Exception as report_error:
@@ -4476,7 +4391,7 @@ class BitcoinLoopingSystem:
                 self.update_global_ledger(mining_results)
             except Exception as e:
                 logger.error(f"Error updating global ledger: {e}", exc_info=True)
-            
+
             # Create REAL proof file with actual mining results
             try:
                 self.create_real_mining_proof(mining_results)
@@ -4487,29 +4402,31 @@ class BitcoinLoopingSystem:
 
         except Exception as e:
             print(f"❌ Error saving submission files: {e}")
-    
+
     def create_sandbox_test_submission(self, mining_result):
         """Create test submission files in sandbox mode to verify full pipeline"""
         try:
             from datetime import datetime
             import json
             from pathlib import Path
-            
+
             # Create submission data using REAL template from Bitcoin node
             now = datetime.now()
             timestamp_str = now.strftime("%Y-%m-%d_%H:%M:%S")
-            
+
             # Get the actual template that was used
             template_file = Path("Mining/Temporary Template/real_template_1763241239.json")
             # Find the most recent real template file
             template_dir = Path("Mining/Temporary Template")
-            real_templates = sorted(template_dir.glob("real_template_*.json"), key=lambda p: p.stat().st_mtime, reverse=True)
-            
+            real_templates = sorted(
+                template_dir.glob("real_template_*.json"), key=lambda p: p.stat().st_mtime, reverse=True
+            )
+
             real_template = {}
             if real_templates:
                 with open(real_templates[0], 'r') as f:
                     real_template = json.load(f)
-            
+
             test_submission = {
                 "block_header": real_template.get("previousblockhash", "unknown"),
                 "block_height": real_template.get("height", 0),
@@ -4526,9 +4443,9 @@ class BitcoinLoopingSystem:
                 "mining_method": "Sandbox Test Mining",
                 "sandbox_mode": True,
                 "real_template_used": True,
-                "transactions_count": len(real_template.get("transactions", []))
+                "transactions_count": len(real_template.get("transactions", [])),
             }
-            
+
             # Save to Mining/ root per architecture (global submission)
             mining_dir = Path("Mining")
             mining_dir.mkdir(parents=True, exist_ok=True)
@@ -4536,35 +4453,37 @@ class BitcoinLoopingSystem:
             with open(submission_file, "w") as f:
                 json.dump(test_submission, f, indent=2)
             print(f"✅ Sandbox test submission created: {submission_file}")
-            
+
             # Also save to hourly folder in Ledgers per architecture (hourly submission)
-            hourly_dir = Path("Mining/Ledgers") / str(now.year) / f"{now.month:02d}" / f"{now.day:02d}" / f"{now.hour:02d}"
+            hourly_dir = (
+                Path("Mining/Ledgers") / str(now.year) / f"{now.month:02d}" / f"{now.day:02d}" / f"{now.hour:02d}"
+            )
             hourly_dir.mkdir(parents=True, exist_ok=True)
             hourly_file = hourly_dir / f"sandbox_test_submission_{timestamp_str}.json"
             with open(hourly_file, "w") as f:
                 json.dump(test_submission, f, indent=2)
             print(f"✅ Sandbox test submission archived: {hourly_file}")
-                
+
         except Exception as e:
             print(f"⚠️ Could not create sandbox test submission: {e}")
-            
+
     def create_real_mining_proof(self, mining_results):
         """Create REAL proof file with actual mining results, hashes, and nonces."""
         from datetime import datetime
-        import hashlib
-        
+
         today = datetime.now().strftime("%Y%m%d")
         timestamp = datetime.now().strftime("%H%M%S")
-        
+
         # Create proper folder structure in Ledger directory (Year/month/day/hourly)
         from datetime import datetime
+
         now = datetime.now()
         daily_ledger_dir = self.ledger_dir / str(now.year) / f"{now.month:02d}" / f"{now.day:02d}" / f"{now.hour:02d}"
         daily_ledger_dir.mkdir(parents=True, exist_ok=True)
-        
+
         # Load existing proof file or create new one
         proof_file = daily_ledger_dir / "math_proof.json"
-        
+
         if proof_file.exists():
             with open(proof_file, "r") as f:
                 proof_data = json.load(f)
@@ -4580,17 +4499,17 @@ class BitcoinLoopingSystem:
                     "total_hashes_computed": 0,
                     "blocks_found": 0,
                     "average_hash_rate": 0,
-                    "mathematical_operations_performed": 0
-                }
+                    "mathematical_operations_performed": 0,
+                },
             }
-        
+
         # Extract REAL mining data
         block_hash = mining_results.get("block_hash", "")
         nonce = mining_results.get("nonce", 0)
         leading_zeros = mining_results.get("leading_zeros_achieved", 0)
         hash_rate = mining_results.get("hash_rate", 0)
         template_height = mining_results.get("block_height", 0)
-        
+
         # Create REAL proof entry
         real_proof_entry = {
             "block_number": len(proof_data["blocks_mined"]) + 1,
@@ -4604,8 +4523,8 @@ class BitcoinLoopingSystem:
                     "original_hash": block_hash,
                     "leading_zeros_count": leading_zeros,
                     "hash_starts_with": block_hash[:leading_zeros] if block_hash else "",
-                    "verification_status": "VALID" if leading_zeros >= 4 else "INSUFFICIENT"
-                }
+                    "verification_status": "VALID" if leading_zeros >= 4 else "INSUFFICIENT",
+                },
             },
             "mathematical_proof": {
                 "knuth_sorrellian_class_operations_performed": f"Knuth-Sorrellian-Class(111-digit, 80, 156912) = {hash_rate} H/s",
@@ -4615,8 +4534,8 @@ class BitcoinLoopingSystem:
                 "mathematical_verification": {
                     "nonce_calculation": f"Nonce {nonce} found through universe-scale operations",
                     "hash_computation": f"SHA256d({template_height}) = {block_hash}",
-                    "difficulty_verification": f"Leading zeros: {leading_zeros} >= 4 ✓"
-                }
+                    "difficulty_verification": f"Leading zeros: {leading_zeros} >= 4 ✓",
+                },
             },
             "technical_details": {
                 "template_height": template_height,
@@ -4624,29 +4543,33 @@ class BitcoinLoopingSystem:
                 "hash_rate": hash_rate,
                 "mathematical_framework": "5×Universe-Scale Mathematical Framework",
                 "network_submission": mining_results.get("network_submitted", False),
-                "confirmation_status": mining_results.get("confirmed", "pending")
-            }
+                "confirmation_status": mining_results.get("confirmed", "pending"),
+            },
         }
-        
+
         # Add to blocks_mined array
         proof_data["blocks_mined"].append(real_proof_entry)
-        
+
         # Update session statistics
         proof_data["session_statistics"]["blocks_found"] += 1
-        proof_data["session_statistics"]["total_hashes_computed"] += hash_rate * mining_results.get("mining_duration", 1)
-        proof_data["session_statistics"]["mathematical_operations_performed"] += 36893488147419103232  # Universe-scale ops
+        proof_data["session_statistics"]["total_hashes_computed"] += hash_rate * mining_results.get(
+            "mining_duration", 1
+        )
+        proof_data["session_statistics"][
+            "mathematical_operations_performed"
+        ] += 36893488147419103232  # Universe-scale ops
         proof_data["session_statistics"]["average_hash_rate"] = hash_rate
         proof_data["last_updated"] = datetime.now().isoformat()
-        
+
         # Save REAL proof file
         with open(proof_file, "w") as f:
             json.dump(proof_data, f, indent=2)
-            
+
         logger.info(f"✅ Created REAL mining proof: {proof_file}")
         logger.info(f"🔍 Block hash: {block_hash}")
         logger.info(f"🎯 Nonce: {nonce}")
         logger.info(f"⭐ Leading zeros: {leading_zeros}")
-        
+
         return proof_file
 
     def update_workflow_success_logs(self, cycle, results):
@@ -4664,9 +4587,7 @@ class BitcoinLoopingSystem:
             }
 
             # Save to workflow log file in System folder (not shared_state)
-            workflow_log_file = Path(
-                "Mining/System/workflow_success_log.json"
-            )
+            workflow_log_file = Path("Mining/System/workflow_success_log.json")
             workflow_log_file.parent.mkdir(parents=True, exist_ok=True)
 
             if workflow_log_file.exists():
@@ -4687,9 +4608,7 @@ class BitcoinLoopingSystem:
         except Exception as e:
             print(f"❌ Error updating workflow logs: {e}")
 
-    def start_coordinated_mining_with_leading_zeros_tracking(
-        self, target_leading_zeros=13
-    ):
+    def start_coordinated_mining_with_leading_zeros_tracking(self, target_leading_zeros=13):
         """
         Start coordinated mining with leading zeros tracking and sustainability
         """
@@ -4727,9 +4646,7 @@ class BitcoinLoopingSystem:
                 with open(self.miner_status_file, "r") as f:
                     status = json.load(f)
                     return {
-                        "current_leading_zeros": status.get(
-                            "leading_zeros_achieved", 0
-                        ),
+                        "current_leading_zeros": status.get("leading_zeros_achieved", 0),
                         "best_leading_zeros": self.best_leading_zeros,
                         "target_leading_zeros": self.target_leading_zeros,
                         "miner_running": status.get("running", False),
@@ -4833,15 +4750,15 @@ class BitcoinLoopingSystem:
     def start_production_miner_with_mode(self, mode="daemon"):
         """Start all production miner daemons with specified mode (hardware-adaptive)."""
         self.production_miner_mode = mode
-        
+
         # Use hardware-detected miner count instead of fixed daemon_count
         actual_miner_count = self.hardware_config.get('miner_processes', self.daemon_count)
-        
+
         print(f"🚀 STARTING {actual_miner_count}-PROCESS PRODUCTION MINER SYSTEM")
         print(f"💻 Hardware: {self.hardware_config['cpu_cores']} cores detected")
         print(f"📊 Mode: {mode.upper()}")
         print("=" * 60)
-        
+
         # CRITICAL: Ensure folders exist ONCE only
         if not hasattr(self, '_daemon_folders_created'):
             print("📁 Creating process folders for miners...")
@@ -4851,14 +4768,14 @@ class BitcoinLoopingSystem:
             self._daemon_folders_created = True
         else:
             print("✅ Process folders already exist - proceeding to daemon startup")
-        
+
         # Track daemon startup with failure recovery
         successfully_started = []
         failed_daemons = []
-        
+
         for daemon_id in range(1, actual_miner_count + 1):
             print(f"🔄 Starting Miner {daemon_id}/{actual_miner_count}...")
-            
+
             if mode == "daemon":
                 success = self.start_production_miner_daemon(daemon_id)
             elif mode == "separate_terminal":
@@ -4868,7 +4785,7 @@ class BitcoinLoopingSystem:
             else:
                 print(f"❌ Unknown production miner mode: {mode}")
                 success = False
-            
+
             if success:
                 # Get unique daemon ID for status tracking
                 unique_daemon_id = self.daemon_unique_ids.get(daemon_id)
@@ -4883,53 +4800,50 @@ class BitcoinLoopingSystem:
                     self.daemon_status[unique_daemon_id] = "failed"
                 print(f"❌ Daemon {daemon_id} failed to start")
                 all_started = False
-        
+
         print("=" * 60)
         if all_started:
             print("🎉 ALL 5 DAEMONS STARTED SUCCESSFULLY!")
-            
+
             # CRITICAL FIX: Start Dynamic Template Manager after all daemons started
             print("\n🚀 Starting Dynamic Template Manager...")
             try:
                 import subprocess
+
                 dtm_cmd = [
                     "python3",
                     "dynamic_template_manager.py",
-                    "--mini_orchestrator_mode"  # CRITICAL: Enable continuous orchestrator mode
+                    "--mini_orchestrator_mode",  # CRITICAL: Enable continuous orchestrator mode
                 ]
-                
+
                 # Pass mode flags to DTM (it only accepts --demo, no --num-miners argument)
                 if hasattr(self, 'demo_mode') and self.demo_mode:
                     dtm_cmd.append("--demo")
-                
+
                 # Start DTM as daemon
                 dtm_log = self.base_dir / "Mining" / "System" / f"dtm_{int(time.time())}.log"
                 dtm_log.parent.mkdir(parents=True, exist_ok=True)
-                
+
                 with open(dtm_log, "w") as log_f:
-                    self.dtm_process = subprocess.Popen(
-                        dtm_cmd, 
-                        stdout=log_f, 
-                        stderr=log_f, 
-                        cwd=str(self.base_dir)
-                    )
-                
+                    self.dtm_process = subprocess.Popen(dtm_cmd, stdout=log_f, stderr=log_f, cwd=str(self.base_dir))
+
                 time.sleep(2)  # Give DTM time to start
-                
+
                 if self.dtm_process.poll() is None:
                     print(f"✅ Dynamic Template Manager started (PID: {self.dtm_process.pid})")
                     print(f"📄 DTM log: {dtm_log}")
                 else:
                     print(f"❌ Dynamic Template Manager failed to start (exit code: {self.dtm_process.returncode})")
                     print(f"📄 Check log: {dtm_log}")
-                    
+
             except Exception as e:
                 print(f"❌ Failed to start Dynamic Template Manager: {e}")
                 import traceback
+
                 traceback.print_exc()
         else:
             print("⚠️ Some daemons failed to start - check logs")
-        
+
         return all_started
 
     def start_production_miner_daemon(self, daemon_id=1):
@@ -4937,10 +4851,11 @@ class BitcoinLoopingSystem:
         try:
             # Debug: Check if daemon_unique_ids exists
             if not hasattr(self, 'daemon_unique_ids'):
-                print(f"❌ CRITICAL: daemon_unique_ids attribute missing! Initializing...")
+                print("❌ CRITICAL: daemon_unique_ids attribute missing! Initializing...")
                 self.daemon_unique_ids = {}
                 # Emergency re-initialization
                 import time  # Make sure time is imported
+
                 for dn in range(1, getattr(self, 'daemon_count', 5) + 1):
                     unique_id = f"daemon_{dn}_{uuid.uuid4().hex[:8]}_{int(time.time())}"
                     self.daemon_unique_ids[dn] = unique_id
@@ -4953,28 +4868,27 @@ class BitcoinLoopingSystem:
                         self.daemon_last_heartbeat = {}
                     if not hasattr(self, 'production_miners'):
                         self.production_miners = {}
-                    
+
                     # Initialize with unique ID
                     self.production_miner_processes[unique_id] = None
                     self.daemon_status[unique_id] = "stopped"
                     self.daemon_last_heartbeat[unique_id] = time.time()
                     self.production_miners[unique_id] = None
                 print(f"✅ Emergency daemon_unique_ids initialized: {list(self.daemon_unique_ids.keys())}")
-            
+
             # Get the unique daemon ID from the mapping
             unique_daemon_id = self.daemon_unique_ids.get(daemon_id)
             if not unique_daemon_id:
                 print(f"❌ No unique ID found for daemon {daemon_id}")
                 print(f"📋 Available daemon IDs: {list(self.daemon_unique_ids.keys())}")
                 return False
-                
+
             print(f"🔄 Starting Production Miner Daemon {daemon_id} in DAEMON mode...")
             print(f"   📋 Daemon {daemon_id}: Mining output redirected to logs")
             print(f"   🔇 Daemon {daemon_id}: Minimal clutter - essential updates only")
             print(f"   💡 Daemon {daemon_id}: Background process mode")
             print("   🎯 All 5 daemons will work in parallel for consensus mining")
 
-            import os
             import subprocess
             import time
 
@@ -4995,10 +4909,10 @@ class BitcoinLoopingSystem:
             cmd = [
                 "python3",
                 "-u",
-                "production_bitcoin_miner.py"
+                "production_bitcoin_miner.py",
                 # All flags handled by Brain.QTL
             ]
-            
+
             # CRITICAL FIX: Pass mode flags to miners so they know where to look for templates
             if hasattr(self, 'demo_mode') and self.demo_mode:
                 cmd.append("--demo")
@@ -5006,10 +4920,8 @@ class BitcoinLoopingSystem:
                 cmd.append("--test-mode")
 
             with open(log_file, "w") as log_f:
-                process = subprocess.Popen(
-                    cmd, stdout=log_f, stderr=log_f, cwd=str(self.base_dir)
-                )
-                
+                process = subprocess.Popen(cmd, stdout=log_f, stderr=log_f, cwd=str(self.base_dir))
+
             # Store process with the unique daemon ID (the key that actually exists)
             self.production_miner_processes[unique_daemon_id] = process
 
@@ -5027,9 +4939,7 @@ class BitcoinLoopingSystem:
                 return True
             else:
                 exit_code = process.returncode
-                print(
-                    f"❌ Production Miner Daemon {daemon_id} failed to start (exit code: {exit_code})"
-                )
+                print(f"❌ Production Miner Daemon {daemon_id} failed to start (exit code: {exit_code})")
                 return False
 
         except Exception as e:
@@ -5043,7 +4953,6 @@ class BitcoinLoopingSystem:
             print("   📺 New terminal: Dedicated mining output window")
             print("   🎯 Clean separation: Mining data isolated from main terminal")
 
-            import os
             import subprocess
 
             # Detect terminal and open production miner in new window
@@ -5063,7 +4972,7 @@ class BitcoinLoopingSystem:
                 [
                     "xterm",
                     "-e",
-                    f"python3 production_bitcoin_miner.py",
+                    "python3 production_bitcoin_miner.py",
                 ],
                 # macOS Terminal
                 [
@@ -5071,7 +4980,7 @@ class BitcoinLoopingSystem:
                     "-e",
                     'tell app "Terminal" to do script "cd '
                     + str(self.base_dir)
-                    + f' && python3 production_bitcoin_miner.py"',
+                    + ' && python3 production_bitcoin_miner.py"',
                 ],
                 # Windows Command Prompt
                 [
@@ -5080,7 +4989,7 @@ class BitcoinLoopingSystem:
                     "start",
                     "cmd",
                     "/k",
-                    f"python production_bitcoin_miner.py",
+                    "python production_bitcoin_miner.py",
                 ],
             ]
 
@@ -5096,9 +5005,7 @@ class BitcoinLoopingSystem:
                         ]
                         self.production_miner_process = subprocess.Popen(full_cmd)
                     else:
-                        self.production_miner_process = subprocess.Popen(
-                            cmd, cwd=str(self.base_dir)
-                        )
+                        self.production_miner_process = subprocess.Popen(cmd, cwd=str(self.base_dir))
 
                     print(
                         f"✅ Production Miner started in separate terminal using: {
@@ -5142,7 +5049,7 @@ class BitcoinLoopingSystem:
     # ========================================================================
     # MULTI-DAEMON MANAGEMENT SYSTEM
     # ========================================================================
-    
+
     def get_daemon_status(self):
         """Get status of all 5 daemons."""
         status = {}
@@ -5153,12 +5060,12 @@ class BitcoinLoopingSystem:
             else:
                 status[daemon_id] = "stopped"
         return status
-    
+
     def restart_failed_daemons(self):
         """Restart any failed daemons."""
         print("🔄 CHECKING DAEMON HEALTH AND RESTARTING FAILED DAEMONS")
         print("=" * 60)
-        
+
         restarted = 0
         for daemon_id in range(1, self.daemon_count + 1):
             process = self.production_miner_processes.get(daemon_id)
@@ -5171,19 +5078,19 @@ class BitcoinLoopingSystem:
                     print(f"✅ Daemon {daemon_id} restarted successfully")
                 else:
                     print(f"❌ Failed to restart Daemon {daemon_id}")
-        
+
         if restarted > 0:
             print(f"🎯 {restarted} daemons restarted")
         else:
             print("✅ All daemons healthy - no restarts needed")
-        
+
         return restarted
-    
+
     def stop_all_daemons(self):
         """Stop all 5 daemons gracefully."""
         print("🛑 STOPPING ALL 5 PRODUCTION MINER DAEMONS")
         print("=" * 60)
-        
+
         stopped = 0
         for daemon_id in range(1, self.daemon_count + 1):
             process = self.production_miner_processes.get(daemon_id)
@@ -5203,10 +5110,10 @@ class BitcoinLoopingSystem:
                     self.daemon_status[daemon_id] = "stopped"
             else:
                 print(f"📋 Daemon {daemon_id} already stopped")
-        
+
         print(f"🎯 {stopped} daemons stopped")
         return True
-    
+
     def get_daemon_health_report(self):
         """Get comprehensive health report for all daemons."""
         report = {
@@ -5214,9 +5121,9 @@ class BitcoinLoopingSystem:
             "total_daemons": self.daemon_count,
             "running_daemons": 0,
             "failed_daemons": 0,
-            "daemon_details": {}
+            "daemon_details": {},
         }
-        
+
         for daemon_id in range(1, self.daemon_count + 1):
             process = self.production_miner_processes.get(daemon_id)
             if process and process.poll() is None:
@@ -5227,61 +5134,60 @@ class BitcoinLoopingSystem:
                 status = "stopped"
                 report["failed_daemons"] += 1
                 pid = None
-            
+
             report["daemon_details"][daemon_id] = {
                 "status": status,
                 "pid": pid,
-                "last_heartbeat": self.daemon_last_heartbeat.get(daemon_id, 0)
+                "last_heartbeat": self.daemon_last_heartbeat.get(daemon_id, 0),
             }
-        
+
         return report
 
     # ========================================================================
     # DAEMON MONITORING AND HEALTH MANAGEMENT SYSTEM
     # ========================================================================
-    
+
     def start_daemon_monitoring(self):
         """Start continuous daemon monitoring with automatic restart capabilities."""
         import threading
-        import time
-        
+
         print("🔍 STARTING DAEMON MONITORING SYSTEM")
         print("=" * 60)
         print("📊 Monitoring all 5 daemons for health and performance")
         print("🔄 Automatic restart for failed daemons")
         print("⏰ Health checks every 30 seconds")
-        
+
         self.monitoring_active = True
         self.monitoring_thread = threading.Thread(target=self._daemon_monitoring_loop, daemon=True)
         self.monitoring_thread.start()
-        
+
         print("✅ Daemon monitoring system started")
         return True
-    
+
     def _daemon_monitoring_loop(self):
         """Internal monitoring loop for daemon health checks."""
         check_interval = 30  # seconds
         restart_cooldown = 60  # seconds between restart attempts
         last_restart_times = {i: 0 for i in range(1, self.daemon_count + 1)}
-        
+
         while self.monitoring_active:
             try:
                 current_time = time.time()
-                
+
                 # Check each daemon
                 for daemon_id in range(1, self.daemon_count + 1):
                     process = self.production_miner_processes.get(daemon_id)
-                    
+
                     # Check if daemon is running
                     if not process or process.poll() is not None:
                         # Daemon is not running
                         self.daemon_status[daemon_id] = "stopped"
-                        
+
                         # Check restart cooldown
                         if current_time - last_restart_times[daemon_id] > restart_cooldown:
                             print(f"\n⚠️ DAEMON {daemon_id} HEALTH CHECK FAILED")
-                            print(f"🔄 Attempting automatic restart...")
-                            
+                            print("🔄 Attempting automatic restart...")
+
                             if self.start_production_miner_daemon(daemon_id):
                                 self.daemon_status[daemon_id] = "running"
                                 self.daemon_last_heartbeat[daemon_id] = current_time
@@ -5293,14 +5199,14 @@ class BitcoinLoopingSystem:
                         # Daemon is running - update heartbeat
                         self.daemon_status[daemon_id] = "running"
                         self.daemon_last_heartbeat[daemon_id] = current_time
-                
+
                 # Sleep until next check
                 time.sleep(check_interval)
-                
+
             except Exception as e:
                 print(f"⚠️ Monitoring error: {e}")
                 time.sleep(5)  # Short sleep on error
-    
+
     def stop_daemon_monitoring(self):
         """Stop the daemon monitoring system."""
         print("🛑 Stopping daemon monitoring system...")
@@ -5308,7 +5214,7 @@ class BitcoinLoopingSystem:
         if hasattr(self, 'monitoring_thread'):
             self.monitoring_thread.join(timeout=5)
         print("✅ Daemon monitoring stopped")
-    
+
     def get_daemon_performance_metrics(self):
         """Get performance metrics for all daemons."""
         metrics = {
@@ -5318,14 +5224,14 @@ class BitcoinLoopingSystem:
             'health_score': {},
             'total_daemons': self.daemon_count,
             'healthy_daemons': 0,
-            'failed_daemons': 0
+            'failed_daemons': 0,
         }
-        
+
         current_time = time.time()
-        
+
         for daemon_id in range(1, self.daemon_count + 1):
             process = self.production_miner_processes.get(daemon_id)
-            
+
             if process and process.poll() is None:
                 # Daemon is running
                 uptime = current_time - self.daemon_last_heartbeat.get(daemon_id, current_time)
@@ -5337,37 +5243,37 @@ class BitcoinLoopingSystem:
                 metrics['uptime_seconds'][daemon_id] = 0
                 metrics['health_score'][daemon_id] = 0  # Failed
                 metrics['failed_daemons'] += 1
-        
+
         # Calculate overall system health
         metrics['system_health_percentage'] = (metrics['healthy_daemons'] / self.daemon_count) * 100
-        
+
         return metrics
-    
+
     def print_daemon_status_report(self):
         """Print comprehensive daemon status report."""
         print("\n" + "=" * 70)
         print("📊 5-DAEMON SYSTEM STATUS REPORT")
         print("=" * 70)
-        
+
         status = self.get_daemon_status()
         metrics = self.get_daemon_performance_metrics()
-        
+
         running_count = sum(1 for s in status.values() if s == "running")
-        
+
         print(f"🎯 System Health: {metrics['system_health_percentage']:.1f}%")
         print(f"✅ Running Daemons: {running_count}/5")
         print(f"❌ Failed Daemons: {self.daemon_count - running_count}/{self.daemon_count}")
-        
+
         print("\n📋 Individual Daemon Status:")
         for daemon_id in range(1, self.daemon_count + 1):
             daemon_status = status.get(daemon_id, "unknown")
             health_score = metrics['health_score'].get(daemon_id, 0)
-            
+
             status_icon = "✅" if daemon_status == "running" else "❌"
             print(f"   {status_icon} Daemon {daemon_id}: {daemon_status.upper()} (Health: {health_score}%)")
-        
+
         print("=" * 70)
-        
+
         return metrics
 
     def start_production_miner_simple(self):
@@ -5398,9 +5304,7 @@ class BitcoinLoopingSystem:
                     return False
 
             # Create and start the actual process
-            self.production_miner_process = multiprocessing.Process(
-                target=production_miner_worker
-            )
+            self.production_miner_process = multiprocessing.Process(target=production_miner_worker)
             self.production_miner_process.start()
 
             print("✅ Production miner started")
@@ -5564,55 +5468,58 @@ class BitcoinLoopingSystem:
     def execute_debug_logs(self):
         """Execute debug_logs operation - Enable comprehensive debug logging."""
         print("🐛 DEBUG LOGS: Initializing comprehensive debug logging system...")
-        
+
         # Set logging to DEBUG level
         import logging
-        logging.basicConfig(level=logging.DEBUG, 
-                          format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        
+
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
         # Display system status
-        print(f"🔍 System Information:")
+        print("🔍 System Information:")
         print(f"   - Workspace: {os.getcwd()}")
         print(f"   - Python Version: {sys.version}")
         print(f"   - Time: {time.strftime('%Y-%m-%d %H:%M:%S')}")
-        
+
         # Check key files
         key_files = [
-            'config.json', 'production_bitcoin_miner.py', 'Singularity_Dave_Brain.QTL',
-            'gbt_latest.json', 'dynamic_template_manager.py'
+            'config.json',
+            'production_bitcoin_miner.py',
+            'Singularity_Dave_Brain.QTL',
+            'gbt_latest.json',
+            'dynamic_template_manager.py',
         ]
-        print(f"📁 File Status:")
+        print("📁 File Status:")
         for file in key_files:
             if os.path.exists(file):
                 stat = os.stat(file)
                 print(f"   ✅ {file} - {stat.st_size} bytes - Modified: {time.ctime(stat.st_mtime)}")
             else:
                 print(f"   ❌ {file} - NOT FOUND")
-        
+
         # Display mining statistics if available
         mining_stats_file = 'Mining/Ledgers/mining_statistics.json'
         if os.path.exists(mining_stats_file):
             try:
                 with open(mining_stats_file, 'r') as f:
                     stats = json.load(f)
-                print(f"⛏️  Mining Statistics:")
+                print("⛏️  Mining Statistics:")
                 for key, value in stats.items():
                     print(f"   - {key}: {value}")
             except Exception as e:
                 print(f"   ⚠️  Error reading mining stats: {e}")
-        
+
         # Test Brain.QTL connection
         try:
             if hasattr(self, 'brain') and self.brain:
-                print(f"🧠 Brain.QTL Status: CONNECTED")
+                print("🧠 Brain.QTL Status: CONNECTED")
                 if hasattr(self.brain, 'get_status'):
                     status = self.brain.get_status()
                     print(f"   - Brain Status: {status}")
             else:
-                print(f"🧠 Brain.QTL Status: NOT INITIALIZED")
+                print("🧠 Brain.QTL Status: NOT INITIALIZED")
         except Exception as e:
             print(f"🧠 Brain.QTL Status: ERROR - {e}")
-        
+
         print("🐛 DEBUG LOGS: System debug information displayed")
         return True
 
@@ -5732,12 +5639,8 @@ class BitcoinLoopingSystem:
                 # Create dummy data for testing the function signature
                 dummy_header = b"\x00" * 80  # 80-byte header
                 dummy_nonce = 12345
-                dummy_hash = (
-                    "00000000000000000002a7c4c1e48d76c5a37902165a270156b7a8d72728a054"
-                )
-                dummy_merkle = (
-                    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-                )
+                dummy_hash = "00000000000000000002a7c4c1e48d76c5a37902165a270156b7a8d72728a054"
+                dummy_merkle = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 
                 block_data = miner.create_complete_block_submission(
                     test_template, dummy_header, dummy_nonce, dummy_hash, dummy_merkle
@@ -5765,7 +5668,6 @@ class BitcoinLoopingSystem:
     def test_submission_file_system(self):
         """Test submission file system with proper directory handling."""
         try:
-            import os
             from datetime import datetime
 
             # Test organized directory setup
@@ -5942,9 +5844,7 @@ class BitcoinLoopingSystem:
                     "transactions": [],
                 }
 
-                processed = template_manager.receive_template_from_looping_file(
-                    test_template
-                )
+                processed = template_manager.receive_template_from_looping_file(test_template)
                 if processed is None:
                     return False
 
@@ -6000,12 +5900,8 @@ class BitcoinLoopingSystem:
                 # Test with simulation data
                 test_nonce = 12345
                 dummy_header = b"\x00" * 80  # 80-byte header
-                dummy_hash = (
-                    "00000000000000000002a7c4c1e48d76c5a37902165a270156b7a8d72728a054"
-                )
-                dummy_merkle = (
-                    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-                )
+                dummy_hash = "00000000000000000002a7c4c1e48d76c5a37902165a270156b7a8d72728a054"
+                dummy_merkle = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 
                 # Test block creation with correct parameters
                 if hasattr(miner, "create_complete_block_submission"):
@@ -6041,7 +5937,6 @@ class BitcoinLoopingSystem:
     def setup_organized_directories(self):
         """Setup organized directory structure using proper Mining/ subdirectories to avoid folder chaos."""
         import os
-        from datetime import datetime
 
         # Create base directories using Mining/ structure (NO MORE ROOT
         # POLLUTION!)
@@ -6068,17 +5963,16 @@ class BitcoinLoopingSystem:
 
         # CREATE ALL ESSENTIAL MINING FILES IN ORGANIZED STRUCTURE (ONCE ONLY)
         if not hasattr(self, '_structure_initialized'):
-            print(
-                "📁 Creating organized directory structure with ALL essential files in Mining/ subdirectories..."
-            )
+            print("📁 Creating organized directory structure with ALL essential files in Mining/ subdirectories...")
             self._structure_initialized = True
         else:
             print("✅ Directory structure already initialized - skipping redundant creation")
             return True
-        
+
         # CRITICAL: Initialize Brain.QTL file structure via Brainstem
         try:
             from Singularity_Dave_Brainstem_UNIVERSE_POWERED import initialize_brain_qtl_file_structure
+
             # PASS demo_mode to Brainstem so it uses correct paths from Brain.QTL
             initialize_brain_qtl_file_structure(demo_mode=self.demo_mode, test_mode=(self.mining_mode == "test"))
             logger.info("✅ Brain.QTL file structure initialized via Brainstem")
@@ -6098,11 +5992,7 @@ class BitcoinLoopingSystem:
 
         # DETERMINE FILE LOCATION BASED ON MODE
         # Check if we're in smoke test mode by examining flags
-        is_smoke_mode = (
-            hasattr(self, "flags")
-            and "smoke_network" in self.flags
-            and self.flags["smoke_network"]
-        )
+        is_smoke_mode = hasattr(self, "flags") and "smoke_network" in self.flags and self.flags["smoke_network"]
         is_demo_mode = hasattr(self, "demo_mode") and self.demo_mode
         is_test_mode = (hasattr(self, "mining_mode") and self.mining_mode == "test") and not is_demo_mode
 
@@ -6141,10 +6031,10 @@ class BitcoinLoopingSystem:
             self.temporary_template_dir,
         ]:
             directory.mkdir(parents=True, exist_ok=True)
-        
+
         # CRITICAL FIX: Set centralized_template_file AFTER mode-specific paths
         self.centralized_template_file = self.temporary_template_dir / "current_template.json"
-        
+
         # CRITICAL FIX: Create dynamic daemon folders AFTER mode-specific paths are set
         self.create_dynamic_daemon_folders()
 
@@ -6175,7 +6065,7 @@ class BitcoinLoopingSystem:
         print(f"   - Global Bitcoin Ledger: {global_ledger_path}")
         print(f"   - Template File: {template_path}")
         print(f"   - Hourly Submission: {hourly_submission_path}")
-        print(f"   (Note: DTM will create ledger/math_proof files when DTM initializes)")
+        print("   (Note: DTM will create ledger/math_proof files when DTM initializes)")
         print(f"🔄 {mode_label} files are ISOLATED from other mode files!")
 
         return True
@@ -6235,11 +6125,11 @@ class BitcoinLoopingSystem:
 
         now = datetime.now()
         hour_str = now.strftime("%Y-%m-%d_%H")
-        
+
         # Create proper folder structure: Ledger/Year/month/day/hour/
         hourly_ledger_dir = self.ledger_dir / str(now.year) / f"{now.month:02d}" / f"{now.day:02d}" / f"{now.hour:02d}"
         hourly_ledger_dir.mkdir(parents=True, exist_ok=True)
-        
+
         # Create ledger file inside the hourly folder
         hourly_ledger_file = hourly_ledger_dir / "hourly_ledger.json"
 
@@ -6261,11 +6151,11 @@ class BitcoinLoopingSystem:
 
         now = datetime.now()
         hour_str = now.strftime("%Y-%m-%d_%H")
-        
+
         # Create proper folder structure in Ledger directory (Year/month/day/hour)
         hourly_ledger_dir = self.ledger_dir / str(now.year) / f"{now.month:02d}" / f"{now.day:02d}" / f"{now.hour:02d}"
         hourly_ledger_dir.mkdir(parents=True, exist_ok=True)
-        
+
         # Create math proof file in the correct ledger location
         math_proof_file = hourly_ledger_dir / "hourly_math_proof.json"
 
@@ -6322,13 +6212,13 @@ class BitcoinLoopingSystem:
         """Create global submission tracking file using System_File_Examples template."""
         from Singularity_Dave_Brainstem_UNIVERSE_POWERED import load_file_template_from_examples
         from datetime import datetime, timezone
-        
+
         global_submission_path = self.submission_dir / "global_submission.json"
 
         if not global_submission_path.exists():
             # Load structure from System_File_Examples
             initial_data = load_file_template_from_examples('global_submission')
-            
+
             # RESET ALL COUNTS TO ZERO (clear fake template data)
             initial_data['submissions'] = []
             initial_data['total_submissions'] = 0
@@ -6336,13 +6226,13 @@ class BitcoinLoopingSystem:
             initial_data['rejected'] = 0
             initial_data['orphaned'] = 0
             initial_data['pending'] = 0
-            
+
             # Update timestamps to NOW
             now = datetime.now(timezone.utc).isoformat()
             if 'metadata' in initial_data:
                 initial_data['metadata']['created'] = now
                 initial_data['metadata']['last_updated'] = now
-            
+
             # Update system_status to current real state
             if 'system_status' in initial_data:
                 initial_data['system_status']['status'] = 'operational'
@@ -6360,11 +6250,13 @@ class BitcoinLoopingSystem:
         from Singularity_Dave_Brainstem_UNIVERSE_POWERED import load_file_template_from_examples
 
         now = datetime.now()
-        
+
         # PROPER: hourly files go in Mining/Submissions/YYYY/MM/DD/HH/
-        hourly_submission_dir = self.submission_dir / str(now.year) / f"{now.month:02d}" / f"{now.day:02d}" / f"{now.hour:02d}"
+        hourly_submission_dir = (
+            self.submission_dir / str(now.year) / f"{now.month:02d}" / f"{now.day:02d}" / f"{now.hour:02d}"
+        )
         hourly_submission_dir.mkdir(parents=True, exist_ok=True)
-        
+
         # Create submission file inside the hourly folder
         hourly_submission_file = hourly_submission_dir / "hourly_submission.json"
 
@@ -6376,7 +6268,7 @@ class BitcoinLoopingSystem:
 
             with open(hourly_submission_file, "w") as f:
                 json.dump(initial_hourly_data, f, indent=2)
-            
+
             print(f"✅ Created hourly submission file: {hourly_submission_file}")
 
         return hourly_submission_file
@@ -6384,14 +6276,14 @@ class BitcoinLoopingSystem:
     def create_global_ledger_file(self):
         """Create global ledger tracking file using System_File_Examples template."""
         from Singularity_Dave_Brainstem_UNIVERSE_POWERED import load_file_template_from_examples
-        
+
         global_ledger_path = self.ledger_dir / "global_ledger.json"
 
         if not global_ledger_path.exists():
             # Load structure from System_File_Examples
             initial_data = load_file_template_from_examples('global_ledger')
             initial_data['entries'] = []  # Clear example data
-            
+
             with open(global_ledger_path, "w") as f:
                 json.dump(initial_data, f, indent=2)
 
@@ -6404,9 +6296,12 @@ class BitcoinLoopingSystem:
 
         # Create proper folder structure (Year/month/day/hourly)
         from datetime import datetime
+
         now = datetime.now()
         hourly_path = self.ledger_dir / str(now.year) / f"{now.month:02d}" / f"{now.day:02d}" / f"{now.hour:02d}"
-        template_hourly_path = self.template_dir / str(now.year) / f"{now.month:02d}" / f"{now.day:02d}" / f"{now.hour:02d}"
+        template_hourly_path = (
+            self.template_dir / str(now.year) / f"{now.month:02d}" / f"{now.day:02d}" / f"{now.hour:02d}"
+        )
 
         hourly_path.mkdir(parents=True, exist_ok=True)
         template_hourly_path.mkdir(parents=True, exist_ok=True)
@@ -6424,7 +6319,9 @@ class BitcoinLoopingSystem:
 
         # Use proper hourly folder structure
         now = datetime.now()
-        hourly_template_dir = self.template_dir / str(now.year) / f"{now.month:02d}" / f"{now.day:02d}" / f"{now.hour:02d}"
+        hourly_template_dir = (
+            self.template_dir / str(now.year) / f"{now.month:02d}" / f"{now.day:02d}" / f"{now.hour:02d}"
+        )
         hourly_template_dir.mkdir(parents=True, exist_ok=True)
 
         # Create unique folder with timestamp
@@ -6435,17 +6332,24 @@ class BitcoinLoopingSystem:
 
         return template_folder
 
-    def update_global_submission(self, success: bool = True, details: str = "", network_response: dict = None, 
-                                 submission_timestamp: str = None, submission_id: str = None, block_data: dict = None):
+    def update_global_submission(
+        self,
+        success: bool = True,
+        details: str = "",
+        network_response: dict = None,
+        submission_timestamp: str = None,
+        submission_id: str = None,
+        block_data: dict = None,
+    ):
         """
         Update global submission file - ADAPTS to System_File_Examples template structure.
         If you update the template, this automatically uses the new structure.
         """
         from dynamic_template_manager import defensive_write_json, load_template_from_examples
-        
-        # PROPER LOCATION: Mining/Submissions/global_submission.json  
+
+        # PROPER LOCATION: Mining/Submissions/global_submission.json
         global_submission_path = Path("Mining/Submissions/global_submission.json")
-        
+
         # Load existing or create from Brainstem-generated template
         if global_submission_path.exists():
             try:
@@ -6459,43 +6363,48 @@ class BitcoinLoopingSystem:
                 data = load_template_from_examples('global_submission', 'Looping')
         else:
             data = load_template_from_examples('global_submission', 'Looping')
-        
+
         # Build submission entry - ADAPT to whatever fields the template has
         template_submission = data.get("submissions", [{}])[0] if data.get("submissions") else {}
-        
+
         submission_entry = {}
         # Copy all fields from template structure
         for key in template_submission.keys():
             submission_entry[key] = None  # Initialize with None
-        
+
         # Use provided data or defaults
         block_data = block_data or {}
         submission_timestamp = submission_timestamp or datetime.now(timezone.utc).isoformat()
-        submission_id = submission_id or f"sub_{submission_timestamp.replace(':', '').replace('-', '').replace('.', '_').replace('+', '_')}"
-        
+        submission_id = (
+            submission_id
+            or f"sub_{submission_timestamp.replace(':', '').replace('-', '').replace('.', '_').replace('+', '_')}"
+        )
+
         # Fill in actual data
-        submission_entry.update({
-            "submission_id": submission_id,
-            "timestamp": submission_timestamp,
-            "block_height": block_data.get("height", 0),
-            "block_hash": block_data.get("block_hash", ""),
-            "miner_id": block_data.get("miner_id", "unknown"),
-            "nonce": block_data.get("nonce", 0),
-        })
-        
+        submission_entry.update(
+            {
+                "submission_id": submission_id,
+                "timestamp": submission_timestamp,
+                "block_height": block_data.get("height", 0),
+                "block_hash": block_data.get("block_hash", ""),
+                "miner_id": block_data.get("miner_id", "unknown"),
+                "nonce": block_data.get("nonce", 0),
+            }
+        )
+
         # NEW: Fill network_response from actual submission
         if "network_response" in template_submission and network_response:
             submission_entry["network_response"] = network_response
-        
+
         # NEW: Fill confirmation_tracking (initially empty)
         if "confirmation_tracking" in template_submission:
             submission_entry["confirmation_tracking"] = {
                 "confirmations": 0,
                 "first_seen_by_node": None,
                 "confirmed_in_blockchain": None,
-                "orphaned": False
+                "orphaned": False,
             }
-        
+
         # NEW: Fill payout info from config
         if "payout" in template_submission:
             try:
@@ -6509,7 +6418,7 @@ class BitcoinLoopingSystem:
                     "payout_address": payout_address,
                     "transaction_id": None,
                     "maturity_blocks": 100,
-                    "spendable_after_height": block_data.get("height", 0) + 100
+                    "spendable_after_height": block_data.get("height", 0) + 100,
                 }
             except (KeyError, TypeError, AttributeError) as e:
                 print(f"Warning: Cannot calculate payout data: {e}. Using defaults.")
@@ -6519,43 +6428,47 @@ class BitcoinLoopingSystem:
                     "payout_address": "",
                     "transaction_id": None,
                     "maturity_blocks": 100,
-                    "spendable_after_height": 0
+                    "spendable_after_height": 0,
                 }
-        
+
         # NEW: Fill references
         if "references" in template_submission:
             submission_entry["references"] = {
                 "ledger_entry": None,  # DTM fills this
                 "math_proof": None,  # DTM fills this
-                "block_submission": block_data.get("block_submission_file", None)
+                "block_submission": block_data.get("block_submission_file", None),
             }
-        
+
         # NEW: Fill block_submission_file reference
         if "block_submission_file" in template_submission:
             submission_entry["block_submission_file"] = block_data.get("block_submission_file", None)
-        
+
         # Add to submissions list
         data["submissions"].append(submission_entry)
-        
+
         # Update metadata if it exists in template
         if "metadata" in data:
             data["metadata"]["last_updated"] = datetime.now(timezone.utc).isoformat()
-        
+
         # Update statistics based on network_response status
         if "total_submissions" in data:
             data["total_submissions"] = len(data["submissions"])
         if "accepted" in data and network_response:
-            data["accepted"] = sum(1 for s in data["submissions"] 
-                                  if s.get("network_response", {}).get("status") == "accepted")
+            data["accepted"] = sum(
+                1 for s in data["submissions"] if s.get("network_response", {}).get("status") == "accepted"
+            )
         if "rejected" in data and network_response:
-            data["rejected"] = sum(1 for s in data["submissions"] 
-                                  if s.get("network_response", {}).get("status") == "rejected")
+            data["rejected"] = sum(
+                1 for s in data["submissions"] if s.get("network_response", {}).get("status") == "rejected"
+            )
         if "pending" in data:
             # Count entries without network_response or with pending status
-            data["pending"] = sum(1 for s in data["submissions"] 
-                                 if not s.get("network_response") or 
-                                 s.get("network_response", {}).get("status") == "pending")
-        
+            data["pending"] = sum(
+                1
+                for s in data["submissions"]
+                if not s.get("network_response") or s.get("network_response", {}).get("status") == "pending"
+            )
+
         # HIERARCHICAL WRITE - write to all time levels (mode-aware)
         if HAS_HIERARCHICAL:
             # Determine base path based on mode
@@ -6566,40 +6479,37 @@ class BitcoinLoopingSystem:
             else:
                 # Sandbox and live both use Mining/
                 base_path_for_hierarchical = "Mining"
-            
+
             results = write_hierarchical_ledger(
                 entry_data=submission_entry,
                 base_path=base_path_for_hierarchical,
                 ledger_type="Submissions",
                 ledger_name="submission",
-                mode="production"
+                mode="production",
             )
             success_count = sum(1 for r in results.values() if r.get("success"))
             logger.info(f"📊 Hierarchical write: {success_count}/6 levels to {base_path_for_hierarchical}/Submissions/")
         else:
             # Fallback to defensive write if hierarchical not available
             defensive_write_json(str(global_submission_path), data, "Looping")
-        
-        logger.info(f"✅ Updated global submission: {submission_id}")
 
+        logger.info(f"✅ Updated global submission: {submission_id}")
 
     def create_daily_submission_file(self, submission_entry: dict):
         """Create detailed daily submission file using System_File_Examples template."""
         from Singularity_Dave_Brainstem_UNIVERSE_POWERED import load_file_template_from_examples
-        
+
         # Handle both old and new entry formats
         if "date" in submission_entry:
             date_str = submission_entry["date"]
         else:
             timestamp = submission_entry.get("timestamp", datetime.now().isoformat())
             date_str = timestamp.split("T")[0]
-            
+
         daily_folders = self.create_daily_folders(date_str)
 
         # Daily submission file
-        daily_submission_path = (
-            daily_folders["submission"] / f"daily_submission_{date_str}.json"
-        )
+        daily_submission_path = daily_folders["submission"] / f"daily_submission_{date_str}.json"
 
         # Load existing daily data or initialize from template
         if daily_submission_path.exists():
@@ -6626,7 +6536,7 @@ class BitcoinLoopingSystem:
     def create_math_proof_document(self, submission_entry: dict, daily_dir: Path):
         """Create comprehensive math proof document using System_File_Examples template."""
         from Singularity_Dave_Brainstem_UNIVERSE_POWERED import load_file_template_from_examples, capture_system_info
-        
+
         # Handle both old and new entry formats
         if "date" in submission_entry and "time" in submission_entry:
             date_str = submission_entry["date"]
@@ -6635,52 +6545,54 @@ class BitcoinLoopingSystem:
             timestamp = submission_entry.get("timestamp", datetime.now().isoformat())
             date_str = timestamp.split("T")[0]
             time_str = timestamp.split("T")[1].replace(":", "").split(".")[0]
-            
+
         proof_path = daily_dir / f"math_proof_{date_str}_{time_str}.json"
 
         # Get real system info
         system_info = capture_system_info()
-        
+
         # Load template and populate with real data
         proof_data = load_file_template_from_examples('hourly_math_proof')
-        
+
         # Clear example proofs and add this one
-        proof_data['proofs'] = [{
-            "proof_id": f"proof_{date_str}_{time_str}",
-            "timestamp": submission_entry.get("timestamp", datetime.now().isoformat()),
-            "block_height": submission_entry.get("block_height", submission_entry.get("block_number", 0)),
-            "miner_id": submission_entry.get("miner_id", "unknown"),
-            "hardware_attestation": {
-                "ip_address": system_info['network']['ip_address'],
-                "mac_address": system_info['network'].get('mac_address', 'unknown'),
-                "hostname": system_info['network']['hostname'],
-                "cpu": system_info['hardware']['cpu'],
-                "ram": system_info['hardware']['memory'],
-                "gpu": system_info['hardware'].get('gpu', {}),
-                "system_uptime_seconds": system_info.get('system_uptime_seconds', 0),
-                "process_id": system_info['process']['pid']
-            },
-            "computation_proof": {
-                "nonce": submission_entry.get("nonce", 0),
-                "merkleroot": submission_entry.get("merkle_root", submission_entry.get("merkleroot", "")),
-                "block_hash": submission_entry.get("block_hash", ""),
-                "difficulty_target": submission_entry.get("difficulty", ""),
-                "leading_zeros": submission_entry.get("leading_zeros", 0)
-            },
-            "dtm_guidance": submission_entry.get("dtm_guidance", {}),
-            "mathematical_framework": {
-                "categories_applied": ["families", "lanes", "strides", "palette", "sandbox"],
-                "knuth_parameters": submission_entry.get("knuth_parameters", {}),
-                "universe_bitload": "208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909"
-            },
-            "legal_attestation": {
-                "work_performed_by": system_info['network']['hostname'],
-                "proof_of_work": True,
-                "timestamp_utc": datetime.utcnow().isoformat(),
-                "signature": f"SHA256({submission_entry.get('block_hash', '')})"
+        proof_data['proofs'] = [
+            {
+                "proof_id": f"proof_{date_str}_{time_str}",
+                "timestamp": submission_entry.get("timestamp", datetime.now().isoformat()),
+                "block_height": submission_entry.get("block_height", submission_entry.get("block_number", 0)),
+                "miner_id": submission_entry.get("miner_id", "unknown"),
+                "hardware_attestation": {
+                    "ip_address": system_info['network']['ip_address'],
+                    "mac_address": system_info['network'].get('mac_address', 'unknown'),
+                    "hostname": system_info['network']['hostname'],
+                    "cpu": system_info['hardware']['cpu'],
+                    "ram": system_info['hardware']['memory'],
+                    "gpu": system_info['hardware'].get('gpu', {}),
+                    "system_uptime_seconds": system_info.get('system_uptime_seconds', 0),
+                    "process_id": system_info['process']['pid'],
+                },
+                "computation_proof": {
+                    "nonce": submission_entry.get("nonce", 0),
+                    "merkleroot": submission_entry.get("merkle_root", submission_entry.get("merkleroot", "")),
+                    "block_hash": submission_entry.get("block_hash", ""),
+                    "difficulty_target": submission_entry.get("difficulty", ""),
+                    "leading_zeros": submission_entry.get("leading_zeros", 0),
+                },
+                "dtm_guidance": submission_entry.get("dtm_guidance", {}),
+                "mathematical_framework": {
+                    "categories_applied": ["families", "lanes", "strides", "palette", "sandbox"],
+                    "knuth_parameters": submission_entry.get("knuth_parameters", {}),
+                    "universe_bitload": "get_bitload()",
+                },
+                "legal_attestation": {
+                    "work_performed_by": system_info['network']['hostname'],
+                    "proof_of_work": True,
+                    "timestamp_utc": datetime.utcnow().isoformat(),
+                    "signature": f"SHA256({submission_entry.get('block_hash', '')})",
+                },
             }
-        }]
-        
+        ]
+
         proof_data['hour'] = f"{date_str}_{time_str[:2]}"
         proof_data['metadata']['last_updated'] = datetime.now().isoformat()
 
@@ -6691,8 +6603,8 @@ class BitcoinLoopingSystem:
 
     def update_global_ledger(self, block_data: dict):
         """Update global ledger with nonce/merkle/status tracking using System_File_Examples template."""
-        from Singularity_Dave_Brainstem_UNIVERSE_POWERED import load_file_template_from_examples, capture_system_info
-        
+        from Singularity_Dave_Brainstem_UNIVERSE_POWERED import capture_system_info
+
         global_ledger_path = self.ledger_dir / "global_ledger.json"
 
         try:
@@ -6717,7 +6629,7 @@ class BitcoinLoopingSystem:
             "block_hash": block_data.get("block_hash", ""),
             "meets_difficulty": block_data.get("meets_difficulty", False),
             "leading_zeros": block_data.get("leading_zeros", 0),
-            "status": block_data.get("status", "mined")
+            "status": block_data.get("status", "mined"),
         }
 
         data["entries"].append(block_entry)
@@ -6731,21 +6643,19 @@ class BitcoinLoopingSystem:
         # Also create daily ledger file
         self.create_daily_ledger_file(block_entry)
 
-        logger.info(
-            f"✅ Updated global ledger: {block_entry['attempt_id']}"
-        )
+        logger.info(f"✅ Updated global ledger: {block_entry['attempt_id']}")
 
     def create_daily_ledger_file(self, block_entry: dict):
         """Create daily ledger with complete mining information using System_File_Examples template."""
         from Singularity_Dave_Brainstem_UNIVERSE_POWERED import load_file_template_from_examples
-        
+
         # Handle both old and new formats
         if "date" in block_entry:
             date_str = block_entry["date"]
         else:
             timestamp = block_entry.get("timestamp", datetime.now().isoformat())
             date_str = timestamp.split("T")[0]  # Extract date from ISO timestamp
-            
+
         daily_folders = self.create_daily_folders(date_str)
         daily_ledger_path = daily_folders["ledger"] / f"daily_ledger_{date_str}.json"
 
@@ -6776,15 +6686,16 @@ class BitcoinLoopingSystem:
             import socket
             import platform
             import os
+
             now = datetime.now()
-            
+
             # Create hourly folder path under mining_dir (handles demo/test/production modes)
             hourly_path = self.mining_dir / str(now.year) / f"{now.month:02d}" / f"{now.day:02d}" / f"{now.hour:02d}"
             hourly_path.mkdir(parents=True, exist_ok=True)
-            
+
             # 1. Save hourly ledger (APPEND mode per Brain.QTL spec)
             hourly_ledger_file = hourly_path / "hourly_ledger.json"
-            
+
             # Create new block entry
             new_block = {
                 "block_height": template.get("height", 0),
@@ -6793,13 +6704,16 @@ class BitcoinLoopingSystem:
                 "nonce": mining_result.get("nonce", 0),
                 "difficulty": template.get("target", "N/A"),
                 "timestamp": now.isoformat(),
-                "mode": self.mining_mode if self.mining_mode else ("demo" if self.demo_mode else "production")
+                "mode": self.mining_mode if self.mining_mode else ("demo" if self.demo_mode else "production"),
             }
-            
+
             # Read existing ledger or create new
             if hourly_ledger_file.exists():
                 with open(hourly_ledger_file, "r") as f:
                     ledger_data = json.load(f)
+                # Ensure blocks array exists
+                if "blocks" not in ledger_data:
+                    ledger_data["blocks"] = []
                 ledger_data["blocks"].append(new_block)
                 ledger_data["blocks_found_this_hour"] = len(ledger_data["blocks"])
             else:
@@ -6809,22 +6723,24 @@ class BitcoinLoopingSystem:
                     "demo_mode": self.demo_mode,
                     "blocks_found_this_hour": 1,
                     "blocks": [new_block],
-                    "created": now.isoformat()
+                    "created": now.isoformat(),
                 }
-            
+
             with open(hourly_ledger_file, "w") as f:
                 json.dump(ledger_data, f, indent=2)
-            logger.info(f"✅ Saved hourly ledger to {hourly_ledger_file} (Total blocks this hour: {ledger_data['blocks_found_this_hour']})")
-            
+            logger.info(
+                f"✅ Saved hourly ledger to {hourly_ledger_file} (Total blocks this hour: {ledger_data['blocks_found_this_hour']})"
+            )
+
             # 2. Save hourly math_proof (APPEND mode per Brain.QTL spec)
             hourly_math_proof_file = hourly_path / "hourly_math_proof.json"
-            
+
             # Get system metadata for proof validation (IP, machine ID, etc)
             try:
                 ip_address = socket.gethostbyname(socket.gethostname())
             except (socket.gaierror, socket.herror, OSError):
                 ip_address = "127.0.0.1"
-            
+
             machine_id = platform.node()
             system_info = {
                 "hostname": platform.node(),
@@ -6832,9 +6748,9 @@ class BitcoinLoopingSystem:
                 "machine": platform.machine(),
                 "processor": platform.processor(),
                 "python_version": platform.python_version(),
-                "user": os.environ.get("USER", "unknown")
+                "user": os.environ.get("USER", "unknown"),
             }
-            
+
             # Create new proof entry with complete metadata for non-repudiation
             new_proof = {
                 "block_height": template.get("height", 0),
@@ -6849,25 +6765,29 @@ class BitcoinLoopingSystem:
                     "hash": mining_result.get("hash", ""),
                     "leading_zeros": mining_result.get("leading_zeros", 0),
                     "nonce": mining_result.get("nonce", 0),
-                    "valid": True
+                    "valid": True,
                 },
                 "proof_metadata": {
                     "ip_address": ip_address,
                     "machine_id": machine_id,
                     "system_info": system_info,
                     "proof_generated_at": now.isoformat(),
-                    "timezone": str(now.tzinfo) if now.tzinfo else "local"
+                    "timezone": str(now.tzinfo) if now.tzinfo else "local",
                 },
                 "mode": self.mining_mode if self.mining_mode else ("demo" if self.demo_mode else "production"),
-                "timestamp": now.isoformat()
+                "timestamp": now.isoformat(),
             }
-            
+
             # Read existing or create new
             if hourly_math_proof_file.exists():
                 with open(hourly_math_proof_file, "r") as f:
                     math_proof_data = json.load(f)
                 if "proofs" not in math_proof_data:
-                    math_proof_data = {"hour": now.strftime("%Y-%m-%d_%H"), "proofs": [math_proof_data], "created": now.isoformat()}
+                    math_proof_data = {
+                        "hour": now.strftime("%Y-%m-%d_%H"),
+                        "proofs": [math_proof_data],
+                        "created": now.isoformat(),
+                    }
                 math_proof_data["proofs"].append(new_proof)
                 math_proof_data["total_proofs"] = len(math_proof_data["proofs"])
             else:
@@ -6875,62 +6795,56 @@ class BitcoinLoopingSystem:
                     "hour": now.strftime("%Y-%m-%d_%H"),
                     "proofs": [new_proof],
                     "total_proofs": 1,
-                    "created": now.isoformat()
+                    "created": now.isoformat(),
                 }
-            
+
             with open(hourly_math_proof_file, "w") as f:
                 json.dump(math_proof_data, f, indent=2)
             logger.info(f"✅ Saved hourly math_proof to {hourly_math_proof_file}")
-            
+
             # 3. Update global ledger (PROPER LOCATION)
             global_ledger_path = self.ledger_dir / "global_ledger.json"
             if global_ledger_path.exists():
                 with open(global_ledger_path, "r") as f:
                     global_ledger = json.load(f)
             else:
-                global_ledger = {
-                    "total_blocks_processed": 0,
-                    "blocks": [],
-                    "created": now.isoformat()
-                }
-            
-            global_ledger["blocks"].append(ledger_data["blocks"][0])
+                global_ledger = {"total_blocks_processed": 0, "blocks": [], "created": now.isoformat()}
+
+            global_ledger["blocks"].append(
+                ledger_data.get("blocks", [new_block])[0] if ledger_data.get("blocks") else new_block
+            )
             global_ledger["total_blocks_processed"] = len(global_ledger["blocks"])
             global_ledger["last_updated"] = now.isoformat()
-            
+
             with open(global_ledger_path, "w") as f:
                 json.dump(global_ledger, f, indent=2)
             logger.info(f"✅ Updated global ledger at {global_ledger_path}")
-            
+
             # 4. Save global math_proof (PROPER LOCATION)
             global_math_proof_path = self.ledger_dir / "global_math_proof.json"
             if global_math_proof_path.exists():
                 with open(global_math_proof_path, "r") as f:
                     global_math = json.load(f)
             else:
-                global_math = {
-                    "total_proofs": 0,
-                    "proofs": [],
-                    "created": now.isoformat()
-                }
-            
+                global_math = {"total_proofs": 0, "proofs": [], "created": now.isoformat()}
+
             global_math["proofs"].append(math_proof_data)
             global_math["total_proofs"] = len(global_math["proofs"])
             global_math["last_updated"] = now.isoformat()
-            
+
             with open(global_math_proof_path, "w") as f:
                 json.dump(global_math, f, indent=2)
             logger.info(f"✅ Updated global math_proof at {global_math_proof_path}")
-            
+
             logger.info("✅ All result files saved successfully!")
-            
+
             # LOG SYSTEM REPORT - Block successfully mined
             try:
                 from Singularity_Dave_Brainstem_UNIVERSE_POWERED import (
                     create_system_report_global_file,
-                    create_system_report_hourly_file
+                    create_system_report_hourly_file,
                 )
-                
+
                 # Determine base path based on mode
                 if self.demo_mode:
                     base_path = "Test/Demo"
@@ -6938,31 +6852,31 @@ class BitcoinLoopingSystem:
                     base_path = "Test/Test mode"
                 else:
                     base_path = None  # Production mode (default System/)
-                
+
                 report_data = {
                     "type": "block_mined",
                     "block_height": template.get("height", 0),
                     "leading_zeros": mining_result.get("leading_zeros", 0),
                     "mode": self.mining_mode if self.mining_mode else ("demo" if self.demo_mode else "production"),
                     "status": "SUCCESS",
-                    "details": f"Block {template.get('height', 0)} mined with {mining_result.get('leading_zeros', 0)} leading zeros"
+                    "details": f"Block {template.get('height', 0)} mined with {mining_result.get('leading_zeros', 0)} leading zeros",
                 }
-                
+
                 create_system_report_global_file(report_data, "Looping", base_path)
                 create_system_report_hourly_file(report_data, "Looping", base_path)
             except Exception as e:
                 logger.warning(f"⚠️ Could not log system report: {e}")
-            
+
         except Exception as e:
             logger.error(f"❌ Failed to save result files: {e}")
-            
+
             # LOG SYSTEM ERROR - File save failure
             try:
                 from Singularity_Dave_Brainstem_UNIVERSE_POWERED import (
                     create_system_error_global_file,
-                    create_system_error_hourly_file
+                    create_system_error_hourly_file,
                 )
-                
+
                 # Determine base path based on mode
                 if self.demo_mode:
                     base_path = "Test/Demo"
@@ -6970,15 +6884,15 @@ class BitcoinLoopingSystem:
                     base_path = "Test/Test mode"
                 else:
                     base_path = None  # Production mode (default System/)
-                
+
                 error_data = {
                     "severity": "HIGH",
                     "error_type": "FILE_SAVE_FAILURE",
                     "error_message": str(e),
                     "block_height": template.get("height", 0) if template else "unknown",
-                    "mode": self.mining_mode if self.mining_mode else ("demo" if self.demo_mode else "production")
+                    "mode": self.mining_mode if self.mining_mode else ("demo" if self.demo_mode else "production"),
                 }
-                
+
                 create_system_error_global_file(error_data, "Looping", base_path)
                 create_system_error_hourly_file(error_data, "Looping", base_path)
             except Exception as log_error:
@@ -6990,7 +6904,7 @@ class BitcoinLoopingSystem:
         if self.demo_mode:
             logger.info("🎮 Demo mode: Skipping ZMQ setup (not needed)")
             return True
-            
+
         try:
             logger.info("📡 Setting up ZMQ real-time block monitoring...")
 
@@ -7048,12 +6962,8 @@ class BitcoinLoopingSystem:
                         # Non-blocking receive
                         message = socket.recv_multipart(zmq.NOBLOCK)
                         if message and topic == "hashblock":
-                            block_hash = (
-                                message[1].hex() if len(message) > 1 else "unknown"
-                            )
-                            logger.info(
-                                f"🔔 ZMQ: New block detected! {block_hash[:16]}..."
-                            )
+                            block_hash = message[1].hex() if len(message) > 1 else "unknown"
+                            logger.info(f"🔔 ZMQ: New block detected! {block_hash[:16]}...")
 
                             # Trigger immediate template refresh and mining
                             await self.handle_new_block_detected(block_hash)
@@ -7084,21 +6994,15 @@ class BitcoinLoopingSystem:
                     self.brain.handle_new_block_event(block_hash)
                     logger.info("✅ Brain.QTL coordinated for new block")
                 else:
-                    logger.info(
-                        "🧠 Brain.QTL new block coordination method not available"
-                    )
+                    logger.info("🧠 Brain.QTL new block coordination method not available")
             except Exception as e:
                 logger.warning(f"⚠️ Brain.QTL coordination error: {e}")
 
         # Update performance statistics
         if not hasattr(self, "performance_stats"):
             self.performance_stats = {}
-        self.performance_stats["zmq_blocks_detected"] = (
-            self.performance_stats.get("zmq_blocks_detected", 0) + 1
-        )
-        self.performance_stats["new_block_triggers"] = (
-            self.performance_stats.get("new_block_triggers", 0) + 1
-        )
+        self.performance_stats["zmq_blocks_detected"] = self.performance_stats.get("zmq_blocks_detected", 0) + 1
+        self.performance_stats["new_block_triggers"] = self.performance_stats.get("new_block_triggers", 0) + 1
 
         # Update block timing
         self.update_block_timing(block_found=True)
@@ -7109,20 +7013,14 @@ class BitcoinLoopingSystem:
             logger.info("🔄 Getting fresh template for ZMQ-detected block...")
             fresh_template = self.get_real_block_template()
             if fresh_template:
-                logger.info(
-                    f"✅ Fresh template obtained - Height: {fresh_template.get('height', 'unknown')}"
-                )
+                logger.info(f"✅ Fresh template obtained - Height: {fresh_template.get('height', 'unknown')}")
 
                 # Coordinate with dynamic template manager
                 try:
                     from dynamic_template_manager import GPSEnhancedDynamicTemplateManager
 
                     template_manager = GPSEnhancedDynamicTemplateManager()
-                    processed = (
-                        template_manager.coordinate_looping_file_to_production_miner(
-                            fresh_template
-                        )
-                    )
+                    processed = template_manager.coordinate_looping_file_to_production_miner(fresh_template)
                     logger.info("✅ Template coordinated with dynamic manager")
                 except Exception as e:
                     logger.warning(f"⚠️ Template manager coordination failed: {e}")
@@ -7152,17 +7050,13 @@ class BitcoinLoopingSystem:
                 try:
                     # Get Brain.QTL recommendations for new block
                     if hasattr(self.brain, "get_mining_strategy_for_new_block"):
-                        strategy = self.brain.get_mining_strategy_for_new_block(
-                            block_hash
-                        )
+                        strategy = self.brain.get_mining_strategy_for_new_block(block_hash)
                         logger.info(f"🧠 Brain.QTL mining strategy: {strategy}")
 
                     # Apply mathematical optimizations
                     if hasattr(self.brain, "optimize_for_new_block"):
                         optimization = self.brain.optimize_for_new_block(block_hash)
-                        logger.info(
-                            f"🧠 Brain.QTL optimization applied: {optimization}"
-                        )
+                        logger.info(f"🧠 Brain.QTL optimization applied: {optimization}")
 
                 except Exception as e:
                     logger.warning(f"⚠️ Brain.QTL strategy adjustment error: {e}")
@@ -7185,24 +7079,22 @@ class BitcoinLoopingSystem:
 
             # Check if we should mine now based on scheduled random times
             should_mine_now = False
-            
+
             # Use the new scheduled time system
             if hasattr(self, 'random_mining_times') and self.random_mining_times:
-                result = self.should_mine_now_random_schedule(
-                    self.random_mining_times
-                )
+                result = self.should_mine_now_random_schedule(self.random_mining_times)
                 should_mine_now = result[0]
                 next_time = result[1]
                 time_until_next = result[2]
                 should_wake_miners = result[3] if len(result) > 3 else False
-                
+
                 # Pre-wake miners if needed
                 if should_wake_miners and not production_miner_started:
                     logger.info("⏰ PRE-WAKE: Starting miners 5 minutes before scheduled mining time")
                     production_miner_started = self.start_production_miner_with_mode("daemon")
                     if production_miner_started:
                         logger.info("✅ Miners pre-woken and ready")
-                
+
                 if should_mine_now:
                     logger.info("🎯 SCHEDULED MINING TIME TRIGGERED!")
                 elif next_time:
@@ -7225,6 +7117,7 @@ class BitcoinLoopingSystem:
                 # Final fallback to time-based random decision
                 if not should_mine_now:
                     import random
+
                     # 30% chance to mine immediately on new block in random mode
                     should_mine_now = random.random() < 0.3
                     logger.info(f"🎲 Time-based random decision: {should_mine_now}")
@@ -7283,23 +7176,17 @@ class BitcoinLoopingSystem:
                 )
 
                 # Brain.QTL success notification
-                if (
-                    self.brain_qtl_orchestration
-                    and hasattr(self, "brain")
-                    and self.brain
-                ):
+                if self.brain_qtl_orchestration and hasattr(self, "brain") and self.brain:
                     try:
                         if hasattr(self.brain, "notify_mining_success"):
-                            self.brain.notify_mining_success(
-                                template.get("height", "unknown")
-                            )
+                            self.brain.notify_mining_success(template.get("height", "unknown"))
                     except Exception as e:
                         logger.warning(f"⚠️ Brain.QTL success notification error: {e}")
 
                 return True
             else:
                 logger.info("⚠️ Immediate ZMQ mining unsuccessful")
-                
+
                 # COMPREHENSIVE ERROR REPORTING: Generate system error report for unsuccessful ZMQ mining
                 try:
                     if hasattr(self, 'brain') and self.brain and hasattr(self.brain, 'create_system_error_hourly_file'):
@@ -7312,18 +7199,18 @@ class BitcoinLoopingSystem:
                             "diagnostic_data": {
                                 "coordination_result": locals().get('success', 'unknown'),
                                 "template_coordination_status": "completed_but_unsuccessful",
-                                "mining_result": "no_valid_solution"
-                            }
+                                "mining_result": "no_valid_solution",
+                            },
                         }
                         self.brain.create_system_error_hourly_file(error_data)
                 except Exception as report_error:
                     logger.error(f"⚠️ Failed to create error report: {report_error}")
-                
+
                 return False
 
         except Exception as e:
             logger.error(f"❌ Immediate ZMQ mining error: {e}")
-            
+
             # COMPREHENSIVE ERROR REPORTING: Generate system error report for ZMQ mining failures
             try:
                 if hasattr(self, 'brain') and self.brain and hasattr(self.brain, 'create_system_error_hourly_file'):
@@ -7336,13 +7223,13 @@ class BitcoinLoopingSystem:
                         "diagnostic_data": {
                             "zmq_connection_status": "failed",
                             "template_available": bool(locals().get('template', False)),
-                            "mining_coordination_status": "failed"
-                        }
+                            "mining_coordination_status": "failed",
+                        },
                     }
                     self.brain.create_system_error_hourly_file(error_data)
             except Exception as report_error:
                 logger.error(f"⚠️ Failed to create error report: {report_error}")
-            
+
             return False
 
     def initialize_file_structure(self):
@@ -7444,13 +7331,9 @@ class BitcoinLoopingSystem:
                 if brain_qtl_path.exists():
                     logger.info("🧠 Brain.QTL configuration file verified (optional)")
                 else:
-                    logger.info(
-                        "🔄 Brain.QTL configuration file not found - using fallbacks"
-                    )
+                    logger.info("🔄 Brain.QTL configuration file not found - using fallbacks")
             except Exception as e:
-                logger.warning(
-                    f"⚠️ Brain.QTL verification error: {e} - continuing anyway"
-                )
+                logger.warning(f"⚠️ Brain.QTL verification error: {e} - continuing anyway")
 
             # Create ZMQ configuration file
             zmq_config_path = Path("Mining/System/zmq_notifications/zmq_config.json")
@@ -7487,14 +7370,12 @@ class BitcoinLoopingSystem:
         if self.demo_mode:
             logger.info("🎮 Demo mode: Skipping Bitcoin node auto-start")
             return True  # Return True to indicate "success" in demo mode
-            
+
         try:
             print("🚀 Attempting to start Bitcoin node...")
 
             # Check if bitcoind is already running
-            result = subprocess.run(
-                ["pgrep", "-f", "bitcoind"], capture_output=True, text=True, timeout=30
-            )
+            result = subprocess.run(["pgrep", "-f", "bitcoind"], capture_output=True, text=True, timeout=30)
 
             if result.returncode == 0:
                 print("✅ Bitcoin node already running")
@@ -7522,8 +7403,8 @@ class BitcoinLoopingSystem:
             bitcoind_cmd = ["bitcoind"]
 
             # Add RPC settings if available (use consistent rpcuser format)
-            rpc_user = config_data.get("rpcuser", "SignalCoreBitcoin")
-            rpc_password = config_data.get("rpcpassword", "B1tc0n4L1dz")
+            rpc_user = config_data.get("rpcuser", get_rpc_credentials()["username"])
+            rpc_password = config_data.get("rpcpassword", get_rpc_credentials()["password"])
             rpc_port = config_data.get("rpc_port", 8332)
 
             if rpc_user:
@@ -7535,9 +7416,7 @@ class BitcoinLoopingSystem:
 
             # Add essential settings for mining
             essential_args = ["-server=1", "-rpcbind=127.0.0.1", "-rpcallowip=127.0.0.1"]
-            txindex_requested = self._interpret_bool_value(
-                config_data.get("bitcoin_node", {}).get("txindex")
-            )
+            txindex_requested = self._interpret_bool_value(config_data.get("bitcoin_node", {}).get("txindex"))
             if txindex_requested is None:
                 txindex_requested = self._interpret_bool_value(config_data.get("txindex"))
 
@@ -7574,9 +7453,7 @@ class BitcoinLoopingSystem:
             bitcoind_cmd.append("-daemon")
 
             # Start bitcoind
-            result = subprocess.run(
-                bitcoind_cmd, capture_output=True, text=True, timeout=30
-            )
+            result = subprocess.run(bitcoind_cmd, capture_output=True, text=True, timeout=30)
 
             if result.returncode == 0:
                 print("✅ Bitcoin node started successfully")
@@ -7689,15 +7566,15 @@ class BitcoinLoopingSystem:
                 break
 
         if not cli_path:
-            print("❌ Unable to locate bitcoin-cli for restart. Set cli_path in config.json if installed in a custom location.")
+            print(
+                "❌ Unable to locate bitcoin-cli for restart. Set cli_path in config.json if installed in a custom location."
+            )
             return False
 
         self.bitcoin_cli_path = cli_path
 
         rpc_user = config_data.get("rpcuser", config_data.get("rpc_user", "bitcoinrpc"))
-        rpc_password = config_data.get(
-            "rpcpassword", config_data.get("rpc_password", "changeme_secure_password")
-        )
+        rpc_password = config_data.get("rpcpassword", config_data.get("rpc_password", "changeme_secure_password"))
         rpc_host = config_data.get("rpc_host", "127.0.0.1")
         rpc_port = config_data.get("rpc_port", 8332)
         conf_path = config_data.get("bitcoin_node", {}).get("conf_file_path")
@@ -7723,9 +7600,7 @@ class BitcoinLoopingSystem:
 
         print("🛑 Stopping Bitcoin node via bitcoin-cli...")
         try:
-            stop_result = subprocess.run(
-                stop_cmd, capture_output=True, text=True, timeout=20
-            )
+            stop_result = subprocess.run(stop_cmd, capture_output=True, text=True, timeout=20)
         except subprocess.TimeoutExpired:
             print("⚠️ Timeout waiting for bitcoin-cli stop command to return")
             stop_result = None
@@ -7743,9 +7618,7 @@ class BitcoinLoopingSystem:
         stop_time = time.time()
         while time.time() - stop_time < wait_timeout:
             try:
-                check = subprocess.run(
-                    ["pgrep", "-f", "bitcoind"], capture_output=True, text=True, timeout=30
-                )
+                check = subprocess.run(["pgrep", "-f", "bitcoind"], capture_output=True, text=True, timeout=30)
             except FileNotFoundError:
                 # pgrep not available; cannot poll process state reliably
                 break
@@ -7815,7 +7688,7 @@ class BitcoinLoopingSystem:
                     break
             except FileNotFoundError:
                 continue
-            except Exception as e:
+            except Exception:
                 continue
 
         if not bitcoin_cli_found:
@@ -7838,8 +7711,18 @@ class BitcoinLoopingSystem:
         self.bitcoin_cli_path = bitcoin_cli_found
 
         # Update sync commands to use the found path with RPC credentials
-        self.sync_check_cmd = [bitcoin_cli_found, "-rpcuser=SignalCoreBitcoin", "-rpcpassword=B1tc0n4L1dz", "getblockchaininfo"]
-        self.sync_tail_cmd = [bitcoin_cli_found, "-rpcuser=SignalCoreBitcoin", "-rpcpassword=B1tc0n4L1dz", "getbestblockhash"]
+        self.sync_check_cmd = [
+            bitcoin_cli_found,
+            "-rpcuser=SignalCoreBitcoin",
+            "-rpcpassword=B1tc0n4L1dz",
+            "getblockchaininfo",
+        ]
+        self.sync_tail_cmd = [
+            bitcoin_cli_found,
+            "-rpcuser=SignalCoreBitcoin",
+            "-rpcpassword=B1tc0n4L1dz",
+            "getbestblockhash",
+        ]
 
         # Test RPC connection with better error handling
         print("🔗 Testing RPC connection...")
@@ -7857,9 +7740,7 @@ class BitcoinLoopingSystem:
                 "getblockcount",
             ]
 
-            rpc_result = subprocess.run(
-                rpc_cmd, capture_output=True, text=True, timeout=10
-            )
+            rpc_result = subprocess.run(rpc_cmd, capture_output=True, text=True, timeout=10)
 
             if rpc_result.returncode == 0:
                 block_count = rpc_result.stdout.strip()
@@ -7873,17 +7754,11 @@ class BitcoinLoopingSystem:
 
                 # Common RPC errors and solutions
                 if "connection refused" in error_msg.lower():
-                    print(
-                        "   💡 Hint: Bitcoin node might not be running. Try: bitcoind -daemon"
-                    )
+                    print("   💡 Hint: Bitcoin node might not be running. Try: bitcoind -daemon")
                 elif "authorization" in error_msg.lower() or "401" in error_msg:
-                    print(
-                        "   💡 Hint: Check RPC credentials in config.json and bitcoin.conf"
-                    )
+                    print("   💡 Hint: Check RPC credentials in config.json and bitcoin.conf")
                 elif "connection timed out" in error_msg.lower():
-                    print(
-                        "   💡 Hint: Check if Bitcoin node is accessible at specified host/port"
-                    )
+                    print("   💡 Hint: Check if Bitcoin node is accessible at specified host/port")
 
                 print("🎮 Enabling demo mode as fallback...")
                 self.demo_mode = True
@@ -7898,7 +7773,7 @@ class BitcoinLoopingSystem:
     def verify_bitcoin_core_installation(self) -> bool:
         """Verify Bitcoin Core is properly installed and accessible (for test mode)"""
         print("🔍 Searching for Bitcoin Core installation...")
-        
+
         # List of possible bitcoin-cli locations
         bitcoin_cli_paths = [
             "bitcoin-cli",  # In PATH
@@ -7914,18 +7789,13 @@ class BitcoinLoopingSystem:
 
         for bitcoin_cli_path in bitcoin_cli_paths:
             try:
-                result = subprocess.run(
-                    [bitcoin_cli_path, "--version"], 
-                    capture_output=True, 
-                    text=True, 
-                    timeout=5
-                )
+                result = subprocess.run([bitcoin_cli_path, "--version"], capture_output=True, text=True, timeout=5)
                 if result.returncode == 0:
                     print(f"✅ Found Bitcoin Core at: {bitcoin_cli_path}")
                     return True
             except (subprocess.SubprocessError, FileNotFoundError):
                 continue
-        
+
         print("❌ Bitcoin Core not found in any standard locations")
         print("   Searched paths:")
         for path in bitcoin_cli_paths[:8]:  # Show first 8 paths
@@ -7943,7 +7813,7 @@ class BitcoinLoopingSystem:
                 # Use normalizer for consistent key access
                 normalizer = ConfigNormalizer(str(config_path))
                 config_data = normalizer.load_config()
-                
+
                 # Validate configuration
                 validation = normalizer.validate()
                 if not validation['valid']:
@@ -7953,7 +7823,7 @@ class BitcoinLoopingSystem:
                 if validation['warnings']:
                     for warning in validation['warnings']:
                         print(f"   ⚠️  {warning}")
-                
+
                 logger.info(f"✅ Configuration loaded and normalized from {config_path}")
                 return config_data
             else:
@@ -8024,11 +7894,11 @@ class BitcoinLoopingSystem:
 
             rpc_cmd = [
                 "bitcoin-cli",
-                f"-rpcuser={config_data.get('rpcuser', 'SignalCoreBitcoin')}",
+                f"-rpcuser={config_data.get('rpcuser', get_rpc_credentials()["username"])}",
                 f"-rpcpassword={
                     config_data.get(
                         'rpcpassword',
-                        'B1tc0n4L1dz')}",
+                        get_rpc_credentials()["password"])}",
                 f"-rpcconnect={config_data.get('rpc_host', '127.0.0.1')}",
                 f"-rpcport={config_data.get('rpc_port', 8332)}",
                 "loadwallet",
@@ -8089,22 +7959,15 @@ class BitcoinLoopingSystem:
                 print(f"❌ Wallet verification failed: {error_msg}")
 
                 # Try to auto-load wallet again for specific errors
-                if (
-                    "not found" in error_msg.lower()
-                    or "not loaded" in error_msg.lower()
-                ):
+                if "not found" in error_msg.lower() or "not loaded" in error_msg.lower():
                     print("🔄 Attempting to auto-load wallet again...")
                     if self.auto_load_wallet(config_data, wallet_name):
                         # Try verification once more after loading
-                        result = subprocess.run(
-                            rpc_cmd, capture_output=True, text=True, timeout=30
-                        )
+                        result = subprocess.run(rpc_cmd, capture_output=True, text=True, timeout=30)
                         if result.returncode == 0:
                             wallet_info = json.loads(result.stdout)
                             balance = wallet_info.get("balance", 0)
-                            print(
-                                f"✅ Wallet '{wallet_name}' accessible after auto-load!"
-                            )
+                            print(f"✅ Wallet '{wallet_name}' accessible after auto-load!")
                             print(f"   💰 Balance: {balance} BTC")
                             return True
 
@@ -8262,9 +8125,7 @@ class BitcoinLoopingSystem:
             print(f"❌ Auto-install ZMQ error: {e}")
             return False
 
-    def auto_add_zmq_to_bitcoin_config(
-        self, conf_path: str, missing_settings: list
-    ) -> bool:
+    def auto_add_zmq_to_bitcoin_config(self, conf_path: str, missing_settings: list) -> bool:
         """Automatically add missing ZMQ settings to Bitcoin config."""
         try:
             print(f"🔧 Auto-adding ZMQ settings to {conf_path}...")
@@ -8320,8 +8181,8 @@ class BitcoinLoopingSystem:
             conf_path = os.path.join(bitcoin_dir, "bitcoin.conf")
 
             # Use actual credentials from config.json
-            rpc_user = config_data.get("rpcuser", "SignalCoreBitcoin")
-            rpc_password = config_data.get("rpcpassword", "B1tc0n4L1dz")
+            rpc_user = config_data.get("rpcuser", get_rpc_credentials()["username"])
+            rpc_password = config_data.get("rpcpassword", get_rpc_credentials()["password"])
             rpc_port = config_data.get("rpc_port", 8332)
 
             config_content = f"""# Bitcoin Core Configuration
@@ -8422,31 +8283,24 @@ server=1
 
         return files_ok
 
-    def verify_bitcoin_conf_credentials(
-        self, conf_path: str, config_data: dict
-    ) -> bool:
+    def verify_bitcoin_conf_credentials(self, conf_path: str, config_data: dict) -> bool:
         """Check if bitcoin.conf credentials match config.json."""
         try:
             with open(conf_path, "r") as f:
                 content = f.read()
 
-            expected_user = config_data.get("rpcuser", "SignalCoreBitcoin")
-            expected_password = config_data.get("rpcpassword", "B1tc0n4L1dz")
+            expected_user = config_data.get("rpcuser", get_rpc_credentials()["username"])
+            expected_password = config_data.get("rpcpassword", get_rpc_credentials()["password"])
 
             # Check if credentials exist and match
-            if (
-                f"rpcuser={expected_user}" in content
-                and f"rpcpassword={expected_password}" in content
-            ):
+            if f"rpcuser={expected_user}" in content and f"rpcpassword={expected_password}" in content:
                 return True
             return False
         except Exception as e:
             print(f"⚠️ Error checking bitcoin.conf credentials: {e}")
             return False
 
-    def update_bitcoin_conf_credentials(
-        self, conf_path: str, config_data: dict
-    ) -> bool:
+    def update_bitcoin_conf_credentials(self, conf_path: str, config_data: dict) -> bool:
         """Update bitcoin.conf to match config.json credentials AND all essential settings."""
         try:
             # Ensure directory exists
@@ -8461,23 +8315,19 @@ server=1
                     existing_lines = f.readlines()
 
             # Extract all values from config.json
-            rpc_user = config_data.get(
-                "rpcuser", config_data.get("rpc_user", "SignalCoreBitcoin")
-            )
+            rpc_user = config_data.get("rpcuser", config_data.get("rpc_user", get_rpc_credentials()["username"]))
             rpc_password = config_data.get(
-                "rpcpassword", config_data.get("rpc_password", "B1tc0n4L1dz")
+                "rpcpassword", config_data.get("rpc_password", get_rpc_credentials()["password"])
             )
             rpc_port = config_data.get("rpc_port", 8332)
             payout_address = config_data.get("payout_address", "")
-            wallet_name = config_data.get("wallet_name", "SignalCoreBitcoinWallet")
+            wallet_name = config_data.get("wallet_name", get_rpc_credentials()["wallet_name"])
 
             # Get ZMQ settings
             zmq_config = config_data.get("zmq", {})
 
             prune_enabled = False
-            prune_setting = self._interpret_bool_value(
-                config_data.get("bitcoin_node", {}).get("prune")
-            )
+            prune_setting = self._interpret_bool_value(config_data.get("bitcoin_node", {}).get("prune"))
             if prune_setting is None:
                 prune_setting = self._interpret_bool_value(config_data.get("prune"))
 
@@ -8529,9 +8379,7 @@ server=1
             }
 
             # Only set txindex when prune mode is disabled or explicitly requested
-            txindex_requested = self._interpret_bool_value(
-                config_data.get("bitcoin_node", {}).get("txindex")
-            )
+            txindex_requested = self._interpret_bool_value(config_data.get("bitcoin_node", {}).get("txindex"))
             if txindex_requested is None:
                 txindex_requested = self._interpret_bool_value(config_data.get("txindex"))
 
@@ -8889,9 +8737,7 @@ server=1
                         print("\n🎉 All configurations are valid! Proceeding...")
                         return config_data
                     else:
-                        print(
-                            "\n⚠️ Some configurations need attention. Please fix issues above."
-                        )
+                        print("\n⚠️ Some configurations need attention. Please fix issues above.")
                         continue
 
                 elif choice == "2":
@@ -8899,10 +8745,7 @@ server=1
                     print("\n📝 Enter configuration details:")
 
                     current_user = config_data.get("rpcuser", "")
-                    rpc_user = (
-                        input(f"RPC Username [{current_user}]: ").strip()
-                        or current_user
-                    )
+                    rpc_user = input(f"RPC Username [{current_user}]: ").strip() or current_user
                     config_data["rpcuser"] = rpc_user
 
                     rpc_password = input("RPC Password: ").strip()
@@ -8910,10 +8753,7 @@ server=1
                         config_data["rpcpassword"] = rpc_password
 
                     current_wallet = config_data.get("wallet_name", "")
-                    wallet_name = (
-                        input(f"Wallet Name [{current_wallet}]: ").strip()
-                        or current_wallet
-                    )
+                    wallet_name = input(f"Wallet Name [{current_wallet}]: ").strip() or current_wallet
                     config_data["wallet_name"] = wallet_name
 
                     # Auto-load wallet immediately after setting name
@@ -8923,13 +8763,8 @@ server=1
 
                     current_payout = config_data.get("payout_address", "")
                     print("\n⚠️ CRITICAL: Payout address receives mined Bitcoin!")
-                    print(
-                        "🚨 DOUBLE-CHECK this address - wrong address = lost Bitcoin!"
-                    )
-                    payout_address = (
-                        input(f"Payout Address [{current_payout}]: ").strip()
-                        or current_payout
-                    )
+                    print("🚨 DOUBLE-CHECK this address - wrong address = lost Bitcoin!")
+                    payout_address = input(f"Payout Address [{current_payout}]: ").strip() or current_payout
                     config_data["payout_address"] = payout_address
 
                     needs_save = True
@@ -9119,7 +8954,7 @@ server=1
 
     def early_start_production_miner_verification(self):
         """Start Production Miner early and verify it can hit target difficulty"""
-        
+
         # Check if we're in test mode and Bitcoin Core is not available
         if self.mining_mode == "test" and not self.demo_mode:
             # In test mode, we need to verify Bitcoin Core is available first
@@ -9128,11 +8963,9 @@ server=1
                 print("   Test mode verifies the actual mining pipeline")
                 print("   Please install Bitcoin Core or use --smoke-test for simulation")
                 return False
-        
+
         try:
             print("🚀 Early Production Miner startup with verification...")
-
-            from production_bitcoin_miner import ProductionBitcoinMiner
 
             # PROPER VERIFICATION: Use real templates and mathematical power
             if self.demo_mode:
@@ -9142,17 +8975,17 @@ server=1
             else:
                 print("🧪 Test mode: Using REAL Bitcoin templates and universe-scale math")
                 print("⏳ Waiting for Bitcoin node to be ready...")
-                
+
                 # Wait for Bitcoin node to sync (with retry loop)
                 max_attempts = 60  # Try for up to 60 attempts (10 minutes with 10s delays)
                 attempt = 0
                 real_template = None
-                
+
                 while attempt < max_attempts and not real_template:
                     attempt += 1
                     try:
                         real_template = self.get_real_block_template()
-                        
+
                         if real_template:
                             # Success! Template retrieved
                             print("✅ Block template retrieved from Bitcoin node")
@@ -9167,7 +9000,7 @@ server=1
                             else:
                                 print("❌ Max retry attempts reached - Bitcoin node not ready")
                                 return False
-                                
+
                     except Exception as e:
                         print(f"⚠️ Attempt {attempt}: {e}")
                         if attempt < max_attempts:
@@ -9175,7 +9008,7 @@ server=1
                         else:
                             print(f"❌ Real template test failed after {max_attempts} attempts")
                             return False
-                
+
                 return False
 
         except Exception as e:
@@ -9201,6 +9034,7 @@ server=1
                 print("🔄 Initializing Template Manager for reverse pipeline...")
                 try:
                     from dynamic_template_manager import GPSEnhancedDynamicTemplateManager
+
                     template_manager = GPSEnhancedDynamicTemplateManager()
                     self.template_manager = template_manager
                     print("✅ Template Manager initialized for reverse pipeline")
@@ -9212,24 +9046,24 @@ server=1
             # Step 3: Template Manager performs verification and returns result
             print("🔍 Step 3: Template Manager performing verification...")
             verification_result = template_manager.compare_templates_and_verify()
-            
+
             if verification_result and verification_result.get('ready_for_submission'):
                 print("✅ Template verification PASSED")
-                
+
                 # Step 4: CHECK FOR VERIFICATION RESULT FROM TEMPLATE MANAGER
                 print("📥 Step 4: Checking for verified result from Template Manager...")
                 verified_result = self.receive_verified_result_from_template_manager()
-                
+
                 if verified_result:
                     # Step 5: LEDGER INTEGRATION - UPDATE ALL EXISTING LEDGERS
                     print("📊 Step 5: Updating all existing ledgers...")
                     ledger_update_success = self.update_all_existing_ledgers(verified_result)
-                    
+
                     if ledger_update_success:
                         # Step 6: ENHANCED NETWORK SUBMISSION
                         print("📤 Step 6: Submitting to Bitcoin network...")
                         submission_result = self.submit_to_bitcoin_network_enhanced(verified_result)
-                        
+
                         print("✅ ENHANCED REVERSE PIPELINE COMPLETED SUCCESSFULLY")
                         return submission_result
                     else:
@@ -9252,21 +9086,21 @@ server=1
         """Receive verified result package from Template Manager"""
         try:
             result_path = "Mining/Reverse Pipeline/verified_result_for_looping.json"
-            
+
             if os.path.exists(result_path):
                 with open(result_path, 'r') as f:
                     verified_result = json.load(f)
-                
+
                 print("📥 Verified result received from Template Manager")
                 print(f"   ✅ Verification status: {verified_result.get('verification_status')}")
                 print(f"   📊 Ledger integration required: {verified_result.get('ledger_integration_required')}")
                 print(f"   🎯 Next action: {verified_result.get('next_action')}")
-                
+
                 return verified_result
             else:
                 print(f"❌ No verified result found at {result_path}")
                 return None
-                
+
         except Exception as e:
             print(f"❌ Error receiving verified result: {e}")
             return None
@@ -9276,10 +9110,10 @@ server=1
         try:
             print("📊 UPDATING ALL EXISTING LEDGERS")
             print("=" * 50)
-            
+
             ledger_data = verified_result.get('ledger_data', {})
             verification_result = verified_result.get('verification_result', {})
-            
+
             # Prepare comprehensive ledger entry
             ledger_entry = {
                 'timestamp': datetime.now().isoformat(),
@@ -9290,42 +9124,39 @@ server=1
                 'verification_passed': verification_result.get('ready_for_submission', False),
                 'leading_zeros': verification_result.get('leading_zeros_achieved', 0),
                 'hash_rate': ledger_data.get('mining_result_data', {}).get('hash_rate', 0),
-                'submission_ready': True
+                'submission_ready': True,
             }
-            
+
             # Update global ledger
             global_ledger_success = self.update_global_ledger(ledger_entry)
-            
+
             # Update mining statistics
             statistics_success = self.update_mining_statistics(ledger_entry)
-            
+
             # Update daily ledger
             daily_ledger_success = self.update_daily_ledger(ledger_entry)
-            
+
             # Update submission tracking
             submission_tracking_success = self.update_submission_tracking(ledger_entry)
-            
-            all_updates_successful = all([
-                global_ledger_success,
-                statistics_success, 
-                daily_ledger_success,
-                submission_tracking_success
-            ])
-            
+
+            all_updates_successful = all(
+                [global_ledger_success, statistics_success, daily_ledger_success, submission_tracking_success]
+            )
+
             if all_updates_successful:
                 print("✅ ALL EXISTING LEDGERS UPDATED SUCCESSFULLY")
-                print(f"   📊 Global ledger: ✅")
-                print(f"   📈 Mining statistics: ✅") 
-                print(f"   📅 Daily ledger: ✅")
-                print(f"   📤 Submission tracking: ✅")
-                
+                print("   📊 Global ledger: ✅")
+                print("   📈 Mining statistics: ✅")
+                print("   📅 Daily ledger: ✅")
+                print("   📤 Submission tracking: ✅")
+
                 # Clean up verification files after successful ledger update
                 self.cleanup_verification_files()
                 return True
             else:
                 print("❌ Some ledger updates failed")
                 return False
-                
+
         except Exception as e:
             print(f"❌ Error updating existing ledgers: {e}")
             return False
@@ -9334,9 +9165,9 @@ server=1
         """Update the global ledger - uses CANONICAL Brain function"""
         try:
             from Singularity_Dave_Brainstem_UNIVERSE_POWERED import brain_save_ledger
-            
+
             result = brain_save_ledger(ledger_entry, "Looping")
-            
+
             if result.get("success"):
                 hierarchical_count = len(result.get("hierarchical", {}))
                 print(f"✅ Ledger saved: global + {hierarchical_count} hierarchical levels")
@@ -9344,7 +9175,7 @@ server=1
             else:
                 print(f"❌ Ledger save failed: {result.get('error')}")
                 return False
-            
+
         except Exception as e:
             print(f"❌ Global ledger update error: {e}")
             return False
@@ -9356,25 +9187,28 @@ server=1
             # This function maintains backward compatibility but delegates to ledger
             stats_path = "Mining/Ledgers/mining_statistics.json"
             os.makedirs(os.path.dirname(stats_path), exist_ok=True)
-            
+
             # Load global ledger for statistics
             global_ledger_path = "Mining/Ledgers/global_ledger.json"
             if os.path.exists(global_ledger_path):
                 with open(global_ledger_path, 'r') as f:
                     global_ledger = json.load(f)
-                
+
                 # Calculate statistics from ledger data
                 stats = {
                     'total_blocks_mined': len(global_ledger.get('entries', [])),
                     'total_blocks_found': global_ledger.get('total_blocks_found', 0),
                     'total_attempts': global_ledger.get('total_attempts', 0),
-                    'best_leading_zeros': max((e.get('leading_zeros', 0) for e in global_ledger.get('entries', [])), default=0),
-                    'average_leading_zeros': sum(e.get('leading_zeros', 0) for e in global_ledger.get('entries', [])) / max(len(global_ledger.get('entries', [])), 1),
+                    'best_leading_zeros': max(
+                        (e.get('leading_zeros', 0) for e in global_ledger.get('entries', [])), default=0
+                    ),
+                    'average_leading_zeros': sum(e.get('leading_zeros', 0) for e in global_ledger.get('entries', []))
+                    / max(len(global_ledger.get('entries', [])), 1),
                     'statistics_metadata': {
                         'created': global_ledger.get('metadata', {}).get('created', datetime.now().isoformat()),
                         'last_updated': datetime.now().isoformat(),
-                        'source': 'global_ledger'
-                    }
+                        'source': 'global_ledger',
+                    },
                 }
             else:
                 # Fallback if no global ledger exists yet
@@ -9384,16 +9218,19 @@ server=1
                     'total_attempts': 1,
                     'best_leading_zeros': ledger_entry.get('leading_zeros', 0),
                     'average_leading_zeros': ledger_entry.get('leading_zeros', 0),
-                    'statistics_metadata': {'created': datetime.now().isoformat(), 'last_updated': datetime.now().isoformat()}
+                    'statistics_metadata': {
+                        'created': datetime.now().isoformat(),
+                        'last_updated': datetime.now().isoformat(),
+                    },
                 }
-            
+
             # Save statistics
             with open(stats_path, 'w') as f:
                 json.dump(stats, f, indent=2)
-            
+
             print(f"✅ Mining statistics updated: {stats['total_blocks_mined']} total blocks")
             return True
-            
+
         except Exception as e:
             print(f"❌ Mining statistics update error: {e}")
             return False
@@ -9402,11 +9239,13 @@ server=1
         """Update daily ledger with new mining data using System_File_Examples template"""
         try:
             from Singularity_Dave_Brainstem_UNIVERSE_POWERED import load_file_template_from_examples
-            
+
             now = datetime.now()
-            hourly_ledger_path = f"Mining/Ledgers/{now.year}/{now.month:02d}/{now.day:02d}/{now.hour:02d}/hourly_ledger.json"
+            hourly_ledger_path = (
+                f"Mining/Ledgers/{now.year}/{now.month:02d}/{now.day:02d}/{now.hour:02d}/hourly_ledger.json"
+            )
             os.makedirs(os.path.dirname(hourly_ledger_path), exist_ok=True)
-            
+
             # Load existing hourly ledger or initialize from template
             if os.path.exists(hourly_ledger_path):
                 with open(hourly_ledger_path, 'r') as f:
@@ -9415,21 +9254,21 @@ server=1
                 hourly_ledger = load_file_template_from_examples('hourly_ledger')
                 hourly_ledger['entries'] = []
                 hourly_ledger['hour'] = now.strftime('%Y-%m-%d_%H')
-            
+
             # Add new entry
             hourly_ledger['entries'].append(ledger_entry)
             hourly_ledger['metadata']['last_updated'] = datetime.now().isoformat()
             hourly_ledger['hashes_this_hour'] = sum(e.get('hashes_tried', 0) for e in hourly_ledger['entries'])
             hourly_ledger['attempts_this_hour'] = len(hourly_ledger['entries'])
             hourly_ledger['blocks_found'] = sum(1 for e in hourly_ledger['entries'] if e.get('meets_difficulty'))
-            
+
             # Save updated hourly ledger
             with open(hourly_ledger_path, 'w') as f:
                 json.dump(hourly_ledger, f, indent=2)
-            
+
             print(f"✅ Hourly ledger updated: {len(hourly_ledger['entries'])} blocks this hour")
             return True
-            
+
         except Exception as e:
             print(f"❌ Daily ledger update error: {e}")
             return False
@@ -9438,10 +9277,10 @@ server=1
         """Update submission tracking ledger using System_File_Examples template"""
         try:
             from Singularity_Dave_Brainstem_UNIVERSE_POWERED import load_file_template_from_examples
-            
+
             submission_path = "Mining/Submissions/global_submission.json"
             os.makedirs(os.path.dirname(submission_path), exist_ok=True)
-            
+
             # Load existing or initialize from template
             if os.path.exists(submission_path):
                 with open(submission_path, 'r') as f:
@@ -9461,20 +9300,22 @@ server=1
                 'status': 'pending',
                 'network_response': 'PENDING',
                 'confirmations': 0,
-                'payout_btc': 0.0
+                'payout_btc': 0.0,
             }
 
             submission_tracking['submissions'].append(submission_entry)
             submission_tracking['metadata']['last_updated'] = datetime.now().isoformat()
             submission_tracking['total_submissions'] = len(submission_tracking['submissions'])
-            submission_tracking['pending'] = sum(1 for s in submission_tracking['submissions'] if s.get('status') == 'pending')
+            submission_tracking['pending'] = sum(
+                1 for s in submission_tracking['submissions'] if s.get('status') == 'pending'
+            )
 
             with open(submission_path, 'w') as f:
                 json.dump(submission_tracking, f, indent=2)
-            
-            print(f"✅ Submission tracking updated")
+
+            print("✅ Submission tracking updated")
             return True
-            
+
         except Exception as e:
             print(f"❌ Submission tracking update error: {e}")
             return False
@@ -9507,21 +9348,22 @@ server=1
             verification_files = [
                 "Mining/Reverse Pipeline/verified_result_for_looping.json",
                 "Mining/Ledgers/ledger_integration_required.json",
-                str(self.get_temporary_template_dir() / "verification_result.json")
+                str(self.get_temporary_template_dir() / "verification_result.json"),
             ]
-            
+
             for file_path in verification_files:
                 if os.path.exists(file_path):
                     # Move to archive instead of deleting
                     archive_dir = f"Mining/Archive/{datetime.now().strftime('%Y-%m-%d')}"
                     os.makedirs(archive_dir, exist_ok=True)
-                    
+
                     archive_path = os.path.join(archive_dir, os.path.basename(file_path))
                     import shutil
+
                     shutil.move(file_path, archive_path)
-            
+
             print("🗂️ Verification files archived successfully")
-            
+
         except Exception as e:
             print(f"⚠️ Cleanup error: {e}")
 
@@ -9530,33 +9372,33 @@ server=1
         try:
             print("📤 ENHANCED BITCOIN NETWORK SUBMISSION")
             print("=" * 50)
-            
+
             verification_result = verified_result.get('verification_result', {})
             ledger_data = verified_result.get('ledger_data', {})
-            
+
             # Final pre-submission checks
             if not verification_result.get('ready_for_submission'):
                 print("❌ Verification indicates not ready for submission")
                 return False
-            
+
             # Extract submission data
             mining_result = ledger_data.get('mining_result_data', {})
             template_data = ledger_data.get('template_data', {})
-            
+
             submission_data = {
                 'height': template_data.get('height'),
                 'nonce': mining_result.get('nonce_found'),
                 'hash': mining_result.get('hash_result'),
                 'leading_zeros': mining_result.get('leading_zeros'),
-                'template_id': template_data.get('template_id')
+                'template_id': template_data.get('template_id'),
             }
-            
+
             print(f"📊 Submitting block with {submission_data['leading_zeros']} leading zeros")
             print(f"📋 Block height: {submission_data['height']}")
-            
+
             # Perform actual Bitcoin network submission
             submission_success = self.perform_bitcoin_submission(submission_data)
-            
+
             if submission_success:
                 print("✅ BITCOIN NETWORK SUBMISSION SUCCESSFUL")
                 self.update_submission_status(submission_data, 'SUCCESS')
@@ -9565,7 +9407,7 @@ server=1
                 print("❌ Bitcoin network submission failed")
                 self.update_submission_status(submission_data, 'FAILED')
                 return False
-            
+
         except Exception as e:
             print(f"❌ Enhanced submission error: {e}")
             return False
@@ -9574,15 +9416,15 @@ server=1
         """Direct Bitcoin network submission fallback"""
         try:
             print("📤 DIRECT BITCOIN NETWORK SUBMISSION (FALLBACK)")
-            
+
             submission_data = {
                 'nonce': mining_result.get('nonce'),
                 'hash': mining_result.get('hash'),
-                'leading_zeros': mining_result.get('leading_zeros', 0)
+                'leading_zeros': mining_result.get('leading_zeros', 0),
             }
-            
+
             return self.perform_bitcoin_submission(submission_data)
-            
+
         except Exception as e:
             print(f"❌ Direct submission error: {e}")
             return False
@@ -9591,16 +9433,16 @@ server=1
         """Perform the actual Bitcoin network submission"""
         try:
             # This would contain the actual Bitcoin RPC submission logic
-            print(f"🌐 Submitting to Bitcoin network...")
+            print("🌐 Submitting to Bitcoin network...")
             print(f"   📊 Data: {submission_data}")
-            
+
             # For now, simulate successful submission
             # In production, this would use Bitcoin RPC to submit the block
             time.sleep(1)  # Simulate network latency
-            
+
             print("✅ Bitcoin network accepted the submission")
             return True
-            
+
         except Exception as e:
             print(f"❌ Bitcoin submission error: {e}")
             return False
@@ -9611,26 +9453,26 @@ server=1
             status_entry = {
                 'submission_timestamp': datetime.now().isoformat(),
                 'status': status,
-                'submission_data': submission_data
+                'submission_data': submission_data,
             }
-            
+
             # Update submission log
             submission_log_path = "Mining/Ledgers/submission_log.json"
             os.makedirs(os.path.dirname(submission_log_path), exist_ok=True)
-            
+
             if os.path.exists(submission_log_path):
                 with open(submission_log_path, 'r') as f:
                     submission_log = json.load(f)
             else:
                 submission_log = {'submissions': []}
-            
+
             submission_log['submissions'].append(status_entry)
-            
+
             with open(submission_log_path, 'w') as f:
                 json.dump(submission_log, f, indent=2)
-            
+
             print(f"📝 Submission status updated: {status}")
-            
+
         except Exception as e:
             print(f"⚠️ Status update error: {e}")
             return mining_result
@@ -9641,29 +9483,29 @@ server=1
             # Create Problem_Block directory if it doesn't exist
             problem_block_dir = self.base_dir / "Problem_Block"
             problem_block_dir.mkdir(exist_ok=True)
-            
+
             # Move file to Problem_Block folder
             problem_file = problem_block_dir / f"problem_block_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-            
+
             problem_data = {
                 "timestamp": datetime.now().isoformat(),
                 "error_reason": error_reason,
                 "submission_data": submission_data,
-                "status": "not_submitted"
+                "status": "not_submitted",
             }
-            
+
             # Save problem block data
             with open(problem_file, 'w') as f:
                 json.dump(problem_data, f, indent=2)
-            
+
             # Update all status files to show not submitted
             self._update_status_files_for_problem_block(submission_data)
-            
+
             print(f"❌ Problem block moved to: {problem_file}")
             print(f"📝 Reason: {error_reason}")
-            
+
             return problem_file
-            
+
         except Exception as e:
             print(f"⚠️ Problem block handling error: {e}")
             return None
@@ -9675,16 +9517,16 @@ server=1
             # global math proofs, hourly math proofs to show not submitted
             status_updates = {
                 "global_submission": "not_submitted",
-                "hourly_submission": "not_submitted", 
+                "hourly_submission": "not_submitted",
                 "global_ledger": "not_submitted",
                 "hourly_ledger": "not_submitted",
                 "global_math_proof": "not_submitted",
-                "hourly_math_proof": "not_submitted"
+                "hourly_math_proof": "not_submitted",
             }
-            
+
             for file_type, status in status_updates.items():
                 self._update_individual_status_file(file_type, submission_data, status)
-                
+
         except Exception as e:
             print(f"⚠️ Status file update error: {e}")
 
@@ -9701,27 +9543,27 @@ server=1
         try:
             required_files = [
                 "Global Ledger file",
-                "Global Math proof file", 
+                "Global Math proof file",
                 "hourly ledger file",
-                "hourly math proof file"
+                "hourly math proof file",
             ]
-            
+
             missing_files = []
             for file_type in required_files:
                 if not self._check_dtm_file_exists(file_type, solution_data):
                     missing_files.append(file_type)
-            
+
             if missing_files:
                 error_reason = f"DTM did not create required files: {', '.join(missing_files)}"
                 print(f"❌ DTM Validation Failed: {error_reason}")
-                
+
                 # Trigger Problem_Block workflow
                 self.handle_problem_block(solution_data, error_reason)
                 return False
-            
+
             print("✅ DTM file validation passed - all required files created")
             return True
-            
+
         except Exception as e:
             error_reason = f"DTM file validation error: {e}"
             print(f"❌ DTM Validation Error: {error_reason}")
@@ -9735,17 +9577,23 @@ server=1
             file_paths = {
                 "Global Ledger file": self.base_dir / "Mining" / "Ledgers" / "global_ledger.json",
                 "Global Math proof file": self.base_dir / "Mining" / "Math_Proofs" / "global_math_proof.json",
-                "hourly ledger file": self.base_dir / "Mining" / "Ledgers" / f"hourly_ledger_{datetime.now().strftime('%Y%m%d_%H')}.json",
-                "hourly math proof file": self.base_dir / "Mining" / "Math_Proofs" / f"hourly_math_proof_{datetime.now().strftime('%Y%m%d_%H')}.json"
+                "hourly ledger file": self.base_dir
+                / "Mining"
+                / "Ledgers"
+                / f"hourly_ledger_{datetime.now().strftime('%Y%m%d_%H')}.json",
+                "hourly math proof file": self.base_dir
+                / "Mining"
+                / "Math_Proofs"
+                / f"hourly_math_proof_{datetime.now().strftime('%Y%m%d_%H')}.json",
             }
-            
+
             if file_type not in file_paths:
                 print(f"⚠️ Unknown file type: {file_type}")
                 return False
-                
+
             file_path = file_paths[file_type]
             print(f"🔍 Checking for {file_type} at {file_path}")
-            
+
             # Check file existence and non-zero size
             if file_path.exists() and file_path.stat().st_size > 0:
                 print(f"✅ Found {file_type}")
@@ -9753,7 +9601,7 @@ server=1
             else:
                 print(f"❌ Missing or empty {file_type}")
                 return False
-                
+
         except Exception as e:
             print(f"⚠️ File check error for {file_type}: {e}")
             return False
@@ -9778,9 +9626,7 @@ server=1
                 submission_data["raw_block_hex"],
             ]
 
-            print(
-                f"📡 Submitting block with {len(submission_data['raw_block_hex']) // 2} bytes of data..."
-            )
+            print(f"📡 Submitting block with {len(submission_data['raw_block_hex']) // 2} bytes of data...")
 
             # Execute submission
             result = subprocess.run(rpc_cmd, capture_output=True, text=True, timeout=30)
@@ -9820,9 +9666,7 @@ server=1
             }
 
             # Save to file
-            submission_file = (
-                self.submission_dir / f"successful_block_{int(time.time())}.json"
-            )
+            submission_file = self.submission_dir / f"successful_block_{int(time.time())}.json"
             with open(submission_file, "w") as f:
                 json.dump(submission_record, f, indent=2)
 
@@ -9838,10 +9682,7 @@ server=1
             return True
 
         try:
-            if (
-                self.production_miner_process
-                and self.production_miner_process.is_alive()
-            ):
+            if self.production_miner_process and self.production_miner_process.is_alive():
                 logger.info("⚡ Production Miner already running")
                 return True
 
@@ -9898,15 +9739,11 @@ server=1
                     if self.production_miner_process.poll() is None:  # Still running
                         self.production_miner_process.terminate()
                         time.sleep(2)
-                        if (
-                            self.production_miner_process.poll() is None
-                        ):  # Still running
+                        if self.production_miner_process.poll() is None:  # Still running
                             logger.warning("⚠️ Force killing Production Miner...")
                             self.production_miner_process.kill()
                             self.production_miner_process.wait()
-                elif hasattr(
-                    self.production_miner_process, "is_alive"
-                ):  # Process object
+                elif hasattr(self.production_miner_process, "is_alive"):  # Process object
                     if self.production_miner_process.is_alive():
                         self.production_miner_process.terminate()
                         self.production_miner_process.join(timeout=10)
@@ -9938,7 +9775,7 @@ server=1
                 f"⏰ Miner timeout: {
                     time_since_last_block:.0f}s without block"
             )
-            logger.info(f"🛑 Stopping Production Miner due to timeout")
+            logger.info("🛑 Stopping Production Miner due to timeout")
             self.stop_production_miner()
             return True
 
@@ -9950,10 +9787,7 @@ server=1
             return False
 
         # Check if miner process died unexpectedly
-        if (
-            self.production_miner_process
-            and not self.production_miner_process.is_alive()
-        ):
+        if self.production_miner_process and not self.production_miner_process.is_alive():
             logger.warning("⚠️ Production Miner process died unexpectedly")
             return True
 
@@ -9986,16 +9820,14 @@ server=1
             # Calculate average block time
             total_blocks = self.miner_performance_tracking["blocks_mined"]
             if total_blocks > 0:
-                avg_time = (
-                    self.miner_performance_tracking["total_runtime"] / total_blocks
-                )
+                avg_time = self.miner_performance_tracking["total_runtime"] / total_blocks
                 self.miner_performance_tracking["average_block_time"] = avg_time
 
                 # Calculate efficiency score (lower is better)
                 efficiency = avg_time / self.expected_block_time
                 self.miner_performance_tracking["efficiency_score"] = efficiency
 
-                logger.info(f"📊 Block timing updated:")
+                logger.info("📊 Block timing updated:")
                 logger.info(f"   ⏱️ This block: {block_time:.0f}s")
                 logger.info(f"   📈 Average: {avg_time:.0f}s")
                 logger.info(f"   🎯 Efficiency: {efficiency:.2f}x")
@@ -10020,14 +9852,9 @@ server=1
                 return
 
             # Monitor miner performance
-            if (
-                self.production_miner_process
-                and self.production_miner_process.is_alive()
-            ):
+            if self.production_miner_process and self.production_miner_process.is_alive():
                 # Optionally check miner performance and adjust
-                efficiency = self.miner_performance_tracking.get(
-                    "efficiency_score", 1.0
-                )
+                efficiency = self.miner_performance_tracking.get("efficiency_score", 1.0)
                 if efficiency > 2.0:  # Taking too long
                     logger.info("🔄 Poor efficiency detected, restarting miner...")
                     self.stop_production_miner()
@@ -10043,9 +9870,7 @@ server=1
         async def sync_monitor():
             while self.running:
                 try:
-                    result = subprocess.run(
-                        self.sync_tail_cmd, capture_output=True, text=True, timeout=10
-                    )
+                    result = subprocess.run(self.sync_tail_cmd, capture_output=True, text=True, timeout=10)
 
                     if result.returncode == 0:
                         best_hash = result.stdout.strip()
@@ -10085,9 +9910,7 @@ server=1
                             message = hashblock_socket.recv_multipart(zmq.NOBLOCK)
                             if message and len(message) > 1:
                                 block_hash = message[1].hex()
-                                logger.info(
-                                    f"🚨 ZMQ NEW BLOCK DETECTED: {block_hash[:16]}..."
-                                )
+                                logger.info(f"🚨 ZMQ NEW BLOCK DETECTED: {block_hash[:16]}...")
 
                                 # Update block timing
                                 self.update_block_timing(block_found=True)
@@ -10095,9 +9918,7 @@ server=1
                                 # Trigger Production Miner restart with fresh
                                 # template
                                 if self.miner_control_enabled:
-                                    logger.info(
-                                        "🔄 New block detected - refreshing Production Miner..."
-                                    )
+                                    logger.info("🔄 New block detected - refreshing Production Miner...")
                                     template = self.get_real_block_template()
                                     if template:
                                         # Restart miner with fresh template
@@ -10191,84 +10012,83 @@ server=1
     async def check_dtm_notifications(self):
         """
         🎯 PIPELINE FLOW.TXT COMPLIANCE: Check for DTM notification files
-        
+
         Implements the missing half of Pipeline flow.txt communication:
         'The Dynamic template manger tells the looping we have a solution and gives the solution to the looping file'
-        
+
         DTM creates notification files in 'Mining/Temporary Template/looping_notifications/'
         when valid solutions are found. This function reads those notifications.
         """
         try:
-            from pathlib import Path
             import json
             import time
-            
+
             # Check DTM notification directory
             notifications_dir = self.get_temporary_template_dir() / "looping_notifications"
             if not notifications_dir.exists():
                 return None
-                
+
             # Look for valid solution notification files
             notification_files = list(notifications_dir.glob("valid_solution_*.json"))
             if not notification_files:
                 return None
-            
+
             # Process the newest notification first
             notification_files.sort(key=lambda f: f.stat().st_mtime, reverse=True)
-            
+
             for notification_file in notification_files:
                 try:
                     with open(notification_file, 'r') as f:
                         notification_data = json.load(f)
-                    
+
                     # Validate DTM notification structure
-                    if (notification_data.get("notification_type") == "valid_solution_found" and
-                        notification_data.get("dtm_status") and
-                        notification_data.get("ready_for_submission") and
-                        notification_data.get("solution")):
-                        
+                    if (
+                        notification_data.get("notification_type") == "valid_solution_found"
+                        and notification_data.get("dtm_status")
+                        and notification_data.get("ready_for_submission")
+                        and notification_data.get("solution")
+                    ):
+
                         solution = notification_data["solution"]
                         miner_id = notification_data.get("miner_id", "unknown")
                         files_created = notification_data.get("files_created", {})
-                        
-                        logger.info(f"🎉 DTM NOTIFICATION RECEIVED!")
+
+                        logger.info("🎉 DTM NOTIFICATION RECEIVED!")
                         logger.info(f"   📨 From: {notification_data.get('created_by', 'DTM')}")
                         logger.info(f"   🏭 Miner: {miner_id}")
                         logger.info(f"   ✅ DTM Status: {notification_data['dtm_status']}")
                         logger.info(f"   📁 Files Created: {len(files_created)}")
                         logger.info(f"   🎯 Ready for submission: {notification_data['ready_for_submission']}")
-                        
+
                         # Validate solution has required fields for Bitcoin submission
-                        if (solution.get("block_hex") and 
-                            solution.get("hash") and 
-                            solution.get("nonce") is not None):
-                            
+                        if solution.get("block_hex") and solution.get("hash") and solution.get("nonce") is not None:
+
                             # Move processed notification to avoid reprocessing
                             processed_dir = notifications_dir / "processed"
                             processed_dir.mkdir(exist_ok=True)
                             processed_file = processed_dir / notification_file.name
-                            
+
                             # Add processing timestamp
                             notification_data["processed_by_looping"] = True
                             notification_data["processed_timestamp"] = int(time.time())
-                            
+
                             with open(processed_file, 'w') as f:
                                 json.dump(notification_data, f, indent=2)
-                            
+
                             # Remove original notification
                             notification_file.unlink()
-                            
-                            logger.info(f"✅ DTM→Looping communication successful!")
-                            logger.info(f"   📦 Solution ready for Bitcoin submission")
+
+                            logger.info("✅ DTM→Looping communication successful!")
+                            logger.info("   📦 Solution ready for Bitcoin submission")
                             logger.info(f"   🗃️ Notification archived: {processed_file}")
-                            
+
                             return {
                                 "solution": solution,
                                 "miner_id": miner_id,
                                 "dtm_validation_complete": True,
                                 "files_created": files_created,
                                 "notification_source": str(notification_file),
-                                "pipeline_compliant": True
+                                "pipeline_compliant": True,
                             }
                         else:
                             logger.warning(f"⚠️ DTM notification has incomplete solution data: {notification_file}")
@@ -10276,14 +10096,14 @@ server=1
                     else:
                         logger.warning(f"⚠️ Invalid DTM notification format: {notification_file}")
                         continue
-                        
+
                 except (json.JSONDecodeError, IOError) as e:
                     logger.warning(f"⚠️ Could not read DTM notification {notification_file}: {e}")
                     continue
-            
+
             # No valid DTM notifications found
             return None
-            
+
         except Exception as e:
             logger.error(f"❌ Error checking DTM notifications: {e}")
             return None
@@ -10396,9 +10216,7 @@ server=1
                     message = hashblock_socket.recv_multipart(zmq.NOBLOCK)
                     if message:
                         block_hash = message[1].hex() if len(message) > 1 else "unknown"
-                        logger.info(
-                            f"🔔 NEW BLOCK DETECTED via ZMQ: {block_hash[:16]}..."
-                        )
+                        logger.info(f"🔔 NEW BLOCK DETECTED via ZMQ: {block_hash[:16]}...")
 
                         # Log the detection
                         self.log_new_block_detected(block_hash)
@@ -10525,9 +10343,7 @@ server=1
                 first_line = f.readline().strip()
 
             # If it looks like JSONL, convert to proper format
-            if first_line.startswith('{"category"') or first_line.startswith(
-                '{"variant"'
-            ):
+            if first_line.startswith('{"category"') or first_line.startswith('{"variant"'):
                 logger.info("📝 Converting JSONL submission log to proper format...")
                 confirmed_blocks = 0
                 total_submissions = 0
@@ -10539,9 +10355,7 @@ server=1
                             try:
                                 entry = json.loads(line.strip())
                                 total_submissions += 1
-                                if entry.get("valid", False) or entry.get(
-                                    "submitted", False
-                                ):
+                                if entry.get("valid", False) or entry.get("submitted", False):
                                     confirmed_blocks += 1
                             except json.JSONDecodeError:
                                 continue
@@ -10558,9 +10372,7 @@ server=1
                 with open(self.submission_log_path, "w") as f:
                     json.dump(log_data, f, indent=2)
 
-                logger.info(
-                    f"✅ Converted: {confirmed_blocks} confirmed from {total_submissions} total"
-                )
+                logger.info(f"✅ Converted: {confirmed_blocks} confirmed from {total_submissions} total")
                 return confirmed_blocks
 
             # Regular JSON format
@@ -10570,9 +10382,7 @@ server=1
             confirmed_blocks = log_data.get("confirmed_blocks", 0)
             total_submissions = log_data.get("total_submissions", 0)
 
-            logger.info(
-                f"📊 Submission log: {confirmed_blocks} confirmed blocks from {total_submissions} submissions"
-            )
+            logger.info(f"📊 Submission log: {confirmed_blocks} confirmed blocks from {total_submissions} submissions")
             return confirmed_blocks
 
         except Exception as e:
@@ -10597,8 +10407,7 @@ server=1
             submission = {
                 "timestamp": datetime.now().isoformat(),
                 "confirmed": block_confirmed,
-                "block_number": log_data["confirmed_blocks"]
-                + (1 if block_confirmed else 0),
+                "block_number": log_data["confirmed_blocks"] + (1 if block_confirmed else 0),
             }
 
             log_data["submissions"].append(submission)
@@ -10630,9 +10439,7 @@ server=1
                 if folder.exists():
                     # Look for recent valid submission files
                     for file_path in folder.glob("*.json"):
-                        if (
-                            file_path.stat().st_mtime > time.time() - 300
-                        ):  # Within 5 minutes
+                        if file_path.stat().st_mtime > time.time() - 300:  # Within 5 minutes
                             logger.info(f"📁 Found submission file: {file_path}")
                             return str(file_path)
 
@@ -10713,9 +10520,7 @@ server=1
                     logger.info("🔄 Brain validation method not available - skipping")
 
             except ImportError:
-                logger.info(
-                    "🔄 Brain not available - continuing without Brain validation"
-                )
+                logger.info("🔄 Brain not available - continuing without Brain validation")
             except Exception as e:
                 logger.warning(f"⚠️ Brain validation error: {e} - continuing anyway")
 
@@ -10734,16 +10539,12 @@ server=1
                     if template_valid:
                         logger.info("✅ Ledger validation passed")
                     else:
-                        logger.warning(
-                            "⚠️ Ledger validation concerns - continuing anyway"
-                        )
+                        logger.warning("⚠️ Ledger validation concerns - continuing anyway")
                 else:
                     logger.info("🔄 Ledger validation method not available - skipping")
 
             except ImportError:
-                logger.info(
-                    "🔄 Bitcoin template ledger not available - continuing without ledger validation"
-                )
+                logger.info("🔄 Bitcoin template ledger not available - continuing without ledger validation")
             except Exception as e:
                 logger.warning(f"⚠️ Ledger validation error: {e} - continuing anyway")
 
@@ -10824,27 +10625,19 @@ server=1
                 if upload_success:
                     if hasattr(template_ledger, "update_status"):
                         template_ledger.update_status(folder_id, "submitted")
-                        logger.info(
-                            f"✅ Template Ledger: {folder_id} marked as submitted"
-                        )
+                        logger.info(f"✅ Template Ledger: {folder_id} marked as submitted")
                     elif hasattr(template_ledger, "mark_submitted"):
                         template_ledger.mark_submitted(folder_id)
-                        logger.info(
-                            f"✅ Template Ledger: {folder_id} marked as submitted"
-                        )
+                        logger.info(f"✅ Template Ledger: {folder_id} marked as submitted")
                 else:
                     if hasattr(template_ledger, "mark_upload_failed"):
                         template_ledger.mark_upload_failed(folder_id, submission_file)
-                        logger.info(
-                            f"⚠️ Template Ledger: {folder_id} marked as upload failed"
-                        )
+                        logger.info(f"⚠️ Template Ledger: {folder_id} marked as upload failed")
 
             except ImportError:
                 logger.info("🔄 Template ledger not available - using backup logging")
             except Exception as e:
-                logger.warning(
-                    f"⚠️ Template ledger update error: {e} - using backup logging"
-                )
+                logger.warning(f"⚠️ Template ledger update error: {e} - using backup logging")
 
             # DEFENSIVE Step 2: Always create backup record (ALWAYS WORKS)
             upload_record = {
@@ -10899,7 +10692,7 @@ server=1
             except Exception as e:
                 logger.error(f"❌ Even simple logging failed: {e}")
 
-            logger.info(f"📝 Defensive ledger update completed")
+            logger.info("📝 Defensive ledger update completed")
 
         except Exception as e:
             logger.error(f"❌ Ledger update system error: {e}")
@@ -10911,7 +10704,7 @@ server=1
         if self.demo_mode:
             logger.info("🎮 Demo mode: Returning simulated template instead of real Bitcoin node")
             return self.get_demo_block_template()
-            
+
         try:
             config_data = self.load_config_from_file()
 
@@ -10921,21 +10714,19 @@ server=1
                 self.bitcoin_cli_path,
                 f"-rpcuser={config_data.get('rpcuser',
                                             config_data.get('rpc_user',
-                                                            'SignalCoreBitcoin'))}",
+                                                            get_rpc_credentials()["username"]))}",
                 f"-rpcpassword={
                     config_data.get(
                         'rpcpassword',
                         config_data.get(
                             'rpc_password',
-                            'B1tc0n4L1dz'))}",
+                            get_rpc_credentials()["password"]))}",
                 f"-rpcconnect={config_data.get('rpc_host', '127.0.0.1')}",
                 f"-rpcport={config_data.get('rpc_port', 8332)}",
                 "getblockchaininfo",
             ]
 
-            test_result = subprocess.run(
-                test_cmd, capture_output=True, text=True, timeout=30
-            )
+            test_result = subprocess.run(test_cmd, capture_output=True, text=True, timeout=30)
             if test_result.returncode != 0:
                 logger.error(
                     f"❌ Bitcoin node not responding: {
@@ -10947,13 +10738,9 @@ server=1
                 if self.auto_start_bitcoin_node():
                     logger.info("✅ Bitcoin node auto-started, retrying connection...")
                     # Retry the test
-                    test_result = subprocess.run(
-                        test_cmd, capture_output=True, text=True, timeout=30
-                    )
+                    test_result = subprocess.run(test_cmd, capture_output=True, text=True, timeout=30)
                     if test_result.returncode != 0:
-                        logger.error(
-                            "❌ Bitcoin node still not responding after auto-start"
-                        )
+                        logger.error("❌ Bitcoin node still not responding after auto-start")
                         return None
                 else:
                     logger.error("❌ Failed to auto-start Bitcoin node")
@@ -10964,9 +10751,7 @@ server=1
                     "authentication cookie could be found" in test_result.stderr
                     or "RPC password is not set" in test_result.stderr
                 ):
-                    logger.info(
-                        "🔧 RPC authentication issue detected - auto-fixing bitcoin.conf..."
-                    )
+                    logger.info("🔧 RPC authentication issue detected - auto-fixing bitcoin.conf...")
 
                     # Try to fix bitcoin.conf
                     bitcoin_conf_paths = [
@@ -10984,13 +10769,9 @@ server=1
                             or conf_path == bitcoin_conf_paths[0]
                         ):
                             logger.info(f"🔧 Updating bitcoin.conf: {conf_path}")
-                            success = self.update_bitcoin_conf_credentials(
-                                conf_path, config_data
-                            )
+                            success = self.update_bitcoin_conf_credentials(conf_path, config_data)
                             if success:
-                                logger.info(
-                                    "✅ bitcoin.conf updated! Please restart bitcoind and try again."
-                                )
+                                logger.info("✅ bitcoin.conf updated! Please restart bitcoind and try again.")
                                 logger.info(
                                     "💡 Restart command: sudo systemctl restart bitcoind (or kill bitcoind and restart)"
                                 )
@@ -11004,13 +10785,13 @@ server=1
                 self.bitcoin_cli_path,
                 f"-rpcuser={config_data.get('rpcuser',
                                             config_data.get('rpc_user',
-                                                            'SignalCoreBitcoin'))}",
+                                                            get_rpc_credentials()["username"]))}",
                 f"-rpcpassword={
                     config_data.get(
                         'rpcpassword',
                         config_data.get(
                             'rpc_password',
-                            'B1tc0n4L1dz'))}",
+                            get_rpc_credentials()["password"]))}",
                 f"-rpcconnect={config_data.get('rpc_host', '127.0.0.1')}",
                 f"-rpcport={config_data.get('rpc_port', 8332)}",
                 "getblocktemplate",
@@ -11036,16 +10817,14 @@ server=1
                         logger.error(f"❌ Template missing required field: {field}")
                         return None
 
-                logger.info(f"✅ Fresh template retrieved:")
+                logger.info("✅ Fresh template retrieved:")
                 logger.info(
                     f"   🧱 Height: {
                         template.get(
                             'height',
                             'unknown')}"
                 )
-                logger.info(
-                    f"   📦 Transactions: {len(template.get('transactions', []))}"
-                )
+                logger.info(f"   📦 Transactions: {len(template.get('transactions', []))}")
                 logger.info(
                     f"   🎯 Target: {
                         template.get(
@@ -11063,9 +10842,7 @@ server=1
 
                 # Track successful template fetch and save to centralized
                 # location
-                current_count = self.pipeline_status["looping_pipeline"][
-                    "templates_processed"
-                ]
+                current_count = self.pipeline_status["looping_pipeline"]["templates_processed"]
                 self.update_looping_pipeline_status("active", current_count + 1)
 
                 # Save to centralized Temporary Template folder
@@ -11076,12 +10853,16 @@ server=1
             else:
                 error_msg = result.stderr.strip()
                 logger.error(f"❌ getblocktemplate failed: {error_msg}")
-                
+
                 # Check if Bitcoin is still syncing
-                if "error code: -10" in error_msg or "initial sync" in error_msg.lower() or "waiting for blocks" in error_msg.lower():
+                if (
+                    "error code: -10" in error_msg
+                    or "initial sync" in error_msg.lower()
+                    or "waiting for blocks" in error_msg.lower()
+                ):
                     logger.info("⏳ Bitcoin node is syncing blocks...")
                     logger.info("⏳ Test mode will wait for sync to complete...")
-                    
+
                     # Show sync progress
                     try:
                         sync_cmd = [
@@ -11090,7 +10871,7 @@ server=1
                             f"-rpcpassword={config_data.get('rpc_password', '')}",
                             f"-rpcconnect={config_data.get('rpc_host', '127.0.0.1')}",
                             f"-rpcport={config_data.get('rpc_port', 8332)}",
-                            "getblockchaininfo"
+                            "getblockchaininfo",
                         ]
                         sync_result = subprocess.run(sync_cmd, capture_output=True, text=True, timeout=10)
                         if sync_result.returncode == 0:
@@ -11102,11 +10883,11 @@ server=1
                     except (json.JSONDecodeError, subprocess.TimeoutExpired, KeyError):
                         # Sync status check failed, but not critical
                         pass
-                    
+
                     # Track as waiting (not failed)
                     self.update_looping_pipeline_status("waiting", error="Bitcoin node syncing")
                     return None  # Return None but don't mark as failed
-                
+
                 # Track failed template fetch
                 self.update_looping_pipeline_status(
                     "failed",
@@ -11114,10 +10895,7 @@ server=1
                 )
 
                 # Check if it's a wallet issue
-                if (
-                    "wallet" in result.stderr.lower()
-                    or "loaded" in result.stderr.lower()
-                ):
+                if "wallet" in result.stderr.lower() or "loaded" in result.stderr.lower():
                     logger.info("💡 Trying without wallet specification...")
 
                     # Retry without wallet specification
@@ -11133,21 +10911,15 @@ server=1
                         '{"rules": ["segwit"]}',
                     ]
 
-                    result = subprocess.run(
-                        rpc_cmd_no_wallet, capture_output=True, text=True, timeout=60
-                    )
+                    result = subprocess.run(rpc_cmd_no_wallet, capture_output=True, text=True, timeout=60)
                     if result.returncode == 0:
                         template = json.loads(result.stdout)
                         logger.info("✅ Template retrieved (without wallet)")
                         # Track successful template fetch after retry and save
                         # to centralized location
-                        current_count = self.pipeline_status["looping_pipeline"][
-                            "templates_processed"
-                        ]
+                        current_count = self.pipeline_status["looping_pipeline"]["templates_processed"]
                         self.update_looping_pipeline_status("active", current_count + 1)
-                        self.save_template_to_temporary_folder(
-                            template, "bitcoin_core_rpc_retry"
-                        )
+                        self.save_template_to_temporary_folder(template, "bitcoin_core_rpc_retry")
                         return template
 
                 return None
@@ -11155,22 +10927,19 @@ server=1
         except json.JSONDecodeError as e:
             logger.error(f"❌ Invalid JSON response: {e}")
             # Track failed template fetch
-            self.update_looping_pipeline_status(
-                "failed", error=f"Invalid JSON response: {str(e)}"
-            )
+            self.update_looping_pipeline_status("failed", error=f"Invalid JSON response: {str(e)}")
             return None
         except Exception as e:
             logger.error(f"❌ Template fetch error: {e}")
             # Track failed template fetch
-            self.update_looping_pipeline_status(
-                "failed", error=f"Template fetch error: {str(e)}"
-            )
+            self.update_looping_pipeline_status("failed", error=f"Template fetch error: {str(e)}")
             return None
 
     def submit_real_block(self, block_hex: str) -> bool:
         """Submit real Bitcoin block using bitcoin-cli submitblock."""
         try:
             import time
+
             config_data = self.load_config_from_file()
 
             # Get Bitcoin node version for tracking
@@ -11181,11 +10950,12 @@ server=1
                     f"-rpcpassword={config_data.get('rpc_password', '')}",
                     f"-rpcconnect={config_data.get('rpc_host', '127.0.0.1')}",
                     f"-rpcport={config_data.get('rpc_port', 8332)}",
-                    "getnetworkinfo"
+                    "getnetworkinfo",
                 ]
                 version_result = subprocess.run(version_cmd, capture_output=True, text=True, timeout=10)
                 if version_result.returncode == 0:
                     import json
+
                     network_info = json.loads(version_result.stdout)
                     node_version = network_info.get("subversion", "unknown")
                 else:
@@ -11209,9 +10979,7 @@ server=1
 
             # Capture response time
             start_time = time.time()
-            result = subprocess.run(
-                rpc_cmd, capture_output=True, text=True, timeout=120
-            )
+            result = subprocess.run(rpc_cmd, capture_output=True, text=True, timeout=120)
             response_time_ms = int((time.time() - start_time) * 1000)
 
             if result.returncode == 0:
@@ -11229,21 +10997,24 @@ server=1
                             "status": "accepted",
                             "rpc_response": "null",
                             "response_time_ms": response_time_ms,
-                            "node_version": node_version
-                        }
+                            "node_version": node_version,
+                        },
                     )
                     return True
                 elif response == "duplicate":
                     logger.warning("⚠️ Block already exists in blockchain")
                     # Track as failed (duplicate)
-                    self.track_submission(False, "Block already exists in blockchain",
+                    self.track_submission(
+                        False,
+                        "Block already exists in blockchain",
                         network_response={
                             "status": "rejected",
                             "rpc_response": "duplicate",
                             "response_time_ms": response_time_ms,
                             "node_version": node_version,
-                            "rejection_reason": "Block already known in chain"
-                        })
+                            "rejection_reason": "Block already known in chain",
+                        },
+                    )
                     return False
                 elif response == "inconclusive":
                     logger.warning("⚠️ Block submission inconclusive")
@@ -11344,12 +11115,12 @@ server=1
             is_valid = hash_int < target_int
 
             if is_valid:
-                logger.info(f"✅ Block solution valid!")
+                logger.info("✅ Block solution valid!")
                 logger.info(f"   🎯 Hash: {block_hash[:16]}...")
                 logger.info(f"   📊 Target: {target[:16]}...")
                 logger.info(f"   🔢 Leading zeros: {leading_zeros}")
             else:
-                logger.error(f"❌ Block solution invalid!")
+                logger.error("❌ Block solution invalid!")
                 logger.error(f"   🎯 Hash: {block_hash[:16]}...")
                 logger.error(f"   📊 Target: {target[:16]}...")
                 logger.error(f"   🔢 Leading zeros: {leading_zeros} (insufficient)")
@@ -11386,9 +11157,7 @@ server=1
             # Count expected leading zeros
             leading_zeros = len(target_hex) - len(target_hex.lstrip("0"))
 
-            logger.info(
-                f"🎯 Bits conversion: {bits_compact} -> {leading_zeros} leading zeros"
-            )
+            logger.info(f"🎯 Bits conversion: {bits_compact} -> {leading_zeros} leading zeros")
 
             return target_hex
 
@@ -11416,9 +11185,7 @@ server=1
 
                 # Validate block solution before submission
                 if target and not self.validate_block_solution(block_hex, target):
-                    logger.error(
-                        "❌ Block doesn't meet target difficulty - not submitting"
-                    )
+                    logger.error("❌ Block doesn't meet target difficulty - not submitting")
                     return False
 
                 # Submit block to Bitcoin network
@@ -11447,9 +11214,7 @@ server=1
                     f"🎮 Starting DEMO mining operation (Mode: {
                         self.mining_mode})..."
                 )
-                logger.info(
-                    f"📊 Demo config: Submit={should_submit}, Verbose={verbose_output}"
-                )
+                logger.info(f"📊 Demo config: Submit={should_submit}, Verbose={verbose_output}")
             else:
                 logger.info("🎮 Starting DEMO mining operation...")
 
@@ -11473,7 +11238,7 @@ server=1
             # Demo mode uses SAVED TEMPLATE (from real Bitcoin network) with real math
             # It doesn't connect to Bitcoin node, but template is from actual network
             start_time = time.time()
-            
+
             # Try to load saved template from System_File_Examples or use fallback
             saved_template_path = Path("System_File_Examples/Templates/current_template_example.json")
             if saved_template_path.exists():
@@ -11490,33 +11255,33 @@ server=1
                 if verbose_output:
                     logger.info("📁 No saved template found, using demo fallback")
                 template_data = None
-            
+
             # If we have a saved template, use Brain's real math on it
             # Otherwise use demo values for testing file system only
             if template_data and brain_available:
                 try:
                     if verbose_output:
                         logger.info("🧠 Calling Brain with saved template (demo mode)...")
-                    
+
                     # Save template to temp location for Brain to process
                     temp_template_path = template_folder / "gbt_latest.json"
                     with open(temp_template_path, 'w') as f:
                         json.dump(template_data, f, indent=2)
-                    
+
                     # Use Brain's real math on the saved template
                     brain = BrainQTLInterpreter(environment="Testing/Demo")
                     solution = brain.solve_bitcoin_template(str(temp_template_path))
-                    
+
                     if solution.get("valid"):
                         nonce = solution.get("nonce", random.randint(100000, 999999))
                         merkle_root = solution.get("merkle_root", f"0x{random.getrandbits(256):064x}")
                         block_hash = solution.get("hash", f"0x{random.getrandbits(256):064x}")
                         difficulty = solution.get("difficulty", 1000000)
                         if verbose_output:
-                            logger.info(f"✅ Brain solved saved template in demo mode")
+                            logger.info("✅ Brain solved saved template in demo mode")
                     else:
                         raise Exception("Brain solution not valid")
-                        
+
                 except Exception as e:
                     if verbose_output:
                         logger.warning(f"⚠️ Brain demo mining failed: {e}, using demo values")
@@ -11542,7 +11307,7 @@ server=1
 
             # Update GUI with demo data
             if self.gui_system:
-                self.gui_system.add_activity(f"🎮 Demo mining complete")
+                self.gui_system.add_activity("🎮 Demo mining complete")
 
             # Create block data for logging
             block_data = {
@@ -11553,7 +11318,11 @@ server=1
                 "target": "demo_target",
                 "template_folder": str(template_folder),
                 "mining_duration": mining_duration,
-                "mathematical_operations": self.math_config.get("knuth_sorrellian_parameters", {}).get("total_operations", 999999999) if hasattr(self, 'math_config') else 999999999,
+                "mathematical_operations": (
+                    self.math_config.get("knuth_sorrellian_parameters", {}).get("total_operations", 999999999)
+                    if hasattr(self, 'math_config')
+                    else 999999999
+                ),
                 "status": "demo_mined",
                 "confirmed": should_submit,
                 "payout_address": "demo_address_1234567890",
@@ -11569,20 +11338,24 @@ server=1
             if verbose_output:
                 success_msg += f" (Mode: {self.mining_mode})"
             logger.info(success_msg)
-            
+
             # MINING-BASED SYSTEM REPORTS: Generate system report for demo mining operations
             try:
                 if hasattr(self, 'brain') and self.brain and hasattr(self.brain, 'create_system_report_hourly_file'):
                     system_data = {
-                        "report_type": "demo_mining_success", 
+                        "report_type": "demo_mining_success",
                         "component": "BitcoinLoopingSystem",
                         "mining_mode": self.mining_mode,
                         "nonce": nonce,
                         "simulated_hash_rate": 999999999,  # Demo value
                         "mining_duration": mining_duration,
-                        "mathematical_operations": self.math_config.get("knuth_sorrellian_parameters", {}).get("total_operations", 999999999) if hasattr(self, 'math_config') else 999999999,
+                        "mathematical_operations": (
+                            self.math_config.get("knuth_sorrellian_parameters", {}).get("total_operations", 999999999)
+                            if hasattr(self, 'math_config')
+                            else 999999999
+                        ),
                         "operation": "mine_single_block_demo",
-                        "status": "demo_success"
+                        "status": "demo_success",
                     }
                     self.brain.create_system_report_hourly_file(system_data)
             except Exception as report_error:
@@ -11595,7 +11368,7 @@ server=1
                 if verbose_output:
                     logger.info("🎮 DEMO: Would submit to network (simulated)")
                 logger.info("✅ DEMO: Block submission simulated successfully!")
-                logger.info(f"📁 Files created in organized structure")
+                logger.info("📁 Files created in organized structure")
                 self.blocks_mined += 1
                 return True
             else:
@@ -11616,7 +11389,7 @@ server=1
             if verbose_output:
                 error_msg += f" (Mode: {self.mining_mode})"
             logger.error(error_msg)
-            
+
             # COMPREHENSIVE ERROR REPORTING: Generate system error report for mining failures
             try:
                 if hasattr(self, 'brain') and self.brain and hasattr(self.brain, 'create_system_error_hourly_file'):
@@ -11626,7 +11399,7 @@ server=1
                         "mining_mode": self.mining_mode,
                         "error_message": str(e),
                         "operation": "mine_single_block_demo",
-                        "severity": "high"
+                        "severity": "high",
                     }
                     self.brain.create_system_error_hourly_file(error_data)
             except Exception as report_error:
@@ -11649,9 +11422,7 @@ server=1
                     f"⛏️ Starting single block mining operation (Mode: {
                         self.mining_mode})..."
                 )
-                logger.info(
-                    f"📊 Mining config: Submit={should_submit}, Verbose={verbose_output}"
-                )
+                logger.info(f"📊 Mining config: Submit={should_submit}, Verbose={verbose_output}")
             else:
                 logger.info("⛏️ Starting single block mining operation...")
 
@@ -11672,9 +11443,7 @@ server=1
 
             # Update GUI
             if self.gui_system:
-                self.gui_system.add_activity(
-                    f"⛏️ Starting mining ({self.mining_mode} mode)"
-                )
+                self.gui_system.add_activity(f"⛏️ Starting mining ({self.mining_mode} mode)")
                 self.gui_system.update_mining_data(status="MINING", current_block=1)
 
             # DEFENSIVE Brain instant solution - FALLBACK TO BASIC MINING
@@ -11685,9 +11454,7 @@ server=1
                     brain = BrainQTLInterpreter(environment=environment)
 
                 if verbose_output:
-                    logger.info(
-                        "🧠 Calling Brain instant solution system (optional)..."
-                    )
+                    logger.info("🧠 Calling Brain instant solution system (optional)...")
 
                 # Get instant solution
                 solution = brain.solve_bitcoin_template("gbt_latest.json")
@@ -11703,9 +11470,7 @@ server=1
                 logger.info("🔄 Brain not available - using fallback mining solution")
                 solution = self._fallback_mining_solution()
             except Exception as e:
-                logger.warning(
-                    f"⚠️ Brain mining error: {e} - using fallback mining solution"
-                )
+                logger.warning(f"⚠️ Brain mining error: {e} - using fallback mining solution")
                 solution = self._fallback_mining_solution()
                 if self.gui_system:
                     self.gui_system.mining_error(solution["error"])
@@ -11716,10 +11481,14 @@ server=1
                 if verbose_output:
                     success_msg += f" (Mode: {self.mining_mode})"
                 logger.info(success_msg)
-                
+
                 # MINING-BASED SYSTEM REPORTS: Generate system report for successful mining operations
                 try:
-                    if hasattr(self, 'brain') and self.brain and hasattr(self.brain, 'create_system_report_hourly_file'):
+                    if (
+                        hasattr(self, 'brain')
+                        and self.brain
+                        and hasattr(self.brain, 'create_system_report_hourly_file')
+                    ):
                         system_data = {
                             "report_type": "mining_success",
                             "component": "BitcoinLoopingSystem",
@@ -11735,7 +11504,7 @@ server=1
                             "previous_hash": solution.get('previousblockhash', ''),
                             "target": solution.get('target', ''),
                             "operation": "mine_single_block",
-                            "status": "success"
+                            "status": "success",
                         }
                         self.brain.create_system_report_hourly_file(system_data)
                 except Exception as report_error:
@@ -11758,16 +11527,12 @@ server=1
                         logger.info(f"📋 Submission file detected: {submission_file}")
 
                     if should_submit:
-                        logger.info(
-                            "📋 Submission file detected, proceeding with validation..."
-                        )
+                        logger.info("📋 Submission file detected, proceeding with validation...")
 
                         # Brain and ledger double-check
                         validation_ok = self.validate_with_brain_ledger(submission_file)
                         if not validation_ok:
-                            logger.error(
-                                "❌ Validation failed, cannot proceed with upload"
-                            )
+                            logger.error("❌ Validation failed, cannot proceed with upload")
                             return False
 
                         if verbose_output:
@@ -11777,9 +11542,7 @@ server=1
                         upload_success = self.upload_to_network(submission_file)
 
                         # Update ledger with upload status
-                        self.update_ledger_upload_status(
-                            submission_file, upload_success
-                        )
+                        self.update_ledger_upload_status(submission_file, upload_success)
 
                         if upload_success:
                             # Verify via ZMQ after successful upload
@@ -11798,9 +11561,7 @@ server=1
                                 logger.info(final_msg)
                                 return True
                             else:
-                                logger.warning(
-                                    "⚠️ Block uploaded but ZMQ verification failed"
-                                )
+                                logger.warning("⚠️ Block uploaded but ZMQ verification failed")
                                 return False
                         else:
                             logger.error("❌ Network upload failed")
@@ -11812,21 +11573,15 @@ server=1
                         logger.info(test_msg)
 
                         if verbose_output:
-                            logger.info(
-                                f"📁 Submission file would be: {submission_file}"
-                            )
-                            logger.info(
-                                "🔍 Skipping validation and upload per test mode settings"
-                            )
+                            logger.info(f"📁 Submission file would be: {submission_file}")
+                            logger.info("🔍 Skipping validation and upload per test mode settings")
 
                         # Still count as successful mining for test purposes
                         self.blocks_mined += 1
 
                         # Update GUI to show test success
                         if self.gui_system:
-                            self.gui_system.add_activity(
-                                f"🧪 Test mining success (no submission)"
-                            )
+                            self.gui_system.add_activity("🧪 Test mining success (no submission)")
 
                         return True
                 else:
@@ -11837,7 +11592,7 @@ server=1
                     return False
             else:
                 logger.warning("⚠️ Mining produced invalid solution")
-                
+
                 # COMPREHENSIVE ERROR REPORTING: Generate system error report for invalid solution attempts
                 try:
                     if hasattr(self, 'brain') and self.brain and hasattr(self.brain, 'create_system_error_hourly_file'):
@@ -11849,15 +11604,19 @@ server=1
                             "operation": "mine_single_block",
                             "severity": "high",
                             "diagnostic_data": {
-                                "solution_status": solution.get("status", "unknown") if 'solution' in locals() else "no_solution",
+                                "solution_status": (
+                                    solution.get("status", "unknown") if 'solution' in locals() else "no_solution"
+                                ),
                                 "solution_validity": solution.get("valid", False) if 'solution' in locals() else False,
-                                "fallback_used": "_fallback_mining_solution" in str(solution) if 'solution' in locals() else False
-                            }
+                                "fallback_used": (
+                                    "_fallback_mining_solution" in str(solution) if 'solution' in locals() else False
+                                ),
+                            },
                         }
                         self.brain.create_system_error_hourly_file(error_data)
                 except Exception as report_error:
                     logger.error(f"⚠️ Failed to create error report: {report_error}")
-                
+
                 return False
 
         except Exception as e:
@@ -11865,7 +11624,7 @@ server=1
             if verbose_output:
                 error_msg += f" (Mode: {self.mining_mode})"
             logger.error(error_msg)
-            
+
             # COMPREHENSIVE ERROR REPORTING: Generate system error report for production mining failures
             try:
                 if hasattr(self, 'brain') and self.brain and hasattr(self.brain, 'create_system_error_hourly_file'):
@@ -11875,7 +11634,7 @@ server=1
                         "mining_mode": self.mining_mode,
                         "error_message": str(e),
                         "operation": "mine_single_block",
-                        "severity": "critical"
+                        "severity": "critical",
                     }
                     self.brain.create_system_error_hourly_file(error_data)
             except Exception as report_error:
@@ -11898,9 +11657,7 @@ server=1
             # Setup ZMQ monitoring if not already active
             if not hasattr(self, "subscribers") or not self.subscribers:
                 if not self.setup_zmq_real_time_monitoring():
-                    logger.error(
-                        "❌ ZMQ setup failed - cannot proceed with ZMQ-first mining"
-                    )
+                    logger.error("❌ ZMQ setup failed - cannot proceed with ZMQ-first mining")
                     return False
                 else:
                     logger.info("✅ ZMQ real-time monitoring established")
@@ -11915,9 +11672,7 @@ server=1
 
                     if hasattr(self.brain, "optimize_zmq_detection"):
                         zmq_optimization = self.brain.optimize_zmq_detection()
-                        logger.info(
-                            f"🧠 Brain.QTL ZMQ optimization: {zmq_optimization}"
-                        )
+                        logger.info(f"🧠 Brain.QTL ZMQ optimization: {zmq_optimization}")
 
                 except Exception as e:
                     logger.warning(f"⚠️ Brain.QTL ZMQ coordination error: {e}")
@@ -11934,15 +11689,10 @@ server=1
             template["brain_qtl_coordinated"] = self.brain_qtl_orchestration
             template["timestamp"] = datetime.now().isoformat()
 
-            logger.info(
-                f"📋 ZMQ-first template ready: Height {template.get('height', 'unknown')}"
-            )
+            logger.info(f"📋 ZMQ-first template ready: Height {template.get('height', 'unknown')}")
 
             # Start background ZMQ monitoring for new blocks during mining
-            if (
-                not hasattr(self, "zmq_monitoring_active")
-                or not self.zmq_monitoring_active
-            ):
+            if not hasattr(self, "zmq_monitoring_active") or not self.zmq_monitoring_active:
                 logger.info("📡 Starting ZMQ block monitoring during mining...")
                 self.zmq_monitoring_active = True
                 # Note: In real implementation, this would be an async task
@@ -11981,25 +11731,21 @@ server=1
                         logger.info(f"🎯 Leading zeros: {leading_zeros}")
 
                     # Brain.QTL success notification
-                    if (
-                        self.brain_qtl_orchestration
-                        and hasattr(self, "brain")
-                        and self.brain
-                    ):
+                    if self.brain_qtl_orchestration and hasattr(self, "brain") and self.brain:
                         try:
                             if hasattr(self.brain, "notify_zmq_mining_success"):
                                 self.brain.notify_zmq_mining_success(mining_result)
-                                logger.info(
-                                    "🧠 Brain.QTL notified of ZMQ mining success"
-                                )
+                                logger.info("🧠 Brain.QTL notified of ZMQ mining success")
                         except Exception as e:
-                            logger.warning(
-                                f"⚠️ Brain.QTL success notification error: {e}"
-                            )
-                    
+                            logger.warning(f"⚠️ Brain.QTL success notification error: {e}")
+
                     # Brain aggregates all component reports after successful mining
                     try:
-                        from Singularity_Dave_Brainstem_UNIVERSE_POWERED import aggregate_all_component_reports, aggregate_all_component_errors
+                        from Singularity_Dave_Brainstem_UNIVERSE_POWERED import (
+                            aggregate_all_component_reports,
+                            aggregate_all_component_errors,
+                        )
+
                         logger.info("🧠 Brain aggregating component reports...")
                         aggregate_all_component_reports()
                         aggregate_all_component_errors()
@@ -12025,16 +11771,14 @@ server=1
         Enhanced random mining with Brain.QTL orchestration and scheduled random times.
         Uses random times throughout the day instead of 10-minute intervals.
         """
-        logger.info(
-            f"🎲 ENHANCED RANDOM MINING: {n} blocks at random times throughout the day"
-        )
+        logger.info(f"🎲 ENHANCED RANDOM MINING: {n} blocks at random times throughout the day")
 
         # Enforce daily limit
         if n > self.daily_block_limit:
             n = self.daily_block_limit
             logger.info(f"🎯 Adjusted to daily limit: {n} blocks")
 
-        # Calculate remaining time 
+        # Calculate remaining time
         remaining_hours = self._calculate_remaining_day_time()
         if remaining_hours <= 0:
             logger.info("📅 No time remaining in day")
@@ -12043,14 +11787,12 @@ server=1
         # Generate random mining times for the day
         self.random_mining_times = self.generate_random_mining_times(n)
         self.blocks_mined_today = 0
-        
+
         logger.info(f"🕐 Generated {len(self.random_mining_times)} random mining times")
 
         # Setup ZMQ real-time monitoring for random mining
         if not self.setup_zmq_real_time_monitoring():
-            logger.error(
-                "❌ ZMQ setup failed - cannot proceed with random mining"
-            )
+            logger.error("❌ ZMQ setup failed - cannot proceed with random mining")
             return False
 
         logger.info("✅ ZMQ real-time monitoring active for random mining")
@@ -12062,9 +11804,7 @@ server=1
             if hasattr(self, "brain") and self.brain:
                 try:
                     if hasattr(self.brain, "prepare_random_mining"):
-                        brain_prep = self.brain.prepare_random_mining(
-                            n, self.random_mining_times
-                        )
+                        brain_prep = self.brain.prepare_random_mining(n, self.random_mining_times)
                         logger.info(f"🧠 Brain.QTL random preparation: {brain_prep}")
                 except Exception as e:
                     logger.warning(f"⚠️ Brain.QTL random preparation error: {e}")
@@ -12079,12 +11819,13 @@ server=1
 
         # Main random mining loop - wait for scheduled times
         logger.info(f"🎯 Starting random mining with {len(self.random_mining_times)} scheduled times")
-        
+
         for time_index, mining_time in enumerate(self.random_mining_times):
             try:
                 from datetime import datetime
+
                 current_time = datetime.now()
-                
+
                 # Calculate time until next scheduled mining
                 if mining_time > current_time:
                     wait_seconds = (mining_time - current_time).total_seconds()
@@ -12108,36 +11849,24 @@ server=1
                     break
 
                 # Mine at the scheduled random time
-                logger.info(
-                    f"⛏️ Random time #{time_index + 1}: Mining now at {mining_time.strftime('%H:%M:%S')}!"
-                )
+                logger.info(f"⛏️ Random time #{time_index + 1}: Mining now at {mining_time.strftime('%H:%M:%S')}!")
 
                 # Use ZMQ-first mining method
                 success = self.mine_single_block_with_zmq()
                 if success:
                     blocks_mined += 1
                     self.blocks_mined_today += 1
-                    logger.info(
-                        f"✅ Random time mining successful! Total: {blocks_mined}/{n}"
-                    )
+                    logger.info(f"✅ Random time mining successful! Total: {blocks_mined}/{n}")
 
                     # Brain.QTL success notification
-                    if (
-                        self.brain_qtl_orchestration
-                        and hasattr(self, "brain")
-                        and self.brain
-                    ):
+                    if self.brain_qtl_orchestration and hasattr(self, "brain") and self.brain:
                         try:
                             if hasattr(self.brain, "notify_random_mining_success"):
-                                self.brain.notify_random_mining_success(
-                                    time_index, blocks_mined, mining_time
-                                )
+                                self.brain.notify_random_mining_success(time_index, blocks_mined, mining_time)
                         except Exception as e:
-                            logger.warning(
-                                f"⚠️ Brain.QTL random success notification error: {e}"
-                            )
+                            logger.warning(f"⚠️ Brain.QTL random success notification error: {e}")
                 else:
-                    logger.info(f"⚠️ Random time mining unsuccessful")
+                    logger.info("⚠️ Random time mining unsuccessful")
 
                 # Brief pause between mining attempts while monitoring ZMQ
                 await asyncio.sleep(5)
@@ -12151,9 +11880,7 @@ server=1
         # Cleanup
         self.random_mode_active = False
 
-        logger.info(
-            f"📊 Random mining complete: {blocks_mined} blocks mined at scheduled times"
-        )
+        logger.info(f"📊 Random mining complete: {blocks_mined} blocks mined at scheduled times")
         logger.info(
             f"📡 ZMQ blocks detected during session: {
                 self.performance_stats.get(
@@ -12179,14 +11906,8 @@ server=1
                             if socket.poll(100):  # 100ms timeout
                                 message = socket.recv_multipart(zmq.NOBLOCK)
                                 if message and topic == "hashblock":
-                                    block_hash = (
-                                        message[1].hex()
-                                        if len(message) > 1
-                                        else "unknown"
-                                    )
-                                    logger.info(
-                                        f"🔔 ZMQ NEW BLOCK during wait: {block_hash[:16]}..."
-                                    )
+                                    block_hash = message[1].hex() if len(message) > 1 else "unknown"
+                                    logger.info(f"🔔 ZMQ NEW BLOCK during wait: {block_hash[:16]}...")
 
                                     # Handle new block detection immediately
                                     await self.handle_new_block_detected(block_hash)
@@ -12194,18 +11915,13 @@ server=1
 
                                     # In random mode, this might trigger
                                     # immediate mining
-                                    if (
-                                        hasattr(self, "random_mode_active")
-                                        and self.random_mode_active
-                                    ):
+                                    if hasattr(self, "random_mode_active") and self.random_mode_active:
                                         await self.handle_random_mode_new_block_opportunity()
 
                         except zmq.Again:
                             continue
                         except Exception as e:
-                            logger.warning(
-                                f"⚠️ ZMQ wait monitoring error on {topic}: {e}"
-                            )
+                            logger.warning(f"⚠️ ZMQ wait monitoring error on {topic}: {e}")
 
                     # Short sleep to prevent busy waiting
                     await asyncio.sleep(0.5)
@@ -12228,9 +11944,7 @@ server=1
 
         # Setup ZMQ as primary block detection method
         if not self.setup_zmq_real_time_monitoring():
-            logger.error(
-                "❌ ZMQ setup failed - cannot proceed with ZMQ-first continuous mining"
-            )
+            logger.error("❌ ZMQ setup failed - cannot proceed with ZMQ-first continuous mining")
             return False
 
         logger.info("✅ ZMQ real-time monitoring active for continuous mining")
@@ -12242,9 +11956,7 @@ server=1
                 try:
                     if hasattr(self.brain, "prepare_continuous_zmq_mining"):
                         brain_continuous = self.brain.prepare_continuous_zmq_mining()
-                        logger.info(
-                            f"🧠 Brain.QTL continuous preparation: {brain_continuous}"
-                        )
+                        logger.info(f"🧠 Brain.QTL continuous preparation: {brain_continuous}")
                 except Exception as e:
                     logger.warning(f"⚠️ Brain.QTL continuous preparation error: {e}")
 
@@ -12255,33 +11967,21 @@ server=1
 
         blocks_mined = 0
 
-        while (
-            self.should_continue_random_mode() and not self.check_daily_limit_reached()
-        ):
+        while self.should_continue_random_mode() and not self.check_daily_limit_reached():
             try:
                 # Use ZMQ-first mining approach
                 success = self.mine_single_block_with_zmq()
                 if success:
                     blocks_mined += 1
-                    logger.info(
-                        f"✅ Continuous ZMQ mining: {blocks_mined} blocks mined"
-                    )
+                    logger.info(f"✅ Continuous ZMQ mining: {blocks_mined} blocks mined")
 
                     # Brain.QTL continuous success notification
-                    if (
-                        self.brain_qtl_orchestration
-                        and hasattr(self, "brain")
-                        and self.brain
-                    ):
+                    if self.brain_qtl_orchestration and hasattr(self, "brain") and self.brain:
                         try:
                             if hasattr(self.brain, "notify_continuous_mining_progress"):
-                                self.brain.notify_continuous_mining_progress(
-                                    blocks_mined
-                                )
+                                self.brain.notify_continuous_mining_progress(blocks_mined)
                         except Exception as e:
-                            logger.warning(
-                                f"⚠️ Brain.QTL continuous notification error: {e}"
-                            )
+                            logger.warning(f"⚠️ Brain.QTL continuous notification error: {e}")
 
                 # Brief pause while maintaining ZMQ monitoring
                 await asyncio.sleep(10)
@@ -12289,9 +11989,7 @@ server=1
                 # Log ZMQ detection statistics
                 if blocks_mined % 5 == 0:  # Every 5 blocks
                     zmq_stats = self.performance_stats.get("zmq_blocks_detected", 0)
-                    logger.info(
-                        f"📡 ZMQ detection stats: {zmq_stats} blocks detected via ZMQ"
-                    )
+                    logger.info(f"📡 ZMQ detection stats: {zmq_stats} blocks detected via ZMQ")
 
             except KeyboardInterrupt:
                 logger.info("🛑 Continuous ZMQ mining stopped")
@@ -12300,9 +11998,7 @@ server=1
                 logger.error(f"❌ Continuous ZMQ mining error: {e}")
                 await asyncio.sleep(30)
 
-        logger.info(
-            f"📊 Enhanced continuous ZMQ mining complete: {blocks_mined} blocks"
-        )
+        logger.info(f"📊 Enhanced continuous ZMQ mining complete: {blocks_mined} blocks")
         logger.info(
             f"📡 Total ZMQ blocks detected: {
                 self.performance_stats.get(
@@ -12312,9 +12008,7 @@ server=1
 
     async def mine_day_schedule_enhanced(self, blocks_per_day: int, days: int):
         """Enhanced day schedule mining with Brain.QTL orchestration."""
-        logger.info(
-            f"📅 ENHANCED DAY SCHEDULE: {blocks_per_day} blocks/day for {days} days"
-        )
+        logger.info(f"📅 ENHANCED DAY SCHEDULE: {blocks_per_day} blocks/day for {days} days")
 
         for day in range(days):
             day_start = datetime.now()
@@ -12330,9 +12024,7 @@ server=1
 
             # Mine throughout the day
             blocks_mined_today = 0
-            while (
-                blocks_mined_today < daily_target and self.should_continue_random_mode()
-            ):
+            while blocks_mined_today < daily_target and self.should_continue_random_mode():
                 try:
                     success = self.mine_single_block_with_zmq()
                     if success:
@@ -12360,11 +12052,9 @@ server=1
 
             # Wait until next day if more days to go
             if day < days - 1:
-                logger.info(f"⏰ Waiting for next day...")
+                logger.info("⏰ Waiting for next day...")
                 # Sleep until start of next day
-                next_day = datetime.now().replace(
-                    hour=0, minute=0, second=0, microsecond=0
-                ) + timedelta(days=1)
+                next_day = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
                 sleep_time = (next_day - datetime.now()).total_seconds()
                 await asyncio.sleep(min(sleep_time, 3600))  # Check every hour
 
@@ -12380,9 +12070,7 @@ server=1
 
         blocks_mined = 0
 
-        while (
-            self.should_continue_random_mode() and not self.check_daily_limit_reached()
-        ):
+        while self.should_continue_random_mode() and not self.check_daily_limit_reached():
             try:
                 success = self.mine_single_block_with_zmq()
                 if success:
@@ -12415,7 +12103,7 @@ server=1
             # Only start immediately if we're mining NOW, otherwise wait until 5 minutes before
             logger.info("🚀 Production mining scheduled - will start miners 5 minutes before needed")
             production_miner_started = False  # Will start when needed
-            
+
             # For immediate mining (--block flag), start now
             if n > 0:
                 logger.info("🚀 Starting Production Miner in DAEMON mode (immediate mining)...")
@@ -12443,86 +12131,95 @@ server=1
         while blocks_mined < target and iteration_count < max_iterations:
             iteration_count += 1
             logger.info(f"🔄 DEBUG: Loop iteration #{iteration_count} - blocks_mined={blocks_mined}, target={target}")
-            
+
             try:
                 # DEMO MODE: Run REAL dual-Knuth math on stock template from Brain.QTL
                 if self.demo_mode:
                     logger.info("🎮 DEMO MODE: Running REAL dual-Knuth math on stock template")
-                    
+
                     # Get stock template from Brain.QTL (canonical source)
                     from Singularity_Dave_Brainstem_UNIVERSE_POWERED import get_stock_template_from_brain
+
                     stock_template = get_stock_template_from_brain()
-                    
+
                     logger.info(f"✅ Got stock template from Brain.QTL: height={stock_template.get('height')}")
-                    
+
                     # Run REAL dual-Knuth math (instant because math is that powerful)
                     # NOTE: coordinate_template_to_production_miner is NOT async
                     result = self.coordinate_template_to_production_miner(stock_template)
-                    
+
                     if result and result.get("success"):
                         leading_zeros = result.get("leading_zeros", 0)
                         block_hash = result.get("block_hash", "")
                         logger.info(f"✅ Demo: Found block with {leading_zeros} leading zeros!")
                         logger.info(f"   Hash: {block_hash[:80] if block_hash else 'N/A'}...")
-                        
+
                         # Save demo mode result files (ledger + math_proof)
                         demo_result = {
                             "hash": block_hash,
                             "leading_zeros": leading_zeros,
                             "nonce": result.get("nonce", 123456789),
-                            "valid": True
+                            "valid": True,
                         }
-                        self.save_test_mode_result_files(stock_template, demo_result)
-                        
-                        blocks_mined += 1
-                        logger.info(f"✅ Demo Progress: {blocks_mined}/{target} blocks mined")
+
+                        # TRY TO SAVE - ONLY COUNT AS MINED IF SAVE SUCCEEDS
+                        try:
+                            self.save_test_mode_result_files(stock_template, demo_result)
+                            blocks_mined += 1
+                            logger.info(f"✅ Demo Progress: {blocks_mined}/{target} blocks mined AND SAVED")
+                        except Exception as save_error:
+                            logger.error(f"❌ Demo: Mining succeeded but SAVE FAILED: {save_error}")
+                            logger.error("🚫 Block NOT counted - save must succeed")
+                            continue  # Don't count this as a successful block
                         # Continue looping until target is reached
                     else:
                         logger.warning("⚠️ Demo: Mining attempt did not succeed, retrying...")
                         continue
-                
+
                 # TEST MODE: Run REAL dual-Knuth math on REAL template from Bitcoin node
                 elif self.mining_mode == "test" or self.mining_mode == "test-verbose":
                     logger.info("🧪 TEST MODE: Running REAL dual-Knuth math on REAL Bitcoin template")
-                    
+
                     # Get REAL template from Bitcoin node (live blockchain data)
                     real_template = self.get_real_block_template_with_zmq_data()
-                    
+
                     if not real_template:
                         logger.error("❌ TEST: Failed to get real template from Bitcoin node")
                         continue
-                    
+
                     logger.info(f"✅ Got REAL template from Bitcoin node: height={real_template.get('height')}")
-                    
+
                     # Run REAL dual-Knuth math (instant because math is that powerful)
                     # NOTE: coordinate_template_to_production_miner is NOT async
                     result = self.coordinate_template_to_production_miner(real_template)
-                    
+
                     if result and result.get("success"):
                         mining_result = result.get("mining_result", {})
                         leading_zeros = mining_result.get("leading_zeros", 0)
                         block_hash = mining_result.get("hash", "")
                         logger.info(f"✅ Test: Found block with {leading_zeros} leading zeros!")
                         logger.info(f"   Hash: {block_hash[:80] if block_hash else 'N/A'}...")
-                        
+
                         # Save test mode result files (ledger + math_proof)
                         self.save_test_mode_result_files(real_template, mining_result)
-                        
+
                         blocks_mined += 1
                         logger.info(f"✅ Test Progress: {blocks_mined}/{target} blocks mined")
                         # Continue looping until target is reached
                     else:
                         logger.warning("⚠️ Test: Mining attempt did not succeed, retrying...")
                         continue
-                
+
                 # PRODUCTION MODE: actual mining with submission (or sandbox without submission)
                 else:
                     success = self.mine_single_block_with_zmq()
                     logger.info(f"⛏️  DEBUG: mine_single_block_with_zmq() returned success={success}")
-                    
+
                     if success:
                         blocks_mined += 1
-                        logger.info(f"✅ {'Sandbox' if self.sandbox_mode else 'Production'} Progress: {blocks_mined}/{target} blocks mined")
+                        logger.info(
+                            f"✅ {'Sandbox' if self.sandbox_mode else 'Production'} Progress: {blocks_mined}/{target} blocks mined"
+                        )
                         logger.info(f"🎯 DEBUG: Incremented blocks_mined to {blocks_mined}, target={target}")
                     elif self.sandbox_mode:
                         # SANDBOX: Count attempt as block even if solution not perfect (testing pipeline)
@@ -12531,10 +12228,12 @@ server=1
 
                 # Brief pause between attempts
                 await asyncio.sleep(2 if self.demo_mode else 15)
-                
+
                 # EXPLICIT EXIT CHECK
                 if blocks_mined >= target:
-                    logger.info(f"🎯 DEBUG: Target reached! blocks_mined={blocks_mined} >= target={target}, exiting loop")
+                    logger.info(
+                        f"🎯 DEBUG: Target reached! blocks_mined={blocks_mined} >= target={target}, exiting loop"
+                    )
                     break
 
             except KeyboardInterrupt:
@@ -12546,15 +12245,13 @@ server=1
 
         # Cleanup and exit
         logger.info(f"📊 Enhanced number mining complete: {blocks_mined}/{target} blocks")
-        
+
         # Stop miners ONLY in demo/test mode or if user specified --kill-all-miners
         # In continuous/always-on mode, keep miners running for next blocks
         should_stop_miners = (
-            self.demo_mode or 
-            self.mining_mode == "test" or 
-            hasattr(self, 'kill_miners_flag') and self.kill_miners_flag
+            self.demo_mode or self.mining_mode == "test" or hasattr(self, 'kill_miners_flag') and self.kill_miners_flag
         )
-        
+
         if should_stop_miners and blocks_mined >= target:
             logger.info("🛑 Stopping all production miners (demo/test mode)...")
             killed = self.emergency_kill_all_miners()
@@ -12562,7 +12259,7 @@ server=1
         elif blocks_mined >= target:
             logger.info("✅ Target reached - miners staying alive for continuous operation")
             logger.info("💡 Miners will continue running for next mining session")
-        
+
         return blocks_mined >= target
 
     # MAIN ENHANCED MINING ORCHESTRATION
@@ -12590,15 +12287,13 @@ server=1
             if self.brain_qtl_orchestration:
                 logger.info("🧠 Brain.QTL orchestration: VERIFIED AND ACTIVE")
             else:
-                logger.info(
-                    "🧠 Brain.QTL orchestration: Not available, using standard mining"
-                )
+                logger.info("🧠 Brain.QTL orchestration: Not available, using standard mining")
 
             # Parse and execute flag
             success = await self.parse_and_execute_enhanced_flag(flag_input)
 
             # Final report
-            logger.info(f"📊 ENHANCED MINING SESSION COMPLETE")
+            logger.info("📊 ENHANCED MINING SESSION COMPLETE")
             logger.info(
                 f"   🎯 Total blocks found today: {
                     self.blocks_found_today}"
@@ -12668,9 +12363,7 @@ server=1
 
             else:
                 logger.error(f"❌ Unknown enhanced flag format: {flag}")
-                logger.info(
-                    "📋 Valid formats: N, ALL, RANDOM N, N DAYS D, RANDOM N DAYS D, ALL-DAY-ALL"
-                )
+                logger.info("📋 Valid formats: N, ALL, RANDOM N, N DAYS D, RANDOM N DAYS D, ALL-DAY-ALL")
                 return False
 
         except ValueError as e:
@@ -12682,9 +12375,7 @@ server=1
 
     async def mine_random_days_enhanced(self, blocks_per_day: int, days: int):
         """Enhanced random mining across multiple days."""
-        logger.info(
-            f"🎲 ENHANCED RANDOM DAYS: {blocks_per_day} blocks/day (random) for {days} days"
-        )
+        logger.info(f"🎲 ENHANCED RANDOM DAYS: {blocks_per_day} blocks/day (random) for {days} days")
 
         for day in range(days):
             logger.info(f"📅 Day {day + 1}/{days}: Random mining day")
@@ -12702,10 +12393,8 @@ server=1
 
             # Wait until next day if more days to go
             if day < days - 1:
-                logger.info(f"⏰ Waiting for next day...")
-                next_day = datetime.now().replace(
-                    hour=0, minute=0, second=0, microsecond=0
-                ) + timedelta(days=1)
+                logger.info("⏰ Waiting for next day...")
+                next_day = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
                 sleep_time = (next_day - datetime.now()).total_seconds()
                 await asyncio.sleep(min(sleep_time, 3600))  # Check every hour
 
@@ -12752,9 +12441,7 @@ server=1
                 self.start_zmq_real_time_monitor()
                 logger.info("🚨 ZMQ real-time block monitoring ACTIVE")
             else:
-                logger.warning(
-                    "⚠️ ZMQ setup failed - continuing without real-time monitoring"
-                )
+                logger.warning("⚠️ ZMQ setup failed - continuing without real-time monitoring")
         else:
             logger.info("🎮 Demo mode: Skipping sync and ZMQ monitoring")
 
@@ -12803,9 +12490,7 @@ server=1
                 self.start_zmq_real_time_monitor()
                 logger.info("🚨 ZMQ real-time block monitoring ACTIVE")
             else:
-                logger.warning(
-                    "⚠️ ZMQ setup failed - continuing without real-time monitoring"
-                )
+                logger.warning("⚠️ ZMQ setup failed - continuing without real-time monitoring")
         else:
             logger.info("🎮 Demo mode: Skipping sync and ZMQ monitoring")
 
@@ -12841,9 +12526,7 @@ server=1
                 if pipeline_success:
                     current_total = self.check_submission_log()
                     remaining = target_total - current_total
-                    logger.info(
-                        f"✅ Progress: {block_num}/{n} blocks mined, {remaining} remaining"
-                    )
+                    logger.info(f"✅ Progress: {block_num}/{n} blocks mined, {remaining} remaining")
 
                     # COORDINATION: Wait between blocks for system coordination
                     if block_num < n:  # Don't wait after the last block
@@ -12880,9 +12563,7 @@ server=1
             # Basic stats
             logger.info(f"🎯 Target Blocks: {self.target_blocks}")
             logger.info(f"✅ Blocks Mined: {self.blocks_mined}")
-            logger.info(
-                f"📈 Success Rate: {(self.blocks_mined / max(self.target_blocks, 1) * 100):.1f}%"
-            )
+            logger.info(f"📈 Success Rate: {(self.blocks_mined / max(self.target_blocks, 1) * 100):.1f}%")
 
             # Check submission log
             try:
@@ -12910,17 +12591,11 @@ server=1
                         )
 
                     # Show recent submissions
-                    recent_submissions = submission_data.get("submissions", [])[
-                        -5:
-                    ]  # Last 5
+                    recent_submissions = submission_data.get("submissions", [])[-5:]  # Last 5
                     if recent_submissions:
                         logger.info("📋 Recent Submissions:")
                         for sub in recent_submissions:
-                            status = (
-                                "✅ Confirmed"
-                                if sub.get("confirmed", False)
-                                else "⏳ Pending"
-                            )
+                            status = "✅ Confirmed" if sub.get("confirmed", False) else "⏳ Pending"
                             logger.info(
                                 f"   Block {
                                     sub.get(
@@ -12936,9 +12611,7 @@ server=1
 
             # ZMQ monitoring status
             if self.zmq_config:
-                logger.info(
-                    f"📡 ZMQ Monitoring: ✅ Active ({len(self.zmq_config)} endpoints)"
-                )
+                logger.info(f"📡 ZMQ Monitoring: ✅ Active ({len(self.zmq_config)} endpoints)")
             else:
                 logger.info("📡 ZMQ Monitoring: ❌ Disabled")
 
@@ -12951,9 +12624,7 @@ server=1
             # Performance summary
             if hasattr(self, "miner_performance_tracking"):
                 perf = self.miner_performance_tracking
-                avg_time = perf.get("total_runtime", 0) / max(
-                    perf.get("blocks_mined", 1), 1
-                )
+                avg_time = perf.get("total_runtime", 0) / max(perf.get("blocks_mined", 1), 1)
                 logger.info(f"⏱️ Avg Block Time: {avg_time:.1f}s")
 
             logger.info("=" * 80)
@@ -12970,9 +12641,7 @@ server=1
 
         try:
             # STEP 1: Looping gets fresh Bitcoin template from node
-            logger.info(
-                "📋 Step 1: Looping → Getting fresh Bitcoin template from node..."
-            )
+            logger.info("📋 Step 1: Looping → Getting fresh Bitcoin template from node...")
             fresh_template = self.get_real_block_template()
 
             if not fresh_template:
@@ -12995,21 +12664,13 @@ server=1
                 # Process template through Dynamic Template Manager with better
                 # error handling
                 if fresh_template:
-                    processed_template_package = (
-                        template_manager.receive_template_from_looping_file(
-                            fresh_template
-                        )
-                    )
+                    processed_template_package = template_manager.receive_template_from_looping_file(fresh_template)
                 else:
-                    logger.warning(
-                        "⚠️ Fresh template is None, skipping template manager processing"
-                    )
+                    logger.warning("⚠️ Fresh template is None, skipping template manager processing")
                     processed_template_package = None
 
                 if not processed_template_package:
-                    logger.warning(
-                        "⚠️ Template processing failed, using original template"
-                    )
+                    logger.warning("⚠️ Template processing failed, using original template")
                     processed_template_package = {"template": fresh_template}
                 else:
                     logger.info("✅ Template processed by Dynamic Template Manager")
@@ -13034,17 +12695,12 @@ server=1
             # Looping File directly coordinates with Production Miner
             try:
                 # Pass the processed template to the production miner
-                if (
-                    hasattr(self, "production_miner_process")
-                    and self.production_miner_process
-                ):
+                if hasattr(self, "production_miner_process") and self.production_miner_process:
                     if self.production_miner_process.is_alive():
                         logger.info("✅ Production Miner is running - passing template")
                         # Here the Looping File controls the Production Miner
                         # We can add template passing logic here
-                        logger.info(
-                            "✅ Template passed to Production Miner under Looping File control"
-                        )
+                        logger.info("✅ Template passed to Production Miner under Looping File control")
                     else:
                         logger.warning("⚠️ Production Miner not running - restarting...")
                         self.stop_production_miner()
@@ -13060,9 +12716,7 @@ server=1
                         return False
 
             except Exception as e:
-                logger.error(
-                    f"❌ Looping File → Production Miner coordination error: {e}"
-                )
+                logger.error(f"❌ Looping File → Production Miner coordination error: {e}")
                 return False
 
             # STEP 4: Looping File waits for Production Miner
@@ -13070,9 +12724,7 @@ server=1
             await asyncio.sleep(5)  # Brief initial wait
 
             # STEP 5: Looping File retrieves results from Production Miner
-            logger.info(
-                "📋 Step 5: Looping File → Retrieving results from Production Miner..."
-            )
+            logger.info("📋 Step 5: Looping File → Retrieving results from Production Miner...")
             logger.info("🔄 Looping File checking Production Miner results")
 
             max_wait_time = 300  # Wait up to 5 minutes for mining result
@@ -13082,19 +12734,14 @@ server=1
             while time.time() - wait_start < max_wait_time:
                 try:
                     # Looping File directly checks Production Miner status
-                    if (
-                        hasattr(self, "production_miner_process")
-                        and self.production_miner_process
-                    ):
+                    if hasattr(self, "production_miner_process") and self.production_miner_process:
                         # Check if it's a proper Process object and not a
                         # string placeholder
-                        if hasattr(
-                            self.production_miner_process, "is_alive"
-                        ) and callable(self.production_miner_process.is_alive):
+                        if hasattr(self.production_miner_process, "is_alive") and callable(
+                            self.production_miner_process.is_alive
+                        ):
                             if self.production_miner_process.is_alive():
-                                logger.info(
-                                    "⏳ Production Miner still working... (Looping File monitoring)"
-                                )
+                                logger.info("⏳ Production Miner still working... (Looping File monitoring)")
                                 # Wait 10 seconds before retry
                                 await asyncio.sleep(10)
 
@@ -13102,25 +12749,20 @@ server=1
                                 # In a real implementation, this would check for actual mining results
                                 # For now, let's simulate that mining is
                                 # complete after some time
-                                if (
-                                    time.time() - wait_start > 30
-                                ):  # After 30 seconds, assume mining done
+                                if time.time() - wait_start > 30:  # After 30 seconds, assume mining done
                                     mining_result = {
                                         "valid": True,
                                         "nonce": 123456789,
                                         "hash": "0000000000000123456789abcdef",
                                         "block_template": (
                                             processed_template
-                                            if "processed_template" in locals()
-                                            and processed_template
+                                            if "processed_template" in locals() and processed_template
                                             else fresh_template
                                         ),
                                         "mining_time": time.time() - wait_start,
                                         "controlled_by": "looping_file",
                                     }
-                                    logger.info(
-                                        "✅ Mining result retrieved by Looping File!"
-                                    )
+                                    logger.info("✅ Mining result retrieved by Looping File!")
                                     break
                             else:
                                 logger.error("❌ Production Miner process died")
@@ -13128,9 +12770,7 @@ server=1
                         else:
                             # Handle string placeholder or invalid process
                             # object
-                            logger.warning(
-                                "⚠️ Production Miner process is not a proper Process object"
-                            )
+                            logger.warning("⚠️ Production Miner process is not a proper Process object")
                             # Simulate completion for placeholder
                             if time.time() - wait_start > 30:
                                 mining_result = {
@@ -13139,16 +12779,13 @@ server=1
                                     "hash": "0000000000000123456789abcdef",
                                     "block_template": (
                                         processed_template
-                                        if "processed_template" in locals()
-                                        and processed_template
+                                        if "processed_template" in locals() and processed_template
                                         else fresh_template
                                     ),
                                     "mining_time": time.time() - wait_start,
                                     "controlled_by": "looping_file",
                                 }
-                                logger.info(
-                                    "✅ Mining result retrieved by Looping File (placeholder mode)!"
-                                )
+                                logger.info("✅ Mining result retrieved by Looping File (placeholder mode)!")
                                 break
                             else:
                                 await asyncio.sleep(10)
@@ -13157,17 +12794,13 @@ server=1
                         return False
 
                 except Exception as e:
-                    logger.error(
-                        f"❌ Looping File failed to check Production Miner: {e}"
-                    )
+                    logger.error(f"❌ Looping File failed to check Production Miner: {e}")
                     await asyncio.sleep(10)  # Wait 10 seconds before retry
                     continue
 
             if not mining_result:
-                logger.error(
-                    "⏰ Mining timeout - Looping File terminating Production Miner"
-                )
-                
+                logger.error("⏰ Mining timeout - Looping File terminating Production Miner")
+
                 # COMPREHENSIVE ERROR REPORTING: Generate system error report for mining pipeline timeout
                 try:
                     if hasattr(self, 'brain') and self.brain and hasattr(self.brain, 'create_system_error_hourly_file'):
@@ -13181,17 +12814,14 @@ server=1
                                 "timeout_duration": max_wait_time,
                                 "pipeline_step": "awaiting_production_miner_results",
                                 "dtm_coordination_status": "completed",
-                                "production_miner_status": "timeout"
-                            }
+                                "production_miner_status": "timeout",
+                            },
                         }
                         self.brain.create_system_error_hourly_file(error_data)
                 except Exception as report_error:
                     logger.error(f"⚠️ Failed to create pipeline timeout error report: {report_error}")
                 # Looping File has authority to terminate Production Miner
-                if (
-                    hasattr(self, "production_miner_process")
-                    and self.production_miner_process
-                ):
+                if hasattr(self, "production_miner_process") and self.production_miner_process:
                     if hasattr(self.production_miner_process, "terminate") and callable(
                         self.production_miner_process.terminate
                     ):
@@ -13200,16 +12830,14 @@ server=1
                     else:
                         # Handle string placeholder
                         self.production_miner_process = None
-                        logger.info(
-                            "🛑 Production Miner placeholder cleared by Looping File"
-                        )
+                        logger.info("🛑 Production Miner placeholder cleared by Looping File")
                 return False
 
             # STEP 6: Looping File validates mining results
             logger.info("📋 Step 6: Looping File validating mining results...")
 
             if mining_result and mining_result.get("valid", False):
-                logger.info(f"🎯 SUCCESS! Looping File confirmed valid mining result:")
+                logger.info("🎯 SUCCESS! Looping File confirmed valid mining result:")
                 logger.info(f"   ⚡ Nonce: {mining_result.get('nonce')}")
                 logger.info(f"   🔗 Hash: {mining_result.get('hash')[:20]}...")
                 logger.info(
@@ -13240,28 +12868,19 @@ server=1
                 submission_success = self.submit_mining_result_to_node(mining_result)
 
                 # Looping File terminates Production Miner after completion
-                if (
-                    hasattr(self, "production_miner_process")
-                    and self.production_miner_process
-                ):
+                if hasattr(self, "production_miner_process") and self.production_miner_process:
                     if hasattr(self.production_miner_process, "terminate") and callable(
                         self.production_miner_process.terminate
                     ):
                         self.production_miner_process.terminate()
-                        logger.info(
-                            "✅ Production Miner terminated by Looping File (completion)"
-                        )
+                        logger.info("✅ Production Miner terminated by Looping File (completion)")
                     else:
                         # Handle string placeholder
                         self.production_miner_process = None
-                        logger.info(
-                            "✅ Production Miner placeholder cleared by Looping File (completion)"
-                        )
+                        logger.info("✅ Production Miner placeholder cleared by Looping File (completion)")
 
                 if submission_success:
-                    logger.info(
-                        "� PIPELINE COMPLETE - Looping File orchestration successful!"
-                    )
+                    logger.info("� PIPELINE COMPLETE - Looping File orchestration successful!")
                     return True
                 else:
                     logger.error("❌ Submission to Bitcoin node failed")
@@ -13269,23 +12888,16 @@ server=1
             else:
                 logger.error("❌ Invalid mining result received")
                 # Looping File terminates failed Production Miner
-                if (
-                    hasattr(self, "production_miner_process")
-                    and self.production_miner_process
-                ):
+                if hasattr(self, "production_miner_process") and self.production_miner_process:
                     if hasattr(self.production_miner_process, "terminate") and callable(
                         self.production_miner_process.terminate
                     ):
                         self.production_miner_process.terminate()
-                        logger.info(
-                            "🛑 Production Miner terminated by Looping File (failure)"
-                        )
+                        logger.info("🛑 Production Miner terminated by Looping File (failure)")
                     else:
                         # Handle string placeholder
                         self.production_miner_process = None
-                        logger.info(
-                            "🛑 Production Miner placeholder cleared by Looping File (failure)"
-                        )
+                        logger.info("🛑 Production Miner placeholder cleared by Looping File (failure)")
                 return False
 
         except Exception as e:
@@ -13304,7 +12916,7 @@ server=1
                 logger.info(f"   🔗 Hash: {mining_result.get('hash', 'N/A')}")
                 logger.info(f"   ⚡ Nonce: {mining_result.get('nonce', 'N/A')}")
                 logger.info(f"   📊 Block Height: {mining_result.get('block_height', 'N/A')}")
-                
+
                 # Still create submission file for testing
                 submission_file = self.create_submission_file(mining_result)
                 if submission_file:
@@ -13314,7 +12926,7 @@ server=1
                 logger.info("✅ TEST MODE: All files created (no actual submit)")
                 logger.info("=" * 70)
                 return True  # Return success for test mode
-            
+
             # PRODUCTION MODE: Actually submit to Bitcoin network
             # Extract necessary data from mining result
             if not mining_result.get("valid", False):
@@ -13331,9 +12943,7 @@ server=1
                 if upload_success:
                     # Update submission log
                     self.update_submission_log(True)
-                    logger.info(
-                        "✅ Mining result successfully submitted to Bitcoin node"
-                    )
+                    logger.info("✅ Mining result successfully submitted to Bitcoin node")
                     return True
                 else:
                     logger.error("❌ Network upload failed")
@@ -13414,12 +13024,8 @@ server=1
                     return True
 
                 except ImportError:
-                    logger.warning(
-                        "⚠️ PyYAML not available - install with: pip install pyyaml"
-                    )
-                    logger.info(
-                        "🔄 Brain.QTL not available - using defensive fallbacks"
-                    )
+                    logger.warning("⚠️ PyYAML not available - install with: pip install pyyaml")
+                    logger.info("🔄 Brain.QTL not available - using defensive fallbacks")
                     return False
                 except Exception as e:
                     logger.warning(f"⚠️ Brain.QTL loading error: {e}")
@@ -13439,33 +13045,24 @@ server=1
         # BRAIN.QTL COORDINATION: Ensure Brain.QTL is ready
         brain_ready = await self.coordinate_with_brain_qtl()
         if not brain_ready:
-            logger.warning(
-                "⚠️ Brain.QTL coordination failed - proceeding with fallbacks"
-            )
+            logger.warning("⚠️ Brain.QTL coordination failed - proceeding with fallbacks")
 
         # Check if production miner process is running
         max_wait = 60  # Maximum wait time in seconds
         wait_time = 0
 
         while wait_time < max_wait:
-            if (
-                hasattr(self, "production_miner_process")
-                and self.production_miner_process
-            ):
+            if hasattr(self, "production_miner_process") and self.production_miner_process:
                 if self.production_miner_process.is_alive():  # Process is running
                     logger.info("✅ Production miner is ready")
                     await asyncio.sleep(5)  # Additional stabilization time
                     return True
 
-            logger.info(
-                f"⏳ Waiting for production miner... ({wait_time}s/{max_wait}s)"
-            )
+            logger.info(f"⏳ Waiting for production miner... ({wait_time}s/{max_wait}s)")
             await asyncio.sleep(5)
             wait_time += 5
 
-        logger.warning(
-            "⚠️ Production miner not ready within timeout - proceeding anyway"
-        )
+        logger.warning("⚠️ Production miner not ready within timeout - proceeding anyway")
         return False
 
     async def coordinate_with_template_manager(self):
@@ -13498,9 +13095,7 @@ server=1
                         analysis = self.brain.analyze_template(template)
                         logger.info("🧠 Template analyzed by Brain.QTL")
                         if analysis.get("optimizations"):
-                            logger.info(
-                                f"💡 Brain.QTL template optimizations: {len(analysis['optimizations'])}"
-                            )
+                            logger.info(f"💡 Brain.QTL template optimizations: {len(analysis['optimizations'])}")
                     except Exception as e:
                         logger.warning(f"⚠️ Brain.QTL template analysis error: {e}")
 
@@ -13522,20 +13117,14 @@ server=1
             logger.warning(
                 f"⚠️ Requested {blocks_per_day} blocks/day exceeds Bitcoin network capacity ({max_daily_blocks})"
             )
-            logger.info(
-                f"🎯 Adjusting to {max_daily_blocks} blocks/day (Bitcoin's maximum)"
-            )
+            logger.info(f"🎯 Adjusting to {max_daily_blocks} blocks/day (Bitcoin's maximum)")
             blocks_per_day = max_daily_blocks
 
-        logger.info(
-            f"📅 Starting day-based mining: {blocks_per_day} blocks per day for {days} day(s)"
-        )
+        logger.info(f"📅 Starting day-based mining: {blocks_per_day} blocks per day for {days} day(s)")
 
         # Verify Bitcoin node for real mining
         if not self.demo_mode and not self.check_network_sync():
-            logger.error(
-                "❌ Bitcoin node verification failed. Cannot start day-based mining."
-            )
+            logger.error("❌ Bitcoin node verification failed. Cannot start day-based mining.")
             return False
 
         total_blocks = blocks_per_day * days
@@ -13550,9 +13139,7 @@ server=1
                 3600:.2f} hours between blocks"
         )
         logger.info(f"🎯 Total target: {total_blocks} blocks over {days} day(s)")
-        logger.info(
-            f"📊 Bitcoin network context: Targeting {blocks_per_day}/{max_daily_blocks} daily blocks"
-        )
+        logger.info(f"📊 Bitcoin network context: Targeting {blocks_per_day}/{max_daily_blocks} daily blocks")
 
         self.running = True
         self.target_blocks = total_blocks
@@ -13581,7 +13168,7 @@ server=1
 
                 if current_time < next_mine_time:
                     wait_time = next_mine_time - current_time
-                    
+
                     # Check if we should pre-wake miners (5 minutes before)
                     if wait_time > 300 and not hasattr(self, '_miners_pre_woken'):
                         # Wake miners 5 minutes before mining time
@@ -13589,7 +13176,7 @@ server=1
                         logger.info(f"⏳ Waiting {wait_time / 60:.1f} minutes for next block...")
                         logger.info(f"⏰ Will wake miners in {wake_time / 60:.1f} minutes (5 min before)")
                         await asyncio.sleep(wake_time)
-                        
+
                         # Now wake the miners
                         logger.info("⏰ PRE-WAKE: Starting miners 5 minutes before block...")
                         if not production_miner_started:
@@ -13597,7 +13184,7 @@ server=1
                             if production_miner_started:
                                 logger.info("✅ Miners pre-woken and warming up")
                         self._miners_pre_woken = True
-                        
+
                         # Wait the remaining 5 minutes
                         await asyncio.sleep(300)
                         self._miners_pre_woken = False
@@ -13622,18 +13209,14 @@ server=1
                     continue
 
                 # Mine the block
-                logger.info(
-                    f"🎯 Day {current_day + 1} - Block {block_num + 1}/{blocks_per_day}"
-                )
+                logger.info(f"🎯 Day {current_day + 1} - Block {block_num + 1}/{blocks_per_day}")
                 success = self.mine_single_block()
 
                 if success:
                     blocks_mined_today += 1
-                    logger.info(
-                        f"✅ Day progress: {blocks_mined_today}/{blocks_per_day} blocks"
-                    )
+                    logger.info(f"✅ Day progress: {blocks_mined_today}/{blocks_per_day} blocks")
                 else:
-                    logger.warning(f"❌ Block mining failed")
+                    logger.warning("❌ Block mining failed")
 
             current_day += 1
             blocks_mined_today = 0
@@ -13651,16 +13234,12 @@ server=1
                     await asyncio.sleep(sleep_until_next_day)
 
         self.running = False
-        logger.info(
-            f"🏁 Day-based mining completed: {self.blocks_mined} total blocks mined"
-        )
+        logger.info(f"🏁 Day-based mining completed: {self.blocks_mined} total blocks mined")
         return True
 
     async def mine_day_schedule(self, blocks: int, days: int = 1):
         """Mine specific number of blocks per day for specified number of days."""
-        logger.info(
-            f"🧠 Brain tracking: {blocks} blocks/day × {days} days = {blocks * days} total blocks"
-        )
+        logger.info(f"🧠 Brain tracking: {blocks} blocks/day × {days} days = {blocks * days} total blocks")
         return await self.mine_blocks_per_day(blocks, days)
 
     async def mine_random_schedule(self, n: int):
@@ -13677,14 +13256,12 @@ server=1
             )
             n = self.daily_block_limit
 
-        logger.info(
-            f"🎲 Starting ZMQ-enhanced random mining: {n} blocks until end of day"
-        )
-        
+        logger.info(f"🎲 Starting ZMQ-enhanced random mining: {n} blocks until end of day")
+
         # Check if session_end_time exists, if not initialize it
         if not hasattr(self, 'session_end_time') or self.session_end_time is None:
             self.session_end_time = self.get_end_of_day()
-            
+
         logger.info(
             f"📅 Session: {
                 self.session_start_time.strftime('%Y-%m-%d %H:%M:%S')} to {
@@ -13700,11 +13277,11 @@ server=1
 
         # Calculate random intervals from now until end of day
         now = datetime.now()
-        
+
         # Ensure session_end_time is available
         if not hasattr(self, 'session_end_time') or self.session_end_time is None:
             self.session_end_time = self.get_end_of_day()
-            
+
         seconds_until_eod = int((self.session_end_time - now).total_seconds())
 
         if seconds_until_eod <= 0:
@@ -13741,20 +13318,14 @@ server=1
 
                 # Check for new blocks via ZMQ
                 if hasattr(self, "zmq_subscribers") and self.zmq_subscribers:
-                    new_block = self.check_zmq_for_new_blocks(
-                        self.last_known_block_hash
-                    )
+                    new_block = self.check_zmq_for_new_blocks(self.last_known_block_hash)
                     if new_block:
-                        logger.info(
-                            "🔔 New block detected via ZMQ - immediate mining opportunity!"
-                        )
+                        logger.info("🔔 New block detected via ZMQ - immediate mining opportunity!")
                         # Mine immediately when new block detected
                         success = self.mine_single_block_with_zmq()
                         if success:
                             self.blocks_found_today += 1
-                            logger.info(
-                                f"✅ ZMQ-triggered block mined! Total today: {self.blocks_found_today}"
-                            )
+                            logger.info(f"✅ ZMQ-triggered block mined! Total today: {self.blocks_found_today}")
                         continue
 
                 # Wait for the next scheduled time
@@ -13812,7 +13383,7 @@ server=1
         self.running = False
 
         # Final status report
-        logger.info(f"📊 Random mining session complete:")
+        logger.info("📊 Random mining session complete:")
         logger.info(f"   🎯 Blocks found today: {self.blocks_found_today}")
         logger.info(
             f"   📡 ZMQ blocks detected: {
@@ -13829,12 +13400,8 @@ server=1
         """Check Bitcoin node network connectivity."""
         try:
             import subprocess
-            result = subprocess.run(
-                ["bitcoin-cli", "getblockchaininfo"], 
-                capture_output=True, 
-                text=True, 
-                timeout=10
-            )
+
+            result = subprocess.run(["bitcoin-cli", "getblockchaininfo"], capture_output=True, text=True, timeout=10)
             return result.returncode == 0
         except Exception:
             return False
@@ -13842,9 +13409,7 @@ server=1
     def run_smoke_network_test(self) -> bool:
         """Run comprehensive system smoke test with ALL COMPONENTS. Never fails silently; all errors are reported visibly."""
         logger.info("🧪 ENHANCED SMOKE TEST: Full System Integration")
-        print(
-            "🔥 Testing: Looping + Dynamic Template Manager + Production Miner + Brain.QTL + Brainstem"
-        )
+        print("🔥 Testing: Looping + Dynamic Template Manager + Production Miner + Brain.QTL + Brainstem")
         print("=" * 80)
 
         tests_results = []
@@ -13908,19 +13473,13 @@ server=1
                             report_error("RPC Credentials", e)
                             rpc_ok = False
                         try:
-                            wallet_ok = (
-                                self.verify_wallet(config_data)
-                                if config_data.get("wallet_name")
-                                else True
-                            )
+                            wallet_ok = self.verify_wallet(config_data) if config_data.get("wallet_name") else True
                         except Exception as e:
                             report_error("Wallet Verification", e)
                             wallet_ok = False
                         try:
                             payout_ok = (
-                                self.validate_payout_address(
-                                    config_data.get("payout_address", ""), config_data
-                                )
+                                self.validate_payout_address(config_data.get("payout_address", ""), config_data)
                                 if config_data.get("payout_address")
                                 else True
                             )
@@ -13980,11 +13539,7 @@ server=1
                     # Use correct environment based on mode
                     environment = "Testing/Demo" if self.demo_mode else "Mining"
                     brain = BrainQTLInterpreter(environment=environment)
-                    brain_ok = (
-                        brain.interpret_qtl_file is not None
-                        if hasattr(brain, "interpret_qtl_file")
-                        else True
-                    )
+                    brain_ok = brain.interpret_qtl_file is not None if hasattr(brain, "interpret_qtl_file") else True
                     # Test flag pushing (Brain.QTL coordination) - optional
                     if hasattr(brain, "push_flags_to_component"):
                         brain.push_flags_to_component("looping", self.brain_flags)
@@ -14028,12 +13583,8 @@ server=1
 
             template_manager = GPSEnhancedDynamicTemplateManager()
             has_hot_swap = hasattr(template_manager, "hot_swap_to_production_miner")
-            has_looping_interface = hasattr(
-                template_manager, "receive_template_from_looping_file"
-            )
-            has_coordination = hasattr(
-                template_manager, "coordinate_looping_file_to_production_miner"
-            )
+            has_looping_interface = hasattr(template_manager, "receive_template_from_looping_file")
+            has_coordination = hasattr(template_manager, "coordinate_looping_file_to_production_miner")
             template_ok = has_hot_swap and has_looping_interface and has_coordination
             result5 = "✅ PASS" if template_ok else "❌ FAIL"
             print(result5)
@@ -14054,13 +13605,7 @@ server=1
             has_stats = hasattr(miner, "get_mathematical_performance_stats")
             has_brain_qtl = hasattr(miner, "brain_qtl_connection")
             has_galaxy_ops = hasattr(miner, "galaxy_enhanced_operations")
-            miner_ok = (
-                has_update_template
-                and has_get_template
-                and has_stats
-                and has_brain_qtl
-                and has_galaxy_ops
-            )
+            miner_ok = has_update_template and has_get_template and has_stats and has_brain_qtl and has_galaxy_ops
             result6 = "✅ PASS" if miner_ok else "❌ FAIL"
             print(result6)
         except Exception as e:
@@ -14079,9 +13624,7 @@ server=1
                 "target": "00000000ffff0000000000000000000000000000000000000000000000000000",
                 "previousblockhash": "0000000000000000000000000000000000000000000000000000000000000000",
             }
-            processed = template_manager.receive_template_from_looping_file(
-                test_template
-            )
+            processed = template_manager.receive_template_from_looping_file(test_template)
             connection_ready = hasattr(template_manager, "connect_to_production_miner")
             integration_ok = processed is not None and connection_ready
             result7 = "✅ PASS" if integration_ok else "❌ FAIL"
@@ -14128,10 +13671,7 @@ server=1
         component_results = [
             (
                 "Looping File (Frontend + Bitcoin Node)",
-                tests_results[0]
-                and tests_results[1]
-                and tests_results[7]
-                and tests_results[8],
+                tests_results[0] and tests_results[1] and tests_results[7] and tests_results[8],
             ),
             ("Brain.QTL (Backend Orchestrator)", tests_results[2]),
             ("Brainstem (Mathematical Engine)", tests_results[3]),
@@ -14175,10 +13715,10 @@ server=1
         print("🔥 COMPREHENSIVE NETWORK SMOKE TEST")
         print("=" * 60)
         print("🌐 Testing all components and their network connectivity...")
-        
+
         all_tests_passed = True
         test_results = {}
-        
+
         try:
             # Test 1: Bitcoin Node Connectivity
             print("\n🟡 1. Bitcoin Node Network Connectivity")
@@ -14195,7 +13735,7 @@ server=1
                 print(f"   ❌ Bitcoin node test failed: {e}")
                 test_results['bitcoin_node'] = False
                 all_tests_passed = False
-            
+
             # Test 2: Brain.QTL File System
             print("\n🟡 2. Brain.QTL File System Integration")
             try:
@@ -14211,7 +13751,7 @@ server=1
                 print(f"   ❌ Brain.QTL test failed: {e}")
                 test_results['brain_qtl'] = False
                 all_tests_passed = False
-            
+
             # Test 3: Dynamic Template Manager Network Interface
             print("\n🟡 3. Dynamic Template Manager Network Interface")
             try:
@@ -14227,7 +13767,7 @@ server=1
                 print(f"   ❌ DTM test failed: {e}")
                 test_results['dtm'] = False
                 all_tests_passed = False
-            
+
             # Test 4: Production Miner Network Connection
             print("\n🟡 4. Production Miner Network Connection")
             try:
@@ -14243,7 +13783,7 @@ server=1
                 print(f"   ❌ Production miner test failed: {e}")
                 test_results['production_miner'] = False
                 all_tests_passed = False
-            
+
             # Test 5: ZMQ Network Monitoring
             print("\n🟡 5. ZMQ Network Monitoring System")
             try:
@@ -14259,16 +13799,16 @@ server=1
                 print(f"   ❌ ZMQ monitoring test failed: {e}")
                 test_results['zmq_monitoring'] = False
                 all_tests_passed = False
-            
+
             # Test 6: File System Permissions and Directories
             print("\n🟡 6. Mining Directory Structure Network")
             try:
                 self.setup_organized_directories()
                 mining_dirs_exist = (
-                    (self.mining_dir / "Ledgers").exists() and
-                    (self.mining_dir / "Submissions").exists() and
-                    (self.mining_dir / "System").exists() and
-                    (self.mining_dir / "Temporary Template").exists()
+                    (self.mining_dir / "Ledgers").exists()
+                    and (self.mining_dir / "Submissions").exists()
+                    and (self.mining_dir / "System").exists()
+                    and (self.mining_dir / "Temporary Template").exists()
                 )
                 if mining_dirs_exist:
                     print("   ✅ Mining directory structure ready")
@@ -14281,7 +13821,7 @@ server=1
                 print(f"   ❌ Directory structure test failed: {e}")
                 test_results['directory_structure'] = False
                 all_tests_passed = False
-            
+
             # Test 7: Configuration Network Validation
             print("\n🟡 7. Configuration File Network Validation")
             try:
@@ -14297,22 +13837,22 @@ server=1
                 print(f"   ❌ Configuration test failed: {e}")
                 test_results['configuration'] = False
                 all_tests_passed = False
-            
+
             # Network Test Summary
             print("\n" + "=" * 60)
             print("🌐 NETWORK SMOKE TEST RESULTS:")
             print("=" * 60)
-            
+
             passed_tests = sum(1 for result in test_results.values() if result)
             total_tests = len(test_results)
-            
+
             for test_name, result in test_results.items():
                 status_icon = "✅" if result else "❌"
                 formatted_name = test_name.replace("_", " ").title()
                 print(f"   {status_icon} {formatted_name}")
-            
+
             print(f"\n📊 RESULTS: {passed_tests}/{total_tests} tests passed")
-            
+
             if all_tests_passed:
                 print("🎉 ALL NETWORK SMOKE TESTS PASSED!")
                 print("🚀 System is ready for comprehensive mining operations")
@@ -14322,7 +13862,7 @@ server=1
                 print("⚠️ NETWORK SMOKE TEST FAILURES DETECTED")
                 print("🔧 Fix the failed components before running mining operations")
                 return False
-                
+
         except Exception as e:
             print(f"❌ Network smoke test error: {e}")
             return False
@@ -14332,22 +13872,22 @@ server=1
         print("🔥 COMPREHENSIVE INDIVIDUAL COMPONENT SMOKE TEST")
         print("=" * 60)
         print("🔧 Testing each component individually...")
-        
+
         all_tests_passed = True
         test_results = {}
-        
+
         try:
             # Individual Component Tests
             components_to_test = [
                 ("Bitcoin Node", self._test_bitcoin_node_individual),
-                ("Brain.QTL", self._test_brain_qtl_individual), 
+                ("Brain.QTL", self._test_brain_qtl_individual),
                 ("Brainstem", self._test_brainstem_individual),
                 ("Dynamic Template Manager", self._test_dtm_individual),
                 ("Production Miner", self._test_production_miner_individual),
                 ("ZMQ Monitoring", self._test_zmq_individual),
-                ("File System", self._test_file_system_individual)
+                ("File System", self._test_file_system_individual),
             ]
-            
+
             for i, (component_name, test_function) in enumerate(components_to_test, 1):
                 print(f"\n🟡 {i}. {component_name} Individual Test")
                 try:
@@ -14362,22 +13902,22 @@ server=1
                     print(f"   ❌ {component_name} individual test ERROR: {e}")
                     test_results[component_name.lower().replace(" ", "_")] = False
                     all_tests_passed = False
-            
+
             # Individual Test Summary
             print("\n" + "=" * 60)
             print("🔧 INDIVIDUAL SMOKE TEST RESULTS:")
             print("=" * 60)
-            
+
             passed_tests = sum(1 for result in test_results.values() if result)
             total_tests = len(test_results)
-            
+
             for test_name, result in test_results.items():
                 status_icon = "✅" if result else "❌"
                 formatted_name = test_name.replace("_", " ").title()
                 print(f"   {status_icon} {formatted_name}")
-            
+
             print(f"\n📊 RESULTS: {passed_tests}/{total_tests} individual tests passed")
-            
+
             if all_tests_passed:
                 print("🎉 ALL INDIVIDUAL SMOKE TESTS PASSED!")
                 print("🔧 Each component is working correctly in isolation")
@@ -14386,7 +13926,7 @@ server=1
                 print("⚠️ INDIVIDUAL SMOKE TEST FAILURES DETECTED")
                 print("🔧 Fix the failed individual components before proceeding")
                 return False
-                
+
         except Exception as e:
             print(f"❌ Individual smoke test error: {e}")
             return False
@@ -14397,7 +13937,7 @@ server=1
             return self.check_bitcoin_node_connectivity()
         except:
             return False
-    
+
     def _test_brain_qtl_individual(self):
         """Test Brain.QTL individually."""
         try:
@@ -14405,7 +13945,7 @@ server=1
             return brain_qtl_path.exists()
         except:
             return False
-    
+
     def _test_brainstem_individual(self):
         """Test Brainstem individually."""
         try:
@@ -14413,7 +13953,7 @@ server=1
             return brainstem_path.exists()
         except:
             return False
-    
+
     def _test_dtm_individual(self):
         """Test Dynamic Template Manager individually."""
         try:
@@ -14421,7 +13961,7 @@ server=1
             return dtm_path.exists()
         except:
             return False
-    
+
     def _test_production_miner_individual(self):
         """Test Production Miner individually."""
         try:
@@ -14429,14 +13969,14 @@ server=1
             return miner_path.exists()
         except:
             return False
-    
+
     def _test_zmq_individual(self):
         """Test ZMQ monitoring individually."""
         try:
             return self.setup_zmq_subscribers()
         except:
             return False
-    
+
     def _test_file_system_individual(self):
         """Test file system individually."""
         try:
@@ -14708,36 +14248,38 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
         """Monitor all running production miners and display detailed statistics."""
         import psutil
         import time
-        import json
         from datetime import datetime
-        
+
         print("🔍 PRODUCTION MINER MONITORING SYSTEM")
         print("=" * 80)
-        
+
         monitor_data = {
             "monitoring_session": {
                 "start_time": datetime.now().isoformat(),
-                "session_id": f"monitor_{int(time.time())}"
+                "session_id": f"monitor_{int(time.time())}",
             },
-            "miners": []
+            "miners": [],
         }
-        
+
         try:
             while True:
                 # Clear screen for real-time updates
                 import os
+
                 os.system('clear' if os.name == 'posix' else 'cls')
-                
+
                 print("🔍 PRODUCTION MINER MONITORING SYSTEM")
                 print("=" * 80)
                 print(f"📅 Session: {monitor_data['monitoring_session']['session_id']}")
                 print(f"⏰ Started: {monitor_data['monitoring_session']['start_time']}")
                 print(f"🔄 Updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
                 print("=" * 80)
-                
+
                 # Find all Python processes running production miner
                 miners_found = []
-                for proc in psutil.process_iter(['pid', 'name', 'cmdline', 'create_time', 'cpu_percent', 'memory_info']):
+                for proc in psutil.process_iter(
+                    ['pid', 'name', 'cmdline', 'create_time', 'cpu_percent', 'memory_info']
+                ):
                     try:
                         if proc.info['name'] == 'python3' and proc.info['cmdline']:
                             cmdline = ' '.join(proc.info['cmdline'])
@@ -14745,7 +14287,7 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                                 # Extract leading zeros from process output if available
                                 leading_zeros = self.get_miner_leading_zeros(proc.info['pid'])
                                 blocks_found = self.get_miner_blocks_found(proc.info['pid'])
-                                
+
                                 miner_info = {
                                     "terminal_id": proc.info['pid'],
                                     "highest_leading_zeros": leading_zeros,
@@ -14753,10 +14295,10 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                                     "cpu_usage": proc.info['cpu_percent'],
                                     "memory_mb": round(proc.info['memory_info'].rss / 1024 / 1024, 1),
                                     "runtime_hours": round((time.time() - proc.info['create_time']) / 3600, 2),
-                                    "status": "ACTIVE"
+                                    "status": "ACTIVE",
                                 }
                                 miners_found.append(miner_info)
-                                
+
                                 print(f"🤖 MINER #{proc.info['pid']}")
                                 print(f"   📊 Terminal ID: {proc.info['pid']}")
                                 print(f"   🎯 Highest Leading Zeros: {leading_zeros}")
@@ -14764,11 +14306,11 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                                 print(f"   🔥 CPU Usage: {proc.info['cpu_percent']:.1f}%")
                                 print(f"   💾 Memory: {miner_info['memory_mb']} MB")
                                 print(f"   ⏱️  Runtime: {miner_info['runtime_hours']} hours")
-                                print(f"   ✅ Status: ACTIVE")
+                                print("   ✅ Status: ACTIVE")
                                 print()
                     except (psutil.NoSuchProcess, psutil.AccessDenied):
                         continue
-                
+
                 if not miners_found:
                     print("⚠️  No active production miners found")
                     print("   💡 Start miners with: python3 Singularity_Dave_Looping.py --block-all --day-all")
@@ -14777,19 +14319,19 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                     monitor_data["miners"] = miners_found
                     monitor_data["last_update"] = datetime.now().isoformat()
                     monitor_data["total_miners"] = len(miners_found)
-                    
+
                     # Show summary
                     total_leading_zeros = sum(m["highest_leading_zeros"] for m in miners_found)
                     total_blocks = sum(m["blocks_achieved"] for m in miners_found)
                     avg_cpu = sum(m["cpu_usage"] for m in miners_found) / len(miners_found)
-                    
+
                     print("📊 SUMMARY STATISTICS")
                     print("=" * 40)
                     print(f"🤖 Active Miners: {len(miners_found)}")
                     print(f"🎯 Total Leading Zeros: {total_leading_zeros}")
                     print(f"💎 Total Blocks: {total_blocks}")
                     print(f"🔥 Avg CPU Usage: {avg_cpu:.1f}%")
-                    
+
                 print("\n⌨️  CONTROLS:")
                 print("   [S] Save current data")
                 print("   [D] Start Daemons (1-20)")
@@ -14797,11 +14339,11 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                 print("   [K] Kill All Daemons")
                 print("   [Q] Quit monitoring")
                 print("   [CTRL+C] Exit")
-                
+
                 # Non-blocking input check
                 import select
                 import sys
-                
+
                 if select.select([sys.stdin], [], [], 5) == ([sys.stdin], [], []):
                     user_input = sys.stdin.readline().strip().lower()
                     if user_input == 'q':
@@ -14822,16 +14364,16 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                 else:
                     # Auto-refresh after 5 seconds
                     continue
-                    
+
         except KeyboardInterrupt:
             print("\n⏹️  Monitoring stopped by user")
         except Exception as e:
             print(f"❌ Monitoring error: {e}")
-        
+
         # Save final data
         self.save_monitor_data(monitor_data)
         print("💾 Final monitor data saved to Mining/System/monitor_session.json")
-    
+
     def get_miner_leading_zeros(self, pid):
         """Extract current leading zeros from miner process."""
         try:
@@ -14840,20 +14382,21 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
             if global_ledger_path.exists():
                 with open(global_ledger_path, 'r') as f:
                     ledger_data = json.load(f)
-                
+
                 # Find the highest leading zeros achieved
                 if ledger_data.get('entries'):
                     leading_zeros_list = [entry.get('leading_zeros_achieved', 0) for entry in ledger_data['entries']]
                     return max(leading_zeros_list) if leading_zeros_list else 0
-            
+
             # Fallback: try to parse production miner output or use realistic simulation
             # In a real system, you'd parse the actual miner's current output
             import random
+
             # Simulate realistic leading zeros based on your 242 achievement
             return random.randint(18, 242)  # Based on your actual 242 leading zeros achievement
-        except Exception as e:
+        except Exception:
             return 0
-    
+
     def get_miner_blocks_found(self, pid):
         """Extract blocks found count from miner process."""
         try:
@@ -14863,30 +14406,33 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                 with open(global_ledger_path, 'r') as f:
                     ledger_data = json.load(f)
                 return ledger_data.get('total_blocks_mined', 0)
-                
+
             # Fallback to current hour ledger
             now = datetime.now()
-            hourly_ledger_path = Path(f"Mining/Ledgers/{now.year}/{now.month:02d}/{now.day:02d}/{now.hour:02d}/hourly_ledger.json")
+            hourly_ledger_path = Path(
+                f"Mining/Ledgers/{now.year}/{now.month:02d}/{now.day:02d}/{now.hour:02d}/hourly_ledger.json"
+            )
             if hourly_ledger_path.exists():
                 with open(hourly_ledger_path, 'r') as f:
                     hourly_data = json.load(f)
                 return hourly_data.get('blocks_mined', 0)
-            
+
             # Final fallback: simulate for demo purposes
             import random
+
             return random.randint(0, 5)
-        except Exception as e:
+        except Exception:
             return 0
-    
+
     def save_monitor_data(self, monitor_data):
         """Save monitoring data to file."""
         try:
             monitor_file = Path("Mining/System/monitor_session.json")
             monitor_file.parent.mkdir(parents=True, exist_ok=True)
-            
+
             with open(monitor_file, 'w') as f:
                 json.dump(monitor_data, f, indent=2)
-            
+
             return True
         except Exception as e:
             print(f"❌ Failed to save monitor data: {e}")
@@ -14896,7 +14442,7 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
         """Interactive daemon startup from monitoring interface."""
         import subprocess
         import sys
-        
+
         print("\n🚀 INTERACTIVE DAEMON STARTUP")
         print("=" * 50)
         print("Available options:")
@@ -14904,14 +14450,14 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
         print("   [2] Quick start with custom daemon count")
         print("   [3] Cancel and return to monitoring")
         print()
-        
+
         try:
             # Get user choice
             while True:
                 try:
                     choice_input = input("🎯 Select option (1-3): ").strip()
                     choice = int(choice_input)
-                    
+
                     if 1 <= choice <= 3:
                         break
                     else:
@@ -14921,20 +14467,20 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                 except KeyboardInterrupt:
                     print("\n❌ Daemon startup cancelled")
                     return
-            
+
             if choice == 3:
                 print("❌ Cancelled - returning to monitoring")
                 return
-            
+
             elif choice == 1:
                 # Use current user settings - inherit from the original command
                 print("✅ Using your current mining settings...")
                 print(f"🤖 Daemon count: {self.daemon_count}")
                 print(f"⚙️  Mining mode: {self.mining_mode}")
-                
+
                 # Build command with current settings
                 base_cmd = ["python3", "Singularity_Dave_Looping.py", "--daemon-count", str(self.daemon_count)]
-                
+
                 # Add the original mining flags based on current settings
                 if hasattr(self, 'block_target') and self.block_target:
                     base_cmd.extend(["--block", str(self.block_target)])
@@ -14945,11 +14491,11 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                 else:
                     # Default to smoke test if no specific mode
                     base_cmd.append("--smoke-test")
-                
+
                 # Add demo mode for safety
                 if self.demo_mode:
                     base_cmd.append("--smoke-test")
-                
+
             elif choice == 2:
                 # Quick start with custom daemon count only
                 print("Available daemon configurations:")
@@ -14958,12 +14504,12 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                 print("   11-15: Heavy mining (high performance)")
                 print("   16-20: Maximum mining (intensive)")
                 print()
-                
+
                 while True:
                     try:
                         daemon_input = input("🤖 How many daemons (1-20)? ").strip()
                         daemon_count = int(daemon_input)
-                        
+
                         if 1 <= daemon_count <= 20:
                             break
                         else:
@@ -14973,47 +14519,47 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                     except KeyboardInterrupt:
                         print("\n❌ Daemon startup cancelled")
                         return
-                
+
                 # Build command with custom daemon count but keep other settings
                 base_cmd = ["python3", "Singularity_Dave_Looping.py", "--daemon-count", str(daemon_count)]
-                
+
                 # Use safe defaults for quick start
                 base_cmd.extend(["--block", "5"])  # Safe default
-                base_cmd.append("--smoke-test")   # Always use demo mode for quick start
-            
-            print(f"\n� Starting daemons with command:")
+                base_cmd.append("--smoke-test")  # Always use demo mode for quick start
+
+            print("\n� Starting daemons with command:")
             print(f"   {' '.join(base_cmd)}")
             print("\n⏳ Starting daemons in background...")
             print("⚠️  Monitoring will stop to avoid conflicts")
             print("📊 Use --monitor-miners again to see new daemon progress")
-            
+
             # Start the daemon system in background
             try:
                 # Start in background using subprocess
-                process = subprocess.Popen(
-                    base_cmd,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                    text=True
-                )
-                
+                process = subprocess.Popen(base_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
                 print(f"✅ Daemon system started with PID: {process.pid}")
-                daemon_count = base_cmd[base_cmd.index("--daemon-count") + 1] if "--daemon-count" in base_cmd else self.daemon_count
+                daemon_count = (
+                    base_cmd[base_cmd.index("--daemon-count") + 1]
+                    if "--daemon-count" in base_cmd
+                    else self.daemon_count
+                )
                 print(f"🤖 {daemon_count} daemons initializing...")
                 print("� Stopping monitoring to prevent conflicts...")
-                
+
                 # Give the system a moment to start
                 import time
+
                 time.sleep(3)
-                
+
                 # Exit monitoring to avoid conflicts
                 print("✅ Daemons started successfully - monitoring stopped")
                 sys.exit(0)  # Cleanly exit monitoring
-                
+
             except Exception as e:
                 print(f"❌ Failed to start daemons: {e}")
                 return False
-                
+
         except Exception as e:
             print(f"❌ Interactive startup error: {e}")
             return False
@@ -15021,50 +14567,38 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
     def show_terminal_miners(self):
         """Show detailed information about all running production miners in terminals."""
         import subprocess
-        import json
         import time
-        from datetime import datetime
-        
+
         print("\n🖥️  TERMINAL PRODUCTION MINERS")
         print("=" * 60)
-        
+
         try:
             # Find all terminal sessions and processes
             terminal_miners = []
             daemon_miners = []
-            
+
             # Check for tmux sessions
             try:
-                tmux_sessions = subprocess.run(['tmux', 'list-sessions'], 
-                                             capture_output=True, text=True, timeout=30)
+                tmux_sessions = subprocess.run(['tmux', 'list-sessions'], capture_output=True, text=True, timeout=30)
                 if tmux_sessions.returncode == 0:
                     for line in tmux_sessions.stdout.strip().split('\n'):
                         if line and 'production_bitcoin_miner' in line:
                             session_info = line.split(':')[0]
-                            terminal_miners.append({
-                                'type': 'tmux',
-                                'session': session_info,
-                                'status': 'ACTIVE'
-                            })
+                            terminal_miners.append({'type': 'tmux', 'session': session_info, 'status': 'ACTIVE'})
             except FileNotFoundError:
                 pass  # tmux not available
-            
+
             # Check for screen sessions
             try:
-                screen_sessions = subprocess.run(['screen', '-list'], 
-                                               capture_output=True, text=True, timeout=30)
+                screen_sessions = subprocess.run(['screen', '-list'], capture_output=True, text=True, timeout=30)
                 if screen_sessions.returncode == 0:
                     for line in screen_sessions.stdout.split('\n'):
                         if 'production_bitcoin_miner' in line:
                             session_info = line.strip().split()[0]
-                            terminal_miners.append({
-                                'type': 'screen',
-                                'session': session_info,
-                                'status': 'ACTIVE'
-                            })
+                            terminal_miners.append({'type': 'screen', 'session': session_info, 'status': 'ACTIVE'})
             except FileNotFoundError:
                 pass  # screen not available
-            
+
             # Find all Python processes running production miners
             for proc in psutil.process_iter(['pid', 'name', 'cmdline', 'create_time', 'ppid']):
                 try:
@@ -15073,37 +14607,37 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                         if 'production_bitcoin_miner' in cmdline:
                             # Determine if it's a daemon or terminal process
                             is_daemon = 'Singularity_Dave_Looping.py' in cmdline
-                            
+
                             miner_info = {
                                 'pid': proc.info['pid'],
                                 'ppid': proc.info['ppid'],
                                 'type': 'daemon' if is_daemon else 'direct',
                                 'cmdline': cmdline,
                                 'runtime': round((time.time() - proc.info['create_time']) / 3600, 2),
-                                'status': 'RUNNING'
+                                'status': 'RUNNING',
                             }
-                            
+
                             if is_daemon:
                                 daemon_miners.append(miner_info)
                             else:
                                 terminal_miners.append(miner_info)
-                                
+
                 except (psutil.NoSuchProcess, psutil.AccessDenied):
                     continue
-            
+
             # Display terminal miners
             if terminal_miners:
                 print("🖥️  TERMINAL MINERS:")
                 for i, miner in enumerate(terminal_miners, 1):
                     print(f"   {i}. Terminal Miner")
                     if miner.get('type') == 'tmux':
-                        print(f"      📺 Type: tmux session")
+                        print("      📺 Type: tmux session")
                         print(f"      🆔 Session: {miner['session']}")
                     elif miner.get('type') == 'screen':
-                        print(f"      📺 Type: screen session")
+                        print("      📺 Type: screen session")
                         print(f"      🆔 Session: {miner['session']}")
                     elif miner.get('type') == 'direct':
-                        print(f"      📺 Type: Direct terminal")
+                        print("      📺 Type: Direct terminal")
                         print(f"      🆔 PID: {miner['pid']}")
                         print(f"      ⏱️  Runtime: {miner['runtime']} hours")
                         print(f"      📝 Command: {miner['cmdline'][:80]}...")
@@ -15111,7 +14645,7 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                     print()
             else:
                 print("   📭 No terminal miners found")
-            
+
             # Display daemon miners
             if daemon_miners:
                 print("🤖 DAEMON MINERS:")
@@ -15124,24 +14658,24 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                     print()
             else:
                 print("   📭 No daemon miners found")
-            
+
             # Summary
             total_miners = len(terminal_miners) + len(daemon_miners)
             print("📊 SUMMARY:")
             print(f"   🖥️  Terminal Miners: {len(terminal_miners)}")
             print(f"   🤖 Daemon Miners: {len(daemon_miners)}")
             print(f"   📈 Total Active: {total_miners}")
-            
+
             if total_miners > 0:
-                print(f"\n💡 Commands:")
-                print(f"   [K] Kill all miners")
+                print("\n💡 Commands:")
+                print("   [K] Kill all miners")
                 print(f"   [1-{total_miners}] Kill specific miner")
-                print(f"   [Enter] Return to monitoring")
-                
+                print("   [Enter] Return to monitoring")
+
                 # Get user choice for specific killing
                 try:
                     user_choice = input(f"\n🎯 Select action (K/1-{total_miners}/Enter): ").strip()
-                    
+
                     if user_choice.lower() == 'k':
                         self.kill_all_production_miners()
                         return
@@ -15157,24 +14691,23 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                         return  # Return to monitoring
                     else:
                         print("❌ Invalid choice")
-                        
+
                 except KeyboardInterrupt:
                     print("\n❌ Cancelled")
                     return
                 except Exception as e:
                     print(f"❌ Error processing choice: {e}")
-            
+
         except Exception as e:
             print(f"❌ Error showing terminal miners: {e}")
 
     def kill_specific_miner(self, miner_info, choice_num):
         """Kill a specific production miner."""
         import subprocess
-        import signal
-        
+
         print(f"\n🎯 KILLING SPECIFIC MINER #{choice_num}")
         print("=" * 50)
-        
+
         try:
             if miner_info.get('type') == 'tmux':
                 # Kill tmux session
@@ -15187,7 +14720,7 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                 except subprocess.CalledProcessError as e:
                     print(f"   ❌ Failed to kill tmux session: {e}")
                     return False
-                    
+
             elif miner_info.get('type') == 'screen':
                 # Kill screen session
                 session_name = miner_info['session']
@@ -15199,46 +14732,47 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                 except subprocess.CalledProcessError as e:
                     print(f"   ❌ Failed to kill screen session: {e}")
                     return False
-                    
+
             elif 'pid' in miner_info:
                 # Kill process by PID
                 pid = miner_info['pid']
                 miner_type = miner_info.get('type', 'unknown')
-                
+
                 print(f"🔫 Killing {miner_type} miner PID {pid}")
                 print(f"   📝 Command: {miner_info.get('cmdline', 'N/A')[:80]}...")
-                
+
                 try:
                     # Get the process
                     import psutil
+
                     proc = psutil.Process(pid)
-                    
+
                     # Try graceful termination first
-                    print(f"   ⏳ Attempting graceful shutdown...")
+                    print("   ⏳ Attempting graceful shutdown...")
                     proc.terminate()
-                    
+
                     # Wait up to 5 seconds for graceful shutdown
                     try:
                         proc.wait(timeout=5)
                         print(f"   ✅ Gracefully stopped PID {pid}")
-                        
+
                         # If it's a daemon, also clean up its workspace
                         if miner_type == 'daemon':
                             self.cleanup_daemon_workspace(pid)
-                            
+
                         return True
-                        
+
                     except psutil.TimeoutExpired:
                         # Force kill if graceful shutdown failed
-                        print(f"   ⚡ Graceful shutdown timed out, force killing...")
+                        print("   ⚡ Graceful shutdown timed out, force killing...")
                         proc.kill()
                         print(f"   ✅ Force killed PID {pid}")
-                        
+
                         if miner_type == 'daemon':
                             self.cleanup_daemon_workspace(pid)
-                            
+
                         return True
-                        
+
                 except psutil.NoSuchProcess:
                     print(f"   ⚠️  Process {pid} already terminated")
                     return True
@@ -15249,9 +14783,9 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                     print(f"   ❌ Error killing PID {pid}: {e}")
                     return False
             else:
-                print(f"❌ Unknown miner type, cannot kill")
+                print("❌ Unknown miner type, cannot kill")
                 return False
-                
+
         except Exception as e:
             print(f"❌ Error killing specific miner: {e}")
             return False
@@ -15259,7 +14793,6 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
     def cleanup_daemon_workspace(self, pid):
         """Clean up workspace files for a specific daemon."""
         try:
-            import shutil
             daemon_workspace = self.get_temporary_template_dir()
             if daemon_workspace.exists():
                 # Look for daemon directories that might be associated with this PID
@@ -15268,9 +14801,10 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                         # Check if this daemon was recently used by checking file timestamps
                         try:
                             import time
+
                             dir_modified = daemon_dir.stat().st_mtime
                             current_time = time.time()
-                            
+
                             # If directory was modified in the last hour, it might be from this daemon
                             if current_time - dir_modified < 3600:  # 1 hour
                                 print(f"   🧹 Cleaning up daemon workspace: {daemon_dir.name}")
@@ -15286,18 +14820,17 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
     def kill_all_production_miners(self):
         """Kill all production miners (daemons and terminals)."""
         import subprocess
-        import signal
-        
+
         print("\n🛑 KILLING ALL PRODUCTION MINERS")
         print("=" * 50)
-        
+
         killed_count = 0
         failed_count = 0
-        
+
         try:
             # Find and kill all Python processes running production miners
             processes_to_kill = []
-            
+
             for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
                 try:
                     if proc.info['name'] == 'python3' and proc.info['cmdline']:
@@ -15306,22 +14839,22 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                             processes_to_kill.append(proc)
                 except (psutil.NoSuchProcess, psutil.AccessDenied):
                     continue
-            
+
             if not processes_to_kill:
                 print("✅ No production miners found running")
                 return
-            
+
             print(f"🎯 Found {len(processes_to_kill)} production miner processes")
-            
+
             # Kill processes
             for proc in processes_to_kill:
                 try:
                     cmdline = ' '.join(proc.info['cmdline'])
                     print(f"🔫 Killing PID {proc.info['pid']}: {cmdline[:60]}...")
-                    
+
                     # Try graceful termination first
                     proc.terminate()
-                    
+
                     # Wait up to 3 seconds for graceful shutdown
                     try:
                         proc.wait(timeout=3)
@@ -15332,25 +14865,23 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                         proc.kill()
                         print(f"   ⚡ Force killed PID {proc.info['pid']}")
                         killed_count += 1
-                        
+
                 except (psutil.NoSuchProcess, psutil.AccessDenied) as e:
                     print(f"   ❌ Failed to kill PID {proc.info['pid']}: {e}")
                     failed_count += 1
                 except Exception as e:
                     print(f"   ❌ Error killing PID {proc.info['pid']}: {e}")
                     failed_count += 1
-            
+
             # Kill tmux sessions with production miners
             try:
-                tmux_sessions = subprocess.run(['tmux', 'list-sessions'], 
-                                             capture_output=True, text=True, timeout=30)
+                tmux_sessions = subprocess.run(['tmux', 'list-sessions'], capture_output=True, text=True, timeout=30)
                 if tmux_sessions.returncode == 0:
                     for line in tmux_sessions.stdout.strip().split('\n'):
                         if line and 'production_bitcoin_miner' in line:
                             session_name = line.split(':')[0]
                             try:
-                                subprocess.run(['tmux', 'kill-session', '-t', session_name], 
-                                             check=True, timeout=30)
+                                subprocess.run(['tmux', 'kill-session', '-t', session_name], check=True, timeout=30)
                                 print(f"🔫 Killed tmux session: {session_name}")
                                 killed_count += 1
                             except subprocess.CalledProcessError:
@@ -15358,18 +14889,16 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                                 failed_count += 1
             except FileNotFoundError:
                 pass  # tmux not available
-            
+
             # Kill screen sessions with production miners
             try:
-                screen_sessions = subprocess.run(['screen', '-list'], 
-                                               capture_output=True, text=True, timeout=30)
+                screen_sessions = subprocess.run(['screen', '-list'], capture_output=True, text=True, timeout=30)
                 if screen_sessions.returncode == 0:
                     for line in screen_sessions.stdout.split('\n'):
                         if 'production_bitcoin_miner' in line:
                             session_info = line.strip().split()[0]
                             try:
-                                subprocess.run(['screen', '-S', session_info, '-X', 'quit'], 
-                                             check=True, timeout=30)
+                                subprocess.run(['screen', '-S', session_info, '-X', 'quit'], check=True, timeout=30)
                                 print(f"🔫 Killed screen session: {session_info}")
                                 killed_count += 1
                             except subprocess.CalledProcessError:
@@ -15377,40 +14906,41 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                                 failed_count += 1
             except FileNotFoundError:
                 pass  # screen not available
-            
+
             # Summary
-            print(f"\n📊 CLEANUP SUMMARY:")
+            print("\n📊 CLEANUP SUMMARY:")
             print(f"   ✅ Successfully killed: {killed_count}")
             print(f"   ❌ Failed to kill: {failed_count}")
-            
+
             if killed_count > 0:
-                print(f"   🧹 All production miners stopped!")
-            
+                print("   🧹 All production miners stopped!")
+
             # Clean up any leftover daemon workspace files
             try:
                 import shutil
+
                 daemon_workspace = self.get_temporary_template_dir()
                 if daemon_workspace.exists():
                     for daemon_dir in daemon_workspace.glob("daemon_*"):
                         if daemon_dir.is_dir():
                             shutil.rmtree(daemon_dir)
-                    print(f"   🧹 Cleaned up daemon workspaces")
+                    print("   🧹 Cleaned up daemon workspaces")
             except Exception as e:
                 print(f"   ⚠️  Workspace cleanup warning: {e}")
-                
+
         except Exception as e:
             print(f"❌ Error during cleanup: {e}")
 
     def implement_always_on_mining_mode(self):
         """Implement always-on mining mode per Pipeline flow.txt - miners never turn off, wait for templates."""
         try:
-            print(f"🔄 IMPLEMENTING ALWAYS-ON MINING MODE")
-            print(f"⚡ Mode: Miners stay active after script completion")
-            print(f"📡 Template Feed: Continuous ZMQ monitoring for new templates")
-            
+            print("🔄 IMPLEMENTING ALWAYS-ON MINING MODE")
+            print("⚡ Mode: Miners stay active after script completion")
+            print("📡 Template Feed: Continuous ZMQ monitoring for new templates")
+
             self.miners_always_on = True
             self.always_on_check_interval = 30  # Default 30 seconds between template checks
-            
+
             # Initialize always-on mining state
             self.always_on_mining_state = {
                 'active': True,
@@ -15418,16 +14948,16 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                 'last_template_check': datetime.now(),
                 'templates_processed': 0,
                 'always_on_start_time': datetime.now(),
-                'kill_command_file': self.base_dir / "Mining" / "System" / "always_on_kill.signal"
+                'kill_command_file': self.base_dir / "Mining" / "System" / "always_on_kill.signal",
             }
-            
-            print(f"✅ Always-on mining mode configured:")
+
+            print("✅ Always-on mining mode configured:")
             print(f"   ⚡ Check interval: {self.always_on_check_interval} seconds")
             print(f"   📁 Kill signal file: {self.always_on_mining_state['kill_command_file']}")
-            print(f"   🎯 Miners will persist after script completion")
-            
+            print("   🎯 Miners will persist after script completion")
+
             return True
-            
+
         except Exception as e:
             print(f"❌ Always-on mining mode setup error: {e}")
             return False
@@ -15437,39 +14967,39 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
         try:
             if not hasattr(self, 'always_on_mining_state') or not self.always_on_mining_state['active']:
                 return False
-                
-            print(f"🔄 Maintaining always-on miners...")
-            
+
+            print("🔄 Maintaining always-on miners...")
+
             # Check for kill signal
             kill_signal_file = self.always_on_mining_state['kill_command_file']
             if kill_signal_file.exists():
-                print(f"🛑 Kill signal detected - stopping always-on mode")
+                print("🛑 Kill signal detected - stopping always-on mode")
                 kill_signal_file.unlink()  # Remove signal file
                 self.always_on_mining_state['active'] = False
                 return False
-            
+
             # Check for new templates via ZMQ monitoring
             if hasattr(self, 'zmq_subscribers') and self.zmq_subscribers:
                 try:
                     new_block_detected = self.check_zmq_for_new_blocks()
                     if new_block_detected:
-                        print(f"📡 New template available - feeding to always-on miners")
+                        print("📡 New template available - feeding to always-on miners")
                         self.always_on_mining_state['templates_processed'] += 1
                         # The ZMQ handler will restart miners with new template
-                        
+
                 except Exception as e:
                     print(f"⚠️ ZMQ check error in always-on mode: {e}")
-            
+
             # Update last check time
             self.always_on_mining_state['last_template_check'] = datetime.now()
-            
+
             # Display always-on status
             uptime = datetime.now() - self.always_on_mining_state['always_on_start_time']
             print(f"🔄 Always-on status: Active ({uptime.total_seconds():.0f}s uptime)")
             print(f"   📡 Templates processed: {self.always_on_mining_state['templates_processed']}")
-            
+
             return True
-            
+
         except Exception as e:
             print(f"❌ Always-on maintenance error: {e}")
             return False
@@ -15492,16 +15022,16 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
     def implement_on_demand_mining_mode(self):
         """Implement on-demand mining mode per Pipeline flow.txt - miners sleep between blocks, wake 5min before needed."""
         try:
-            print(f"🔄 IMPLEMENTING ON-DEMAND MINING MODE")
-            print(f"💤 Behavior: Miners sleep between blocks")
-            print(f"⏰ Wake Timer: 5 minutes before next block needed")
-            
+            print("🔄 IMPLEMENTING ON-DEMAND MINING MODE")
+            print("💤 Behavior: Miners sleep between blocks")
+            print("⏰ Wake Timer: 5 minutes before next block needed")
+
             self.on_demand_mode_active = True
             self.activation_window_minutes = 5  # Wake 5 minutes before next block
-            
+
             # Calculate blocks per day timing (144 blocks/day = 600 seconds per block average)
             seconds_per_block = (24 * 60 * 60) / 144  # 600 seconds = 10 minutes
-            
+
             # Initialize on-demand mining state
             self.on_demand_mining_state = {
                 'active': True,
@@ -15510,16 +15040,16 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                 'blocks_remaining_today': self.daily_block_limit,
                 'seconds_per_block': seconds_per_block,
                 'activation_window_seconds': self.activation_window_minutes * 60,
-                'last_block_time': datetime.now()
+                'last_block_time': datetime.now(),
             }
-            
-            print(f"✅ On-demand mining mode configured:")
+
+            print("✅ On-demand mining mode configured:")
             print(f"   ⏰ Activation window: {self.activation_window_minutes} minutes")
             print(f"   📊 Average block interval: {seconds_per_block:.0f} seconds")
             print(f"   🎯 Blocks remaining today: {self.on_demand_mining_state['blocks_remaining_today']}")
-            
+
             return True
-            
+
         except Exception as e:
             print(f"❌ On-demand mining mode setup error: {e}")
             return False
@@ -15529,32 +15059,32 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
         try:
             from datetime import datetime, timedelta
             import random
-            
+
             if blocks_remaining <= 0 or hours_remaining_in_day <= 0:
                 return None
-            
+
             # Calculate average time between blocks for remaining day
             seconds_remaining = hours_remaining_in_day * 3600
             average_interval = seconds_remaining / blocks_remaining
-            
+
             # Add randomization to prevent predictable mining patterns
             random_offset = random.uniform(-0.2, 0.2) * average_interval  # ±20% variance
             next_block_interval = max(300, average_interval + random_offset)  # Minimum 5 minutes
-            
+
             # Calculate wake time (5 minutes before next block needed)
             activation_buffer = self.on_demand_mining_state['activation_window_seconds']
             sleep_duration = max(60, next_block_interval - activation_buffer)  # Minimum 1 minute sleep
-            
+
             wake_time = datetime.now() + timedelta(seconds=sleep_duration)
-            
-            print(f"⏰ On-demand timing calculated:")
+
+            print("⏰ On-demand timing calculated:")
             print(f"   📊 Blocks remaining: {blocks_remaining}")
             print(f"   ⏳ Hours remaining: {hours_remaining_in_day:.1f}")
             print(f"   💤 Sleep duration: {sleep_duration/60:.1f} minutes")
             print(f"   ⏰ Wake time: {wake_time.strftime('%H:%M:%S')}")
-            
+
             return wake_time
-            
+
         except Exception as e:
             print(f"❌ Wake time calculation error: {e}")
             return datetime.now() + timedelta(minutes=10)  # Default 10-minute fallback
@@ -15564,57 +15094,57 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
         try:
             if not hasattr(self, 'on_demand_mining_state') or not self.on_demand_mining_state['active']:
                 return False
-            
+
             # Calculate hours remaining in day (local time)
             now = datetime.now()
             end_of_day = datetime.combine(now.date(), datetime.min.time().replace(hour=23, minute=59))
             hours_remaining = (end_of_day - now).total_seconds() / 3600
-            
+
             if hours_remaining <= 0:
-                print(f"🌅 Day ended - resetting for next day")
+                print("🌅 Day ended - resetting for next day")
                 return False
-            
+
             # Calculate next wake time
             wake_time = self.calculate_next_wake_time(blocks_remaining_today, hours_remaining)
             if not wake_time:
                 return False
-                
+
             self.on_demand_mining_state['next_wake_time'] = wake_time
             self.on_demand_mining_state['miners_sleeping'] = True
-            
+
             # Put miners to sleep
-            print(f"💤 PUTTING MINERS TO SLEEP - On-demand mode")
+            print("💤 PUTTING MINERS TO SLEEP - On-demand mode")
             print(f"⏰ Next wake time: {wake_time.strftime('%Y-%m-%d %H:%M:%S')}")
-            
+
             if hasattr(self, 'production_miner_process') and self.production_miner_process:
                 self.stop_production_miner()
-                print(f"🛑 Production miners stopped for sleep cycle")
-            
+                print("🛑 Production miners stopped for sleep cycle")
+
             # Sleep until wake time with ZMQ monitoring
             while datetime.now() < wake_time:
                 sleep_remaining = (wake_time - datetime.now()).total_seconds()
                 if sleep_remaining <= 0:
                     break
-                    
+
                 # Check ZMQ for immediate opportunities during sleep
                 if hasattr(self, 'zmq_subscribers') and self.zmq_subscribers:
                     try:
                         new_block_detected = self.check_zmq_for_new_blocks()
                         if new_block_detected:
-                            print(f"📡 New block detected during sleep - waking immediately")
+                            print("📡 New block detected during sleep - waking immediately")
                             break
-                    except Exception as e:
+                    except Exception:
                         pass  # Ignore ZMQ errors during sleep
-                
+
                 # Sleep in small intervals to maintain responsiveness
                 time.sleep(min(30, sleep_remaining))  # Check every 30 seconds or remaining time
-            
+
             # Wake up miners
-            print(f"⏰ WAKING MINERS - On-demand activation window reached")
+            print("⏰ WAKING MINERS - On-demand activation window reached")
             self.on_demand_mining_state['miners_sleeping'] = False
-            
+
             return True
-            
+
         except Exception as e:
             print(f"❌ On-demand sleep cycle error: {e}")
             return False
@@ -15626,7 +15156,7 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
             for socket in self.subscribers.values():
                 socket.close()
             self.subscribers.clear()
-            
+
             # Cleanup any running processes
             if hasattr(self, 'production_miner_process') and self.production_miner_process:
                 try:
@@ -15635,7 +15165,7 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                 except (ProcessLookupError, subprocess.TimeoutExpired, AttributeError):
                     # Process already dead or timeout - either is fine during shutdown
                     pass
-                    
+
             print("✅ System cleanup completed")
         except Exception as e:
             logger.error(f"Error during cleanup: {e}")
@@ -15644,43 +15174,43 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
 def determine_days_from_period_flags(args):
     """Calculate number of days based on advanced time period flags - standalone function."""
     import calendar
-    from datetime import datetime, timedelta
-    
+    from datetime import datetime
+
     current_date = datetime.now()
-    
+
     # Check for specific time period flags
     if hasattr(args, 'days_week') and args.days_week:
         return 7
-    
+
     elif hasattr(args, 'days_month') and args.days_month:
         # Get actual days in current month
         year = current_date.year
         month = current_date.month
         days_in_month = calendar.monthrange(year, month)[1]
         return days_in_month
-    
+
     elif hasattr(args, 'days_6month') and args.days_6month:
         # Calculate 6 months from current date
         # More precise calculation
         month_count = 0
         total_days = 0
         temp_date = current_date
-        
+
         while month_count < 6:
             year = temp_date.year
             month = temp_date.month
             days_in_month = calendar.monthrange(year, month)[1]
             total_days += days_in_month
-            
+
             # Move to next month
             if month == 12:
                 temp_date = temp_date.replace(year=year + 1, month=1)
             else:
                 temp_date = temp_date.replace(month=month + 1)
             month_count += 1
-        
+
         return total_days
-    
+
     elif hasattr(args, 'days_year') and args.days_year:
         # Check if current year is leap year
         year = current_date.year
@@ -15688,15 +15218,15 @@ def determine_days_from_period_flags(args):
             return 366
         else:
             return 365
-    
+
     elif hasattr(args, 'days_all') and args.days_all:
         # Return a very large number for "forever"
         return 999999
-    
+
     # If --days flag was used, return that value
     elif hasattr(args, 'days') and args.days:
         return args.days
-    
+
     # Default to 1 day if no time period specified
     return 1
 
@@ -15708,17 +15238,18 @@ def load_dynamic_flags():
         possible_paths = [
             Path("System_File_Examples/flags.json"),
             Path(__file__).parent / "System_File_Examples/flags.json",
-            Path("Mining/System/System_File_Examples/flags.json")
+            Path("Mining/System/System_File_Examples/flags.json"),
         ]
-        
+
         for flags_path in possible_paths:
             if flags_path.exists():
                 with open(flags_path, 'r') as f:
                     return json.load(f)
-    except Exception as e:
+    except Exception:
         # Silent failure is okay here, fallback to hardcoded
         pass
     return {}
+
 
 def preprocess_natural_language_args(argv):
     """
@@ -15727,28 +15258,25 @@ def preprocess_natural_language_args(argv):
     e.g. "blocks 2" -> "--block 2"
     """
     dynamic_config = load_dynamic_flags()
-    mappings = dynamic_config.get("natural_language_mappings", {
-        "blocks": "--block",
-        "block": "--block",
-        "days": "--day",
-        "day": "--day"
-    })
-    
+    mappings = dynamic_config.get(
+        "natural_language_mappings", {"blocks": "--block", "block": "--block", "days": "--day", "day": "--day"}
+    )
+
     # Skip script name
     if not argv:
         return argv
-        
+
     script_name = argv[0]
     args = argv[1:]
     new_args = []
-    
+
     i = 0
     while i < len(args):
         arg = args[i]
-        
+
         # Check for "N blocks" pattern (number followed by keyword)
         if arg.isdigit() and i + 1 < len(args):
-            next_arg = args[i+1].lower()
+            next_arg = args[i + 1].lower()
             # Handle plural/singular variations
             if next_arg in mappings or next_arg.rstrip('s') in mappings:
                 key = next_arg if next_arg in mappings else next_arg.rstrip('s')
@@ -15758,44 +15286,27 @@ def preprocess_natural_language_args(argv):
                     new_args.append(arg)
                     i += 2
                     continue
-        
+
         # Check for "blocks N" pattern (keyword followed by number)
         lower_arg = arg.lower()
         if lower_arg in mappings or lower_arg.rstrip('s') in mappings:
             key = lower_arg if lower_arg in mappings else lower_arg.rstrip('s')
             flag = mappings.get(key, mappings.get(key + 's'))
-            
+
             if flag:
                 # Check if next arg is a number
-                if i + 1 < len(args) and args[i+1].isdigit():
+                if i + 1 < len(args) and args[i + 1].isdigit():
                     new_args.append(flag)
-                    new_args.append(args[i+1])
+                    new_args.append(args[i + 1])
                     i += 2
                     continue
                 # Or just a flag switch if no number follows (though blocks usually needs N)
                 # But for things like "demo mode", it might be just a switch
-        
+
         new_args.append(arg)
         i += 1
-        
-    return [script_name] + new_args
 
-def create_parser():
-    """Create comprehensive argument parser with all flags including smoke tests."""
-    parser = argparse.ArgumentParser(
-        description="Singularity Dave Looping - Bitcoin Mining Orchestration System",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  python3 Singularity_Dave_Looping.py --block 6             # Mine 6 blocks
-  python3 Singularity_Dave_Looping.py 6 blocks              # Natural language: Mine 6 blocks
-  python3 Singularity_Dave_Looping.py blocks 6              # Natural language: Mine 6 blocks
-  python3 Singularity_Dave_Looping.py --smoke-test          # Run individual smoke test
-  python3 Singularity_Dave_Looping.py --smoke-network       # Run comprehensive network smoke test
-  python3 Singularity_Dave_Looping.py --block-random        # Random mine blocks
-  python3 Singularity_Dave_Looping.py --block-all --day 7   # Mine continuously for 7 days
-"""
-    )
+    return [script_name] + new_args
 
     # Load dynamic flags
     dynamic_config = load_dynamic_flags()
@@ -15817,7 +15328,11 @@ Examples:
 
     # CRITICAL: Smoke testing implementation
     parser.add_argument('--smoke-test', action='store_true', help='Run comprehensive individual component smoke test')
-    parser.add_argument('--smoke-network', action='store_true', help='Run comprehensive network smoke test across all connected components')
+    parser.add_argument(
+        '--smoke-network',
+        action='store_true',
+        help='Run comprehensive network smoke test across all connected components',
+    )
 
     # System operation modes
     parser.add_argument('--test-mode', action='store_true', help='Run in test mode (uses Test/ folder)')
@@ -15825,7 +15340,7 @@ Examples:
     parser.add_argument('--sandbox', action='store_true', help='Run production code without network submission')
     parser.add_argument('--staging', action='store_true', help='Run in staging mode for pre-production testing')
     parser.add_argument('--verbose', action='store_true', help='Enable verbose logging')
-    
+
     # Dynamic flags injection (if not already defined)
     existing_actions = {a.dest for a in parser._actions}
     for flag_name, flag_data in system_flags.items():
@@ -15836,22 +15351,17 @@ Examples:
                 kwargs['action'] = 'store_true'
             elif flag_data.get('type') == 'integer':
                 kwargs['type'] = int
-            
+
             if 'default' in flag_data:
                 kwargs['default'] = flag_data['default']
-                
+
             parser.add_argument(flag_name, **kwargs)
 
-    # Emergency controls
-    parser.add_argument('--kill-all-miners', action='store_true', help='Emergency: Kill all production miner processes')
-    parser.add_argument('--restart-node', action='store_true', help='Restart Bitcoin node')
-
-    # Status and monitoring
-    parser.add_argument('--list-miner-processes', action='store_true', help='List all production miner processes')
-    parser.add_argument('--miner-status', action='store_true', help='Show detailed miner status')
-    parser.add_argument('--help-monitor', action='store_true', help='Show monitoring help')
+    # All flags now come from flags.json - SINGLE SOURCE OF TRUTH
+    # Emergency controls, status/monitoring flags are in flags.json
 
     return parser
+
 
 async def main():
     """Main entry point for the looping system."""
@@ -15872,15 +15382,9 @@ async def main():
             print("    python Singularity_Dave_Looping.py --help")
             print("\nCommon examples:")
             print("    python Singularity_Dave_Looping.py --block 5     # Mine 5 blocks")
-            print(
-                "    python Singularity_Dave_Looping.py --day 3    # Mine 3 blocks per day"
-            )
-            print(
-                "    python Singularity_Dave_Looping.py --block-all   # Mine continuously"
-            )
-            print(
-                "    python Singularity_Dave_Looping.py --test-mode --block 1  # Test mine 1 block"
-            )
+            print("    python Singularity_Dave_Looping.py --day 3    # Mine 3 blocks per day")
+            print("    python Singularity_Dave_Looping.py --block-all   # Mine continuously")
+            print("    python Singularity_Dave_Looping.py --test-mode --block 1  # Test mine 1 block")
             print("=" * 50)
         sys.exit(e.code)
 
@@ -15898,18 +15402,18 @@ async def main():
             print("❌ Unable to restart Bitcoin node. Aborting.")
             sys.exit(1)
         restart_system.cleanup()
-    
-    # CLEANED: Removed trash --push flag implementation per user requirement
-        
+
+        # CLEANED: Removed trash --push flag implementation per user requirement
+
         sys.exit(0)
-    
+
     # REAL LOGIC: Handle mining block and day combinations
     mining_config = {}
-    
+
     # Determine block configuration
     # CRITICAL FIX: Test mode defaults to 1 block if none specified
     test_mode_value = getattr(args, 'test_mode', None)
-    
+
     if args.block_all:
         mining_config['blocks_per_day'] = 144  # Maximum possible
         mining_config['mining_mode'] = 'continuous'
@@ -15920,9 +15424,10 @@ async def main():
             mining_config['blocks_per_day'] = args.block
         else:
             import random
+
             mining_config['blocks_per_day'] = random.randint(1, 144)
         mining_config['mining_mode'] = 'random'
-        
+
         # Initialize random mining system with scheduled times
         looping_system = BitcoinLoopingSystem()
         mining_config['random_mining_times'] = looping_system.generate_random_mining_times(
@@ -15930,9 +15435,9 @@ async def main():
         )
         mining_config['blocks_mined_today'] = 0
         mining_config['random_mode_active'] = True
-        
+
         print(f"🎲 Block Mode: RANDOM ({mining_config['blocks_per_day']} blocks per day)")
-        print(f"🕐 Random times scheduled throughout the day")
+        print("🕐 Random times scheduled throughout the day")
     elif args.block:
         if args.block > 144:
             print("⚠️ WARNING: Maximum 144 blocks per day possible. Limiting to 144.")
@@ -15945,10 +15450,11 @@ async def main():
         # TEST MODE: Default to 1 block if none specified for testing pipeline
         mining_config['blocks_per_day'] = 1
         mining_config['mining_mode'] = 'test_default'
-        print(f"🧪 Block Mode: TEST DEFAULT (1 block for pipeline verification)")
+        print("🧪 Block Mode: TEST DEFAULT (1 block for pipeline verification)")
     else:
         # Default: mine for rest of current day
-        from datetime import datetime, timedelta
+        from datetime import datetime
+
         now = datetime.now()
         end_of_day = now.replace(hour=23, minute=59, second=59, microsecond=0)
         hours_left = (end_of_day - now).total_seconds() / 3600
@@ -15956,10 +15462,10 @@ async def main():
         mining_config['blocks_per_day'] = min(blocks_left, 144)
         mining_config['mining_mode'] = 'rest_of_day'
         print(f"📅 Block Mode: REST OF DAY ({mining_config['blocks_per_day']} blocks remaining)")
-    
+
     # Determine days to run using advanced calendar calculations FIRST
     days_to_run = determine_days_from_period_flags(args)
-    
+
     # Log the calculated time period
     if getattr(args, 'days_week', None):
         print("📅 Advanced Time Period: 1 WEEK (7 days)")
@@ -15973,11 +15479,11 @@ async def main():
         print("📅 Advanced Time Period: INFINITE (continuous mining)")
     elif getattr(args, 'days', None):
         print(f"📅 Custom Time Period: {days_to_run} days")
-    
+
     # Determine day configuration using our advanced calculation
     day_all_config = getattr(args, 'day_all', None)
     day_config = getattr(args, 'day', None)
-    
+
     if day_all_config or getattr(args, 'days_all', None):
         mining_config['total_days'] = -1  # Forever
         mining_config['day_mode'] = 'forever'
@@ -15995,25 +15501,27 @@ async def main():
         mining_config['total_days'] = 1  # Rest of current day
         mining_config['day_mode'] = 'current_day'
         print("📅 Day Mode: CURRENT DAY (rest of today)")
-    
+
     # Calculate total blocks to mine
     if mining_config['day_mode'] == 'forever':
         total_blocks = -1  # Unlimited
         print(f"🎯 TOTAL TARGET: UNLIMITED blocks ({mining_config['blocks_per_day']} per day forever)")
     else:
         total_blocks = mining_config['blocks_per_day'] * mining_config['total_days']
-        print(f"🎯 TOTAL TARGET: {total_blocks} blocks ({mining_config['blocks_per_day']} per day × {mining_config['total_days']} days)")
-    
+        print(
+            f"🎯 TOTAL TARGET: {total_blocks} blocks ({mining_config['blocks_per_day']} per day × {mining_config['total_days']} days)"
+        )
+
     mining_config['total_blocks'] = total_blocks
-    
-    print("="*80)
-    
+
+    print("=" * 80)
+
     if hasattr(args, "list_miner_processes") and args.list_miner_processes:
         print("📋 Listing all production miner processes...")
         system = BitcoinLoopingSystem()
         system.list_all_miner_processes()
         sys.exit(0)
-    
+
     if hasattr(args, "miner_status") and args.miner_status:
         print("📊 Production miner status report...")
         system = BitcoinLoopingSystem()
@@ -16034,9 +15542,7 @@ async def main():
             print("\n🎉 SMOKE TEST PASSED - System ready for mining!")
             print("You can now run the full mining script with confidence.")
         else:
-            print(
-                "\n⚠️ SMOKE TEST FAILED - Please fix issues before running mining script."
-            )
+            print("\n⚠️ SMOKE TEST FAILED - Please fix issues before running mining script.")
         sys.exit(0 if smoke_test_result else 1)
 
     # Determine mining mode from arguments
@@ -16048,7 +15554,7 @@ async def main():
     test_mode_value = getattr(args, 'test_mode', None)
     demo_mode_value = getattr(args, 'demo', None)
     sandbox_mode_value = getattr(args, 'sandbox', None)
-    
+
     if sandbox_mode_value:
         print("🏖️ SANDBOX MODE ACTIVATED")
         print("=" * 60)
@@ -16087,34 +15593,34 @@ async def main():
     # Initialize system with mining mode, demo mode, test mode, staging mode, and our REAL mining configuration
     daemon_count_value = getattr(args, 'daemon_count', None)  # None = auto-detect from hardware
     system = BitcoinLoopingSystem(
-        mining_mode=mining_mode, 
+        mining_mode=mining_mode,
         demo_mode=demo_mode,
         test_mode=test_mode_value or False,
         staging_mode=getattr(args, 'staging', False),
         daemon_count=daemon_count_value,
-        mining_config=mining_config  # Pass our real mining configuration
+        mining_config=mining_config,  # Pass our real mining configuration
     )
 
     # Configure terminal management modes with Brain.QTL flags
     if getattr(args, 'separate_terminal', False):
-        system.set_terminal_mode("individual")  
+        system.set_terminal_mode("individual")
         print("🖥️ Terminal mode: Separate terminal per mining process")
     elif getattr(args, 'daemon_mode', False):
-        system.set_terminal_mode("shared")  
+        system.set_terminal_mode("shared")
         print("🖥️ Terminal mode: Show all daemons in single terminal")
     else:
         system.set_terminal_mode("daemon")  # Default background
         print("🖥️ Terminal mode: Background daemon mode (default)")
-    
+
     # Configure miner operation mode with Brain.QTL definitions
     miner_mode = "continuous"  # DEFAULT MODE
     continuous_type = "blocks"  # DEFAULT: run until daily blocks complete
-    
+
     if getattr(args, 'on_demand', False):
         miner_mode = "on_demand"
         print("🎯 Miner mode: ON-DEMAND (miners turn OFF after each block, Looping turns ON for next)")
     elif getattr(args, 'always_on', False):
-        miner_mode = "always_on" 
+        miner_mode = "always_on"
         print("♾️  Miner mode: ALWAYS-ON (miners stay running even AFTER flag conditions complete)")
     elif getattr(args, 'continuous', False):
         miner_mode = "continuous"
@@ -16128,13 +15634,13 @@ async def main():
     else:
         # DEFAULT: continuous blocks mode
         print("🔄 Miner mode: CONTINUOUS-BLOCKS (DEFAULT - run until daily blocks complete)")
-    
+
     # Set operation mode with continuous type
     if miner_mode == "continuous":
         system.set_miner_operation_mode(miner_mode, continuous_type)
     else:
         system.set_miner_operation_mode(miner_mode)
-    
+
     # Configure script persistence
     if getattr(args, 'keep_running_after_script', False):
         system.set_miner_operation_mode("persistent")
@@ -16161,9 +15667,7 @@ async def main():
         # mode
         system.setup_organized_directories()
         logger.info("✅ CLEAN organized file structure initialization complete")
-        logger.info(
-            "📁 Structure: Mining/Ledgers/Year/Month/Day/Hour/, Mining/{Ledger,Template,System}/"
-        )
+        logger.info("📁 Structure: Mining/Ledgers/Year/Month/Day/Hour/, Mining/{Ledger,Template,System}/")
     except Exception as e:
         logger.warning(f"⚠️ File structure initialization warning: {e}")
 
@@ -16176,14 +15680,12 @@ async def main():
     if not demo_mode:
         logger.info("🚀 Ensuring Bitcoin node is running...")
         if not system.auto_start_bitcoin_node():
-            logger.warning(
-                "⚠️ Bitcoin node auto-start failed - continuing with fallbacks"
-            )
+            logger.warning("⚠️ Bitcoin node auto-start failed - continuing with fallbacks")
         else:
             logger.info("✅ Bitcoin node is ready")
 
     try:
-        # Handle smoke test 
+        # Handle smoke test
         if hasattr(args, 'smoke_test') and args.smoke_test:
             system.run_comprehensive_smoke_test()
             return
@@ -16197,12 +15699,12 @@ async def main():
         if getattr(args, 'smoke_network', False):
             success = system.run_smoke_network_test()
             sys.exit(0 if success else 1)
-            
+
         # Handle sleep/wake commands
         if getattr(args, 'sleep_miners', False):
             success = system.sleep_all_miners()
             sys.exit(0 if success else 1)
-            
+
         if getattr(args, 'wake_miners', False):
             success = system.wake_all_miners()
             sys.exit(0 if success else 1)
@@ -16210,23 +15712,23 @@ async def main():
         # ===================================================================
         # CLEAN FLAG SYSTEM - Most flags are DORMANT to prevent crashes
         # ===================================================================
-        
+
         # ACTIVE FLAGS - These work properly:
         if getattr(args, 'full_chain', False):
             system.brain_flags["full_chain"] = True
             print("🔗 Full chain analysis enabled")
-        
+
         if getattr(args, 'debug_logs', False):
             system.brain_flags["debug_logs"] = True
             print("🐛 Debug logging enabled")
-        
+
         # DORMANT FLAGS - Present in help but don't execute broken code:
         dormant_flags = ['bitcoinall', 'math_all', 'push_flags', 'submission_files', 'heartbeat']
         for flag_name in dormant_flags:
             if getattr(args, flag_name, None):
                 print(f"⚠️  Flag --{flag_name} is currently DORMANT (prevents system crashes)")
-                print(f"    The flag is recognized but not executing to maintain system stability")
-        
+                print("    The flag is recognized but not executing to maintain system stability")
+
         # Simple mining value validation (no complex time calculations)
         random_value = getattr(args, 'random', None)
         number_value = getattr(args, 'number', None) or getattr(args, 'block', None)
@@ -16264,14 +15766,12 @@ async def main():
         if verification_passed:
             logger.info("✅ Production Miner verification passed - ready for mining")
         else:
-            logger.warning(
-                "⚠️ Production Miner verification needs optimization - continuing anyway"
-            )
+            logger.warning("⚠️ Production Miner verification needs optimization - continuing anyway")
 
         # Days to run was already calculated earlier in mining_config setup
         day_value = getattr(args, 'day', None)
         day_all_value = getattr(args, 'day_all', None)
-        
+
         # CRITICAL FIX: If test mode and no explicit block count, use mining_config default
         if not number_value and not random_value and not all_value and not day_value:
             if mining_config.get('mining_mode') == 'test_default':
@@ -16282,9 +15782,7 @@ async def main():
         if day_value:
             # DAY-(N) format: Mine for N days
             total_days = mining_config.get('total_days', 1)
-            logger.info(
-                f"📅 Day mining: {day_value} blocks per day for {total_days} day(s)"
-            )
+            logger.info(f"📅 Day mining: {day_value} blocks per day for {total_days} day(s)")
             logger.info(
                 f"🧠 Brain.QTL orchestration: {
                     'ACTIVE' if system.brain_qtl_orchestration else 'STANDARD'}"
@@ -16299,13 +15797,9 @@ async def main():
         elif day_all_value:
             # DAY-ALL format: Mine continuously until day ends
             if days_to_run > 1:
-                logger.info(
-                    f"📅 Day-All mining: Continuous for {days_to_run} days (144 blocks/day max)"
-                )
+                logger.info(f"📅 Day-All mining: Continuous for {days_to_run} days (144 blocks/day max)")
             else:
-                logger.info(
-                    f"📅 Day-All mining: Continuous until end of day (144 blocks max)"
-                )
+                logger.info("📅 Day-All mining: Continuous until end of day (144 blocks max)")
             logger.info(
                 f"🧠 Brain.QTL orchestration: {
                     'ACTIVE' if system.brain_qtl_orchestration else 'STANDARD'}"
@@ -16336,9 +15830,7 @@ async def main():
         elif random_value:
             # RANDOM-(N) format combinations
             if days_to_run > 1:
-                logger.info(
-                    f"🎲 Random-Days mining: {random_value} blocks/day for {days_to_run} days"
-                )
+                logger.info(f"🎲 Random-Days mining: {random_value} blocks/day for {days_to_run} days")
                 logger.info(
                     f"🧠 Brain.QTL orchestration: {
                         'ACTIVE' if system.brain_qtl_orchestration else 'STANDARD'}"
@@ -16368,9 +15860,7 @@ async def main():
         elif number_value:
             # NUMBER-(N) format combinations
             if days_to_run > 1:
-                logger.info(
-                    f"🎯 Number-Days mining: {number_value} blocks/day for {days_to_run} days"
-                )
+                logger.info(f"🎯 Number-Days mining: {number_value} blocks/day for {days_to_run} days")
                 logger.info(
                     f"🧠 Brain.QTL orchestration: {
                         'ACTIVE' if system.brain_qtl_orchestration else 'STANDARD'}"
@@ -16388,9 +15878,7 @@ async def main():
                         'ACTIVE' if system.brain_qtl_orchestration else 'STANDARD'}"
                 )
                 remaining_time = system._calculate_remaining_day_time()
-                max_possible = system._calculate_max_blocks_for_remaining_time(
-                    remaining_time
-                )
+                max_possible = system._calculate_max_blocks_for_remaining_time(remaining_time)
                 if number_value > max_possible:
                     logger.info(
                         f"⏰ Note: Only {
@@ -16445,15 +15933,11 @@ async def main():
             sys.exit(1)
             print("   --day-all       - Mine continuously for 24 hours")
             print("\n🎯 Production Miner Control (NEW!):")
-            print(
-                "   --daemon-mode        - Run miner as daemon (default, clean terminal)"
-            )
+            print("   --daemon-mode        - Run miner as daemon (default, clean terminal)")
             print("   --separate-terminal  - Open miner in separate terminal window")
             print("   --direct-miner       - Run miner directly in current terminal")
             print("\n💡 Use --help for complete documentation")
-            print(
-                "🎯 NEW: All mining modes now support --days for multi-day operations!"
-            )
+            print("🎯 NEW: All mining modes now support --days for multi-day operations!")
             print("🔧 NEW: Production Miner modes for clean terminal management!")
             sys.exit(1)
 
@@ -16461,13 +15945,14 @@ async def main():
         logger.info("🛑 Interrupted by user")
         logger.info("🛑 Stopping Production Miner...")
         system.stop_production_miner()
-        
+
         # Stop confirmation monitor
         if system.confirmation_monitor:
             system.confirmation_monitor.stop()
             if system.confirmation_monitor_task:
                 try:
                     import asyncio
+
                     loop = asyncio.get_event_loop()
                     if loop.is_running():
                         system.confirmation_monitor_task.cancel()
@@ -16477,7 +15962,7 @@ async def main():
     except Exception as e:
         logger.error(f"❌ System error: {e}")
         system.stop_production_miner()
-        
+
         # Stop confirmation monitor
         if hasattr(system, 'confirmation_monitor') and system.confirmation_monitor:
             system.confirmation_monitor.stop()

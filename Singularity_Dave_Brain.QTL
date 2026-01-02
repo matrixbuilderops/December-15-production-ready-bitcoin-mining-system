@@ -277,7 +277,8 @@ mathematical_framework:
     cycles: 161
     knuth_sorrellian_class_notation: "Knuth-Sorrellian-Class(208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909, 80, 156912)"
     sync_source_file: "Interation 3.yaml"
-    sync_last_update: "2025-10-13"
+    sync_last_update: "2025-01-01"
+    configuration_note: "BitLoad constant must match config.json mathematical_framework.bitload_constant for consistency"
   base_knuth_parameters:
     # ALL CATEGORIES USE SAME BASE VALUES
     knuth_sorrellian_class_levels: 80
