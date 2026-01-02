@@ -182,9 +182,12 @@ def _build_path(mode, path_type, component=None):
             'DEMO_MODE', '').lower() == 'true' else "System/Temporary/Template"
         return f"{prefix}{demo_path}"
     elif path_type == "user_look_at":
-        demo_path = "Mining/Temporary/User_Look_At" if os.getenv(
-            'DEMO_MODE', '').lower() == 'true' else "System/Temporary/User_Look_At"
-        return f"{prefix}{demo_path}"
+        # Dynamic User_Look_At placement: System/User_Look_At
+        # For Demo/Test: Test/Demo/System/User_Look_At
+        # For Live/Staging: System/User_Look_At (root)
+        demo_base = "Test/Demo/System" if os.getenv(
+            'DEMO_MODE', '').lower() == 'true' else "System"
+        return f"{prefix}{demo_base}/User_Look_At"
 
     # System paths
     elif path_type == "system_report" and component:
@@ -11821,6 +11824,9 @@ def brain_get_folder_structure():
                                    "errors": False},
             "Temporary/User_Look_At": {"reports": [],
                                        "errors": False},
+            "System/User_Look_At": {"reports": [],
+                                    "errors": False,
+                                    "subfolders": []},
             "System/System_Reports/Brain": {"reports": ["brain_report",
                                                         "system_report"],
                                             "errors": ["brain_error",
