@@ -1,4 +1,3 @@
-from centralized_config import get_bitload, get_rpc_credentials
 #!/usr/bin/env python3
 """
 Dynamic Template Manager for Bitcoin Mining
@@ -6,6 +5,7 @@ Handles template coordination and GPS-enhanced mining capabilities
 """
 
 from __future__ import annotations
+from centralized_config import get_bitload, get_rpc_credentials
 
 import copy
 import json

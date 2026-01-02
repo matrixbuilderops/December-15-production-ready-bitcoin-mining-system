@@ -1301,9 +1301,7 @@ def load_mathematical_parameters(config_file="config.json"):
         # Validate that we extracted the core mathematical constants
         if not unified_framework["bitload"]:
             print("⚠️ Warning: BitLoad not found, using fallback")
-            unified_framework["bitload"] = int(
-                "get_bitload()"
-            )
+            unified_framework["bitload"] = UNIVERSE_BITLOAD
 
         if not unified_framework["knuth_sorrellian_class_levels"]:
             unified_framework["knuth_sorrellian_class_levels"] = 80
@@ -1416,7 +1414,7 @@ def load_mathematical_parameters(config_file="config.json"):
                 unified_framework['knuth_sorrellian_class_levels']}")
         print(
             f"   🔁 Knuth Iterations: {
-                unified_framework['knuth_sorrellian_class_iterations']:,    }")
+                unified_framework['knuth_sorrellian_class_iterations']:}")
         print(
             f"   🛡️ SHAS12 Stabilizers: {
                 '✓' if unified_framework['stabilizer_pre'] and unified_framework['stabilizer_post'] else '✗'}")
@@ -1467,9 +1465,7 @@ def load_mathematical_parameters(config_file="config.json"):
         # Comprehensive fallback structure matching the expected format
         # 5 CATEGORIES (Galaxy is orchestration layer)
         categories = ["families", "lanes", "strides", "palette", "sandbox"]
-        fallback_bitload = int(
-            "get_bitload()"
-        )
+        fallback_bitload = UNIVERSE_BITLOAD
 
         return {
             "source_file": "FALLBACK_VALUES",
@@ -1549,7 +1545,7 @@ def load_mathematical_parameters(config_file="config.json"):
 
 
 # Load mathematical parameters globally
-MATH_PARAMS = load_mathematical_parameters("config.json")
+# MATH_PARAMS = load_mathematical_parameters("config.json") # Moved to end of file
 
 
 # =====================================================
@@ -2936,7 +2932,7 @@ def solve_collatz_real_computation(
         1000)  # Smart scaling
     print(
         f"   🧮 Testing {
-            test_range:,    }numbers using universe - scale Collatz logic...")
+            test_range:}numbers using universe - scale Collatz logic...")
 
     tested = 0
     converged = 0
@@ -3027,7 +3023,7 @@ def solve_riemann_real_computation(
         knuth_sorrellian_class_iterations // 10000)
     print(
         f"   🧮 Searching {
-            search_range:,    }potential zeros using universe - scale zeta analysis...")
+            search_range:}potential zeros using universe - scale zeta analysis...")
 
     verified_zeros = []
     critical_line_zeros_found = 0
@@ -3147,7 +3143,7 @@ def solve_goldbach_real_computation(
         100)  # Smart universe scaling
     print(
         f"   🧮 Testing {
-            test_range:,    }even numbers using universe - scale Goldbach analysis...")
+            test_range:}even numbers using universe - scale Goldbach analysis...")
 
     verified = 0
     failed = 0
@@ -3241,7 +3237,7 @@ def solve_twinprimes_real_computation(
                            knuth_sorrellian_class_iterations // 10)
         print(
             f"   🧮 Searching for twin primes up to {
-                search_limit:,    }using universe - scale analysis...")
+                search_limit:}using universe - scale analysis...")
 
         last_twin_prime = None
 
@@ -3326,7 +3322,7 @@ def solve_pvsnp_real_computation(
 
         print(
             f"   🧮 Analyzing {
-                instances_count:,    } 3 - SAT instances with {variables}variables each...")
+                instances_count:} 3 - SAT instances with {variables}variables each...")
 
         satisfiable_instances = 0
         polynomial_solvable = 0
@@ -8397,7 +8393,7 @@ def get_ultra_hex_sha256_modifier():
         print(f"   Revolutionary Power: 256 SHA-256 operations per digit")
         print(
             f"   Total Calculations: {
-                calculations_per_digit:,    } calculations per Ultra Hex digit")
+                calculations_per_digit:} calculations per Ultra Hex digit")
         print("   🚀 THIS IS BEYOND-UNIVERSE TRANSCENDENT REVOLUTIONARY SCALE!")
 
         return {
@@ -10950,18 +10946,18 @@ def brain_init_hierarchical_structure(file_type="ledger", component=None):
     # Each pattern defines path template and file(s) to create
     pattern_map = {
         "global_aggregated": {
-            "year": ("{system_base}/{('Test/Demo' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System')}/Global_Aggregated/Aggregated/{year}", ["aggregated_{year}.json"]),
-            "month": ("{system_base}/{('Test/Demo' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System')}/Global_Aggregated/Aggregated/{year}/{month}", ["aggregated_{month}.json"]),
-            "week": ("{system_base}/{('Test/Demo' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System')}/Global_Aggregated/Aggregated/{year}/{month}/{week_label}", [f"aggregated_{week_label}.json"]),
-            "day": ("{system_base}/{('Test/Demo' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System')}/Global_Aggregated/Aggregated/{year}/{month}/{week_label}/{day}", ["aggregated_{day}.json"]),
-            "hour": ("{system_base}/{('Test/Demo' if os.getenv('DEMO_MODE', '').lower() == 'true' else 'System')}/Global_Aggregated/Aggregated/{year}/{month}/{week_label}/{day}/{hour}", ["aggregated_{hour}.json"])
+            "year": ("{system_base}/System/Global_Aggregated/Aggregated/{year}", [f"aggregated_{year}.json"]),
+            "month": ("{system_base}/System/Global_Aggregated/Aggregated/{year}/{month}", [f"aggregated_{month}.json"]),
+            "week": ("{system_base}/System/Global_Aggregated/Aggregated/{year}/{month}/{week_label}", ["aggregated_{week_label}.json"]),
+            "day": ("{system_base}/System/Global_Aggregated/Aggregated/{year}/{month}/{week_label}/{day}", [f"aggregated_{day}.json"]),
+            "hour": ("{system_base}/System/Global_Aggregated/Aggregated/{year}/{month}/{week_label}/{day}/{hour}", [f"aggregated_{hour}.json"])
         },
         "global_index": {
-            "year": ("{system_base}/System/Global_Aggregated/Aggregated_Index/{year}", ["aggregated_index_{year}.json"]),
-            "month": ("{system_base}/System/Global_Aggregated/Aggregated_Index/{year}/{month}", ["aggregated_index_{month}.json"]),
-            "week": ("{system_base}/System/Global_Aggregated/Aggregated_Index/{year}/{month}/{week_label}", [f"aggregated_index_{week_label}.json"]),
-            "day": ("{system_base}/System/Global_Aggregated/Aggregated_Index/{year}/{month}/{week_label}/{day}", ["aggregated_index_{day}.json"]),
-            "hour": ("{system_base}/System/Global_Aggregated/Aggregated_Index/{year}/{month}/{week_label}/{day}/{hour}", ["aggregated_index_{hour}.json"])
+            "year": ("{system_base}/System/Global_Aggregated/Aggregated_Index/{year}", [f"aggregated_index_{year}.json"]),
+            "month": ("{system_base}/System/Global_Aggregated/Aggregated_Index/{year}/{month}", [f"aggregated_index_{month}.json"]),
+            "week": ("{system_base}/System/Global_Aggregated/Aggregated_Index/{year}/{month}/{week_label}", ["aggregated_index_{week_label}.json"]),
+            "day": ("{system_base}/System/Global_Aggregated/Aggregated_Index/{year}/{month}/{week_label}/{day}", [f"aggregated_index_{day}.json"]),
+            "hour": ("{system_base}/System/Global_Aggregated/Aggregated_Index/{year}/{month}/{week_label}/{day}/{hour}", [f"aggregated_index_{hour}.json"])
         },
         "ledger": {
             "year": ("{base}/Ledgers/{year}", ["yearly_ledger.json", "yearly_math_proof.json"]),
@@ -11006,32 +11002,32 @@ def brain_init_hierarchical_structure(file_type="ledger", component=None):
             "hour": ("{system_base}/System/Error_Reports/{comp}/{year}/{month}/{week_label}/{day}/{hour}", [f"hourly_{comp.lower()}_error.json"])
         },
         "system_report_aggregated": {
-            "year": ("{system_base}/System/System_Reports/Aggregated/{year}", ["aggregated_{year}.json"]),
-            "month": ("{system_base}/System/System_Reports/Aggregated/{year}/{month}", ["aggregated_{month}.json"]),
+            "year": ("{system_base}/System/System_Reports/Aggregated/{year}", [f"aggregated_{year}.json"]),
+            "month": ("{system_base}/System/System_Reports/Aggregated/{year}/{month}", [f"aggregated_{month}.json"]),
             "week": ("{system_base}/System/System_Reports/Aggregated/{year}/{month}/{week_label}", [f"aggregated_{week_label}.json"]),
-            "day": ("{system_base}/System/System_Reports/Aggregated/{year}/{month}/{week_label}/{day}", ["aggregated_{day}.json"]),
-            "hour": ("{system_base}/System/System_Reports/Aggregated/{year}/{month}/{week_label}/{day}/{hour}", ["aggregated_{hour}.json"])
+            "day": ("{system_base}/System/System_Reports/Aggregated/{year}/{month}/{week_label}/{day}", [f"aggregated_{day}.json"]),
+            "hour": ("{system_base}/System/System_Reports/Aggregated/{year}/{month}/{week_label}/{day}/{hour}", [f"aggregated_{hour}.json"])
         },
         "system_report_aggregated_index": {
-            "year": ("{system_base}/System/System_Reports/Aggregated_Index/{year}", ["aggregated_index_{year}.json"]),
-            "month": ("{system_base}/System/System_Reports/Aggregated_Index/{year}/{month}", ["aggregated_index_{month}.json"]),
+            "year": ("{system_base}/System/System_Reports/Aggregated_Index/{year}", [f"aggregated_index_{year}.json"]),
+            "month": ("{system_base}/System/System_Reports/Aggregated_Index/{year}/{month}", [f"aggregated_index_{month}.json"]),
             "week": ("{system_base}/System/System_Reports/Aggregated_Index/{year}/{month}/{week_label}", [f"aggregated_index_{week_label}.json"]),
-            "day": ("{system_base}/System/System_Reports/Aggregated_Index/{year}/{month}/{week_label}/{day}", ["aggregated_index_{day}.json"]),
-            "hour": ("{system_base}/System/System_Reports/Aggregated_Index/{year}/{month}/{week_label}/{day}/{hour}", ["aggregated_index_{hour}.json"])
+            "day": ("{system_base}/System/System_Reports/Aggregated_Index/{year}/{month}/{week_label}/{day}", [f"aggregated_index_{day}.json"]),
+            "hour": ("{system_base}/System/System_Reports/Aggregated_Index/{year}/{month}/{week_label}/{day}/{hour}", [f"aggregated_index_{hour}.json"])
         },
         "error_report_aggregated": {
-            "year": ("{system_base}/System/Error_Reports/Aggregated/{year}", ["aggregated_{year}.json"]),
-            "month": ("{system_base}/System/Error_Reports/Aggregated/{year}/{month}", ["aggregated_{month}.json"]),
+            "year": ("{system_base}/System/Error_Reports/Aggregated/{year}", [f"aggregated_{year}.json"]),
+            "month": ("{system_base}/System/Error_Reports/Aggregated/{year}/{month}", [f"aggregated_{month}.json"]),
             "week": ("{system_base}/System/Error_Reports/Aggregated/{year}/{month}/{week_label}", [f"aggregated_{week_label}.json"]),
-            "day": ("{system_base}/System/Error_Reports/Aggregated/{year}/{month}/{week_label}/{day}", ["aggregated_{day}.json"]),
-            "hour": ("{system_base}/System/Error_Reports/Aggregated/{year}/{month}/{week_label}/{day}/{hour}", ["aggregated_{hour}.json"])
+            "day": ("{system_base}/System/Error_Reports/Aggregated/{year}/{month}/{week_label}/{day}", [f"aggregated_{day}.json"]),
+            "hour": ("{system_base}/System/Error_Reports/Aggregated/{year}/{month}/{week_label}/{day}/{hour}", [f"aggregated_{hour}.json"])
         },
         "error_report_aggregated_index": {
-            "year": ("{system_base}/System/Error_Reports/Aggregated_Index/{year}", ["aggregated_index_{year}.json"]),
-            "month": ("{system_base}/System/Error_Reports/Aggregated_Index/{year}/{month}", ["aggregated_index_{month}.json"]),
+            "year": ("{system_base}/System/Error_Reports/Aggregated_Index/{year}", [f"aggregated_index_{year}.json"]),
+            "month": ("{system_base}/System/Error_Reports/Aggregated_Index/{year}/{month}", [f"aggregated_index_{month}.json"]),
             "week": ("{system_base}/System/Error_Reports/Aggregated_Index/{year}/{month}/{week_label}", [f"aggregated_index_{week_label}.json"]),
-            "day": ("{system_base}/System/Error_Reports/Aggregated_Index/{year}/{month}/{week_label}/{day}", ["aggregated_index_{day}.json"]),
-            "hour": ("{system_base}/System/Error_Reports/Aggregated_Index/{year}/{month}/{week_label}/{day}/{hour}", ["aggregated_index_{hour}.json"])
+            "day": ("{system_base}/System/Error_Reports/Aggregated_Index/{year}/{month}/{week_label}/{day}", [f"aggregated_index_{day}.json"]),
+            "hour": ("{system_base}/System/Error_Reports/Aggregated_Index/{year}/{month}/{week_label}/{day}/{hour}", [f"aggregated_index_{hour}.json"])
         }
     }
 
@@ -11045,12 +11041,34 @@ def brain_init_hierarchical_structure(file_type="ledger", component=None):
 
     # Create each level's folder and file(s)
     for level_name in ["year", "month", "week", "day", "hour"]:
-        dir_path_str, filenames = levels_def[level_name]
+        dir_path_template, filenames = levels_def[level_name]
+        dir_path_str = dir_path_template.format(
+            base=base,
+            system_base=system_base,
+            comp=comp,
+            year=year,
+            month=month,
+            week=week_label,
+            week_label=week_label,
+            day=day,
+            hour=hour
+        )
         dir_path = Path(dir_path_str)
         dir_path.mkdir(parents=True, exist_ok=True)
 
         # Create file(s) at this level
-        for filename in filenames:
+        for filename_template in filenames:
+            filename = filename_template.format(
+                base=base,
+                system_base=system_base,
+                comp=comp,
+                year=year,
+                month=month,
+                week=week_label,
+                week_label=week_label,
+                day=day,
+                hour=hour
+            )
             file_path = dir_path / filename
 
             if not file_path.exists():
@@ -11183,19 +11201,19 @@ def brain_init_aggregated_index(file_type="ledger", component=None):
     # Define ALL levels with their scope (what they contain)
     levels_idx = [
         ("root", bp, "aggregated_index.json", "Contains: All years, months, weeks, days, hours"),
-        ("year", yd, "aggregated_index_{year}.json", "Contains: Year {year} + all months/weeks/days/hours"),
-        ("month", md, "aggregated_index_{month}.json", "Contains: Month {month} + all weeks/days/hours"),
+        ("year", yd, f"aggregated_index_{year}.json", "Contains: Year {year} + all months/weeks/days/hours"),
+        ("month", md, f"aggregated_index_{month}.json", "Contains: Month {month} + all weeks/days/hours"),
         ("week", wd, f"aggregated_index_{week_label}.json", f"Contains: Week {week_label} + all days/hours"),
-        ("day", dd, "aggregated_index_{day}.json", "Contains: Day {day} + all hours"),
-        ("hour", hd, "aggregated_index_{hour}.json", "Contains: Hour {hour} only")
+        ("day", dd, f"aggregated_index_{day}.json", "Contains: Day {day} + all hours"),
+        ("hour", hd, f"aggregated_index_{hour}.json", "Contains: Hour {hour} only")
     ]
 
     levels_agg = [
-        (agg_root / year, "aggregated_{year}.json"),
-        (agg_root / year / month, "aggregated_{month}.json"),
+        (agg_root / year, f"aggregated_{year}.json"),
+        (agg_root / year / month, f"aggregated_{month}.json"),
         (agg_root / year / month / week_label, f"aggregated_{week_label}.json"),
-        (agg_root / year / month / week_label / day, "aggregated_{day}.json"),
-        (agg_root / year / month / week_label / day / hour, "aggregated_{hour}.json"),
+        (agg_root / year / month / week_label / day, f"aggregated_{day}.json"),
+        (agg_root / year / month / week_label / day / hour, f"aggregated_{hour}.json"),
     ]
 
     # Skip root level for aggregated - global_aggregated_* files already
@@ -11308,11 +11326,11 @@ def brain_update_master_aggregated_index(
             "aggregated_index.json",
             g_idx_root /
             year /
-            "aggregated_index_{year}.json",
+            f"aggregated_index_{year}.json",
             g_idx_root /
             year /
             month /
-            "aggregated_index_{month}.json",
+            f"aggregated_index_{month}.json",
             g_idx_root /
             year /
             month /
@@ -11323,14 +11341,14 @@ def brain_update_master_aggregated_index(
             month /
             week_label /
             day /
-            "aggregated_index_{day}.json",
+            f"aggregated_index_{day}.json",
             g_idx_root /
             year /
             month /
             week_label /
             day /
             hour /
-            "aggregated_index_{hour}.json",
+            f"aggregated_index_{hour}.json",
         ]
 
         g_agg_paths = [
@@ -11338,11 +11356,11 @@ def brain_update_master_aggregated_index(
             "aggregated.json",
             g_agg_root /
             year /
-            "aggregated_{year}.json",
+            f"aggregated_{year}.json",
             g_agg_root /
             year /
             month /
-            "aggregated_{month}.json",
+            f"aggregated_{month}.json",
             g_agg_root /
             year /
             month /
@@ -11353,14 +11371,14 @@ def brain_update_master_aggregated_index(
             month /
             week_label /
             day /
-            "aggregated_{day}.json",
+            f"aggregated_{day}.json",
             g_agg_root /
             year /
             month /
             week_label /
             day /
             hour /
-            "aggregated_{hour}.json",
+            f"aggregated_{hour}.json",
         ]
 
         # Ensure all dirs exist
@@ -11462,11 +11480,11 @@ def brain_update_aggregated_index(
         "aggregated_index.json",
         idx_root /
         year /
-        "aggregated_index_{year}.json",
+        f"aggregated_index_{year}.json",
         idx_root /
         year /
         month /
-        "aggregated_index_{month}.json",
+        f"aggregated_index_{month}.json",
         idx_root /
         year /
         month /
@@ -11476,15 +11494,15 @@ def brain_update_aggregated_index(
         year /
         month /
         week_label /
-        "{day}" /
-        "aggregated_index_{day}.json",
+        day /
+        f"aggregated_index_{day}.json",
         idx_root /
         year /
         month /
         week_label /
-        "{day}" /
+        day /
         hour /
-        "aggregated_index_{hour}.json",
+        f"aggregated_index_{hour}.json",
     ]
 
     levels_agg = [
@@ -11492,11 +11510,11 @@ def brain_update_aggregated_index(
         "aggregated.json",
         agg_root /
         year /
-        "aggregated_{year}.json",
+        f"aggregated_{year}.json",
         agg_root /
         year /
         month /
-        "aggregated_{month}.json",
+        f"aggregated_{month}.json",
         agg_root /
         year /
         month /
@@ -11506,15 +11524,15 @@ def brain_update_aggregated_index(
         year /
         month /
         week_label /
-        "{day}" /
-        "aggregated_{day}.json",
+        day /
+        f"aggregated_{day}.json",
         agg_root /
         year /
         month /
         week_label /
-        "{day}" /
+        day /
         hour /
-        "aggregated_{hour}.json",
+        f"aggregated_{hour}.json",
     ]
 
     array_key = _array_key_for_type(file_type)
@@ -11582,11 +11600,11 @@ def brain_update_aggregated_index(
         "aggregated_index.json",
         idx_root /
         year /
-        "aggregated_index_{year}.json",
+        f"aggregated_index_{year}.json",
         idx_root /
         year /
         month /
-        "aggregated_index_{month}.json",
+        f"aggregated_index_{month}.json",
         idx_root /
         year /
         month /
@@ -11596,15 +11614,15 @@ def brain_update_aggregated_index(
         year /
         month /
         week_label /
-        "{day}" /
-        "aggregated_index_{day}.json",
+        day /
+        f"aggregated_index_{day}.json",
         idx_root /
         year /
         month /
         week_label /
-        "{day}" /
+        day /
         hour /
-        "aggregated_index_{hour}.json",
+        f"aggregated_index_{hour}.json",
     ]
 
     levels_agg = [
@@ -11612,11 +11630,11 @@ def brain_update_aggregated_index(
         "aggregated.json",
         agg_root /
         year /
-        "aggregated_{year}.json",
+        f"aggregated_{year}.json",
         agg_root /
         year /
         month /
-        "aggregated_{month}.json",
+        f"aggregated_{month}.json",
         agg_root /
         year /
         month /
@@ -11626,15 +11644,15 @@ def brain_update_aggregated_index(
         year /
         month /
         week_label /
-        "{day}" /
-        "aggregated_{day}.json",
+        day /
+        f"aggregated_{day}.json",
         agg_root /
         year /
         month /
         week_label /
-        "{day}" /
+        day /
         hour /
-        "aggregated_{hour}.json",
+        f"aggregated_{hour}.json",
     ]
 
     array_key = _array_key_for_type(file_type)
@@ -13490,3 +13508,6 @@ def brain_validate_flags(args, component_name):
 print("✅ Brain file system functions loaded (native Python)")
 print("✅ Canonical brain_save_* functions loaded from Brain.QTL specification")
 print("✅ Brain flag orchestration loaded - all components get flags from Brain.QTL")
+
+# Load mathematical parameters globally (Moved from top to ensure modifiers are loaded)
+MATH_PARAMS = load_mathematical_parameters("config.json")
