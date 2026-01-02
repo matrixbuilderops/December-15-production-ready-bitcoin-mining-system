@@ -1,0 +1,20 @@
+# Consensus Mechanism & Ultra Hex Buckets
+
+## Ultra Hex System
+- **Scale**: Max 256 Buckets.
+- **Bucket Rule**: 1 Bucket = 64 leading hex zeros (1 full SHA256 tier).
+- **Consensus**: DTM calculates cross-bucket difficulty. It scales Bucket 1 (68 zeros) correctly so it isn't seen as lower than Bucket 0 (64 zeros).
+
+## DTM GPS Guidance
+- **Direction**: DTM aims miners with template difficulty.
+- **Rejection**: If solution < Target or in wrong Bucket, DTM rejects.
+- **Feedback**: DTM writes EXACT reason to Miner's process folder.
+- **Investigation**: Consistent failure triggers a "Miner Investigation" flag in Error Reports.
+
+## Staged Consensus
+1. **Miner**: Submits bucket-aware solution.
+2. **DTM**: Validates hash vs Bucket vs Bitcoin Network difficulty.
+3. **Looping**: Verifies DTM's ledgers and the physical presence of the submission file.
+4. **Brain**: Audits hierarchy (Submission Logs, Aggregated reports, Global Index).
+5. **Node**: Looping submits after Brain All-Clear.
+6. **Final**: Brain re-audits Global Aggregated after broadcast.

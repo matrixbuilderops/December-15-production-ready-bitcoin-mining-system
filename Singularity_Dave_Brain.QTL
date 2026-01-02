@@ -277,7 +277,8 @@ mathematical_framework:
     cycles: 161
     knuth_sorrellian_class_notation: "Knuth-Sorrellian-Class(208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909, 80, 156912)"
     sync_source_file: "Interation 3.yaml"
-    sync_last_update: "2025-10-13"
+    sync_last_update: "2025-01-01"
+    configuration_note: "BitLoad constant must match config.json mathematical_framework.bitload_constant for consistency"
   base_knuth_parameters:
     # ALL CATEGORIES USE SAME BASE VALUES
     knuth_sorrellian_class_levels: 80
@@ -315,7 +316,9 @@ folder_management:
   base_paths:
     root: "."
     mining: "./Mining"
-    temporary_template: "./Mining/Temporary Template"
+    temporary: "./Mining/Temporary"
+    temporary_template: "./Mining/Temporary/Template"
+    user_look_at: "./Mining/Temporary/User_Look_At"
     test: "./Test"
   auto_create_structure:
     # PRODUCTION MODE FOLDERS (no flags) - NESTED TIME HIERARCHY
@@ -327,27 +330,28 @@ folder_management:
     - "Mining/Submission_Logs"
     - "Mining/Submission_Logs/Aggregated"
     - "Mining/Submission_Logs/Aggregated_Index"
-    - "Mining/Temporary Template"
-    - "Mining/System"
-    - "Mining/System"
+    - "Mining/Temporary"
+    - "Mining/Temporary/Template"
+    - "Mining/Temporary/User_Look_At"
+    - "System"
     # System component folders - each component gets YYYY/MM/WXX/DD/HH structure
-    - "Mining/System/System_Reports/Brain"
-    - "Mining/System/System_Reports/Brainstem"
-    - "Mining/System/System_Reports/DTM"
-    - "Mining/System/System_Reports/Looping"
-    - "Mining/System/System_Reports/Production_Miner"
-    - "Mining/System/System_Reports/Aggregated"
-    - "Mining/System/System_Reports/Aggregated_Index"
-    - "Mining/System/Error_Reports/Brain"
-    - "Mining/System/Error_Reports/Brainstem"
-    - "Mining/System/Error_Reports/DTM"
-    - "Mining/System/Error_Reports/Looping"
-    - "Mining/System/Error_Reports/Production_Miner"
-    - "Mining/System/Error_Reports/Aggregated"
-    - "Mining/System/Error_Reports/Aggregated_Index"
-    - "Mining/Global_Aggregated"
-    - "Mining/Global_Aggregated/Aggregated"
-    - "Mining/Global_Aggregated/Aggregated_Index"
+    - "System/System_Reports/Brain"
+    - "System/System_Reports/Brainstem"
+    - "System/System_Reports/DTM"
+    - "System/System_Reports/Looping"
+    - "System/System_Reports/Production_Miner"
+    - "System/System_Reports/Aggregated"
+    - "System/System_Reports/Aggregated_Index"
+    - "System/Error_Reports/Brain"
+    - "System/Error_Reports/Brainstem"
+    - "System/Error_Reports/DTM"
+    - "System/Error_Reports/Looping"
+    - "System/Error_Reports/Production_Miner"
+    - "System/Error_Reports/Aggregated"
+    - "System/Error_Reports/Aggregated_Index"
+    - "System/Global_Aggregated"
+    - "System/Global_Aggregated/Aggregated"
+    - "System/Global_Aggregated/Aggregated_Index"
     
     # DEMO MODE FOLDERS (--demo flag) - Same structure as production
     - "Test/Demo/Mining"
@@ -357,25 +361,27 @@ folder_management:
     - "Test/Demo/Mining/Submission_Logs"
     - "Test/Demo/Mining/Submission_Logs/Aggregated"
     - "Test/Demo/Mining/Submission_Logs/Aggregated_Index"
-    - "Test/Demo/Mining/Temporary Template"
-    - "Test/Demo/Mining/System"
-    - "Test/Demo/Mining/System/System_Reports/Brain"
-    - "Test/Demo/Mining/System/System_Reports/Brainstem"
-    - "Test/Demo/Mining/System/System_Reports/DTM"
-    - "Test/Demo/Mining/System/System_Reports/Looping"
-    - "Test/Demo/Mining/System/System_Reports/Production_Miner"
-    - "Test/Demo/Mining/System/System_Reports/Aggregated"
-    - "Test/Demo/Mining/System/System_Reports/Aggregated_Index"
-    - "Test/Demo/Mining/System/Error_Reports/Brain"
-    - "Test/Demo/Mining/System/Error_Reports/Brainstem"
-    - "Test/Demo/Mining/System/Error_Reports/DTM"
-    - "Test/Demo/Mining/System/Error_Reports/Looping"
-    - "Test/Demo/Mining/System/Error_Reports/Production_Miner"
-    - "Test/Demo/Mining/System/Error_Reports/Aggregated"
-    - "Test/Demo/Mining/System/Error_Reports/Aggregated_Index"
-    - "Test/Demo/Mining/Global_Aggregated"
-    - "Test/Demo/Mining/Global_Aggregated/Aggregated"
-    - "Test/Demo/Mining/Global_Aggregated/Aggregated_Index"
+    - "Test/Demo/Mining/Temporary"
+    - "Test/Demo/Mining/Temporary/Template"
+    - "Test/Demo/Mining/Temporary/User_Look_At"
+    - "Test/Demo/System"
+    - "Test/Demo/System/System_Reports/Brain"
+    - "Test/Demo/System/System_Reports/Brainstem"
+    - "Test/Demo/System/System_Reports/DTM"
+    - "Test/Demo/System/System_Reports/Looping"
+    - "Test/Demo/System/System_Reports/Production_Miner"
+    - "Test/Demo/System/System_Reports/Aggregated"
+    - "Test/Demo/System/System_Reports/Aggregated_Index"
+    - "Test/Demo/System/Error_Reports/Brain"
+    - "Test/Demo/System/Error_Reports/Brainstem"
+    - "Test/Demo/System/Error_Reports/DTM"
+    - "Test/Demo/System/Error_Reports/Looping"
+    - "Test/Demo/System/Error_Reports/Production_Miner"
+    - "Test/Demo/System/Error_Reports/Aggregated"
+    - "Test/Demo/System/Error_Reports/Aggregated_Index"
+    - "Test/Demo/System/Global_Aggregated"
+    - "Test/Demo/System/Global_Aggregated/Aggregated"
+    - "Test/Demo/System/Global_Aggregated/Aggregated_Index"
     
     # TEST MODE FOLDERS (--test flag) - Same structure as production
     - "Test/Test mode/Mining"
@@ -385,25 +391,35 @@ folder_management:
     - "Test/Test mode/Mining/Submission_Logs"
     - "Test/Test mode/Mining/Submission_Logs/Aggregated"
     - "Test/Test mode/Mining/Submission_Logs/Aggregated_Index"
-    - "Test/Test mode/Mining/Temporary Template"
-    - "Test/Test mode/Mining/System"
-    - "Test/Test mode/Mining/System/System_Reports/Brain"
-    - "Test/Test mode/Mining/System/System_Reports/Brainstem"
-    - "Test/Test mode/Mining/System/System_Reports/DTM"
-    - "Test/Test mode/Mining/System/System_Reports/Looping"
-    - "Test/Test mode/Mining/System/System_Reports/Production_Miner"
-    - "Test/Test mode/Mining/System/System_Reports/Aggregated"
-    - "Test/Test mode/Mining/System/System_Reports/Aggregated_Index"
-    - "Test/Test mode/Mining/System/Error_Reports/Brain"
-    - "Test/Test mode/Mining/System/Error_Reports/Brainstem"
-    - "Test/Test mode/Mining/System/Error_Reports/DTM"
-    - "Test/Test mode/Mining/System/Error_Reports/Looping"
-    - "Test/Test mode/Mining/System/Error_Reports/Production_Miner"
-    - "Test/Test mode/Mining/System/Error_Reports/Aggregated"
-    - "Test/Test mode/Mining/System/Error_Reports/Aggregated_Index"
-    - "Test/Test mode/Mining/Global_Aggregated"
-    - "Test/Test mode/Mining/Global_Aggregated/Aggregated"
-    - "Test/Test mode/Mining/Global_Aggregated/Aggregated_Index"
+    - "Test/Test mode/Mining/Temporary"
+    - "Test/Test mode/Mining/Temporary/Template"
+    - "Test/Test mode/Mining/Temporary/User_Look_At"
+    - "Test/Test mode/System"
+    - "Test/Test mode/System/System_Reports/Brain"
+    - "Test/Test mode/System/System_Reports/Brainstem"
+    - "Test/Test mode/System/System_Reports/DTM"
+    - "Test/Test mode/System/System_Reports/Looping"
+    - "Test/Test mode/System/System_Reports/Production_Miner"
+    - "Test/Test mode/System/System_Reports/Aggregated"
+    - "Test/Test mode/System/System_Reports/Aggregated_Index"
+    - "Test/Test mode/System/Error_Reports/Brain"
+    - "Test/Test mode/System/Error_Reports/Brainstem"
+    - "Test/Test mode/System/Error_Reports/DTM"
+    - "Test/Test mode/System/Error_Reports/Looping"
+    - "Test/Test mode/System/Error_Reports/Production_Miner"
+    - "Test/Test mode/System/Error_Reports/Aggregated"
+    - "Test/Test mode/System/Error_Reports/Aggregated_Index"
+    - "Test/Test mode/System/Global_Aggregated"
+    - "Test/Test mode/System/Global_Aggregated/Aggregated"
+    - "Test/Test mode/System/Global_Aggregated/Aggregated_Index"
+    
+    # TEMPORARY FOLDERS (New Structure)
+    - "Mining/Temporary/Template"
+    - "Mining/Temporary/User_Look_At"
+    - "Test/Demo/Mining/Temporary/Template"
+    - "Test/Demo/Mining/Temporary/User_Look_At"
+    - "Test/Test mode/Mining/Temporary/Template"
+    - "Test/Test mode/Mining/Temporary/User_Look_At"
     
     # SYSTEM ARCHITECTURE FOLDERS
     - "System_File_Examples"
@@ -654,12 +670,12 @@ brain_file_system:
     def brain_get_base_path():
         """Get base path for current mode."""
         mode_paths = {
-            "demo": "Test/Demo/Mining",
-            "test": "Test/Test mode/Mining",
-            "sandbox": "Mining",
-            "live": "Mining"
+            "demo": "Test/Demo",
+            "test": "Test/Test mode",
+            "sandbox": ".",
+            "live": "."
         }
-        return mode_paths.get(_BRAIN_MODE, "Mining")
+        return mode_paths.get(_BRAIN_MODE, ".")
     
     def brain_create_folder(folder_path, component=None):
         """Create folder following Brain rules."""
@@ -779,18 +795,22 @@ brain_file_system:
         comp = component or _BRAIN_COMPONENT
         base = brain_get_base_path()
         
+        # Handle root path "." cleanly
+        prefix = f"{base}/" if base != "." else ""
+        
         path_map = {
-            "ledger": f"{base}/Ledgers",
-          "submission": f"{base}/Submission_Logs",
-            "math_proof": f"{base}/Math_Proofs",
-            "rejection": f"{base}/Rejections",
-            "system_report": f"{base}/System/System_Reports/{comp}",
-            "error_report": f"{base}/System/Error_Reports/{comp}",
-            "system_log": f"{base}/System/System_Logs/{comp}",
-            "template": f"{base}/Temporary Template"
+            "ledger": f"{prefix}Mining/Ledgers",
+            "submission": f"{prefix}Mining/Submission_Logs",
+            "math_proof": f"{prefix}Mining/Ledgers",
+            "rejection": f"{prefix}Mining/Rejections",
+            "system_report": f"{prefix}System/System_Reports/{comp}",
+            "error_report": f"{prefix}System/Error_Reports/{comp}",
+            "system_log": f"{prefix}System/System_Logs/{comp}",
+            "template": f"{prefix}Mining/Temporary/Template",
+            "user_look_at": f"{prefix}Mining/Temporary/User_Look_At"
         }
         
-        return path_map.get(file_type, f"{base}/Unknown")
+        return path_map.get(file_type, f"{prefix}Unknown")
     
     # ARCHIVE ROLLUP SYSTEM
     # Create archive files when time periods end
@@ -989,7 +1009,7 @@ brain_file_system:
     demo_mode:
       flag: "--demo"
       base_path: "Testing/Demo"
-      temporary_template: "Testing/Demo/Mining/Temporary Template"
+      temporary_template: "Testing/Demo/Mining/Temporary/Template"
       ledgers: "Testing/Demo/Mining/Ledgers"
       environment_key: "Testing/Demo"
       # Stock template for demo mode - canonical Bitcoin template
@@ -1005,13 +1025,13 @@ brain_file_system:
     test_mode:
       flag: "--test"
       base_path: "Testing/Test"
-      temporary_template: "Testing/Test/Mining/Temporary Template"
+      temporary_template: "Testing/Test/Mining/Temporary/Template"
       ledgers: "Testing/Test/Mining/Ledgers"
       environment_key: "Testing/Test"
     production_mode:
       flag: "none"
       base_path: "Mining"
-      temporary_template: "Mining/Temporary Template"
+      temporary_template: "Mining/Temporary/Template"
       ledgers: "Mining/Ledgers"
       environment_key: "Mining"
 

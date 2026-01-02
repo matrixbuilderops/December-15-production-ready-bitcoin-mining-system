@@ -1,4 +1,10 @@
 {
+  "mathematical_framework": {
+    "bitload_constant": "208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909",
+    "source_file": "Singularity_Dave_Brain.QTL",
+    "knuth_params_source": "Iteration 3.yaml",
+    "last_sync": "2025-01-01T00:00:00Z"
+  },
   "rpcuser": "SignalCoreBitcoin",
   "rpcpassword": "B1tc0n4L1dz",
   "rpc_host": "127.0.0.1",

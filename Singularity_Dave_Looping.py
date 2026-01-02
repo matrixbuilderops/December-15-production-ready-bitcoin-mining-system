@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+from centralized_config import get_bitload, get_rpc_credentials
+#!/usr/bin/env if "blocks" not in locals(): blocks = []
 """
 Singularity_Dave_Looping.py
 Specialized Bitcoin Mining Loop Manager
@@ -33,34 +34,115 @@ HAS_CONFIRMATION_MONITOR = False
 # File structure management - handled by Brain.QTL
 HAS_HIERARCHICAL = True
 
-def write_hierarchical_ledger(data, base_path="Mining", component="Looping", file_type="ledger"):
-    """Brain.QTL-driven hierarchical file management"""
-    import os
+def write_hierarchical_ledger(entry_data, base_path="Mining", ledger_type="Looping", ledger_name="ledger", mode="production"):
+    """
+    Brain.QTL-driven hierarchical file management
+    Writes data to global, year, month, week, day, and hour files.
+    """
+    import json
     from datetime import datetime
-    
+    from pathlib import Path
+
+    # Alias for backward compatibility if needed
+    data = entry_data
+    component = ledger_type
+    file_type = ledger_name
+
     now = datetime.now()
     year = now.strftime("%Y")
     month = now.strftime("%m") 
     day = now.strftime("%d")
     hour = now.strftime("%H")
+    week = f"W{now.strftime('%W')}"
     
-    # Create hierarchical path based on Brain.QTL folder_management structure
+    # Determine base directory based on file type and component
     if file_type == "ledger":
-        hierarchy_path = f"{base_path}/Ledgers/{year}/{month}/{day}/{hour}"
+        base_dir = f"{base_path}/Ledgers"
     elif file_type == "submission":
-        hierarchy_path = f"{base_path}/Submissions/{year}/{month}/{day}/{hour}"
+        base_dir = f"{base_path}/Submission_Logs" # Corrected from Submissions
     elif file_type == "system_report":
-        hierarchy_path = f"{base_path}/System/System_Reports/{component}/Hourly/{year}/{month}/{day}/{hour}"
+        base_dir = f"{base_path}/System/System_Reports/{component}"
     elif file_type == "system_log":
-        hierarchy_path = f"{base_path}/System/System_Logs/{component}/Hourly/{year}/{month}/{day}/{hour}"
+        base_dir = f"{base_path}/System/System_Logs/{component}"
     elif file_type == "error_report":
-        hierarchy_path = f"{base_path}/System/Error_Reports/{component}/Hourly/{year}/{month}/{day}/{hour}"
+        base_dir = f"{base_path}/System/Error_Reports/{component}"
     else:
-        hierarchy_path = f"{base_path}/{component}/{year}/{month}/{day}/{hour}"
+        base_dir = f"{base_path}/{component}"
+
+    bp = Path(base_dir)
+    yd = bp / year
+    md = yd / month
+    wd = md / week
+    dd = md / day
+    hd = dd / hour
     
-    # Ensure directory exists
-    os.makedirs(hierarchy_path, exist_ok=True)
-    return hierarchy_path
+    results = {}
+    
+    # Create all directories
+    for d in [bp, yd, md, wd, dd, hd]:
+        d.mkdir(parents=True, exist_ok=True)
+    
+    # Define file names for each level
+    # Using standard naming convention: global_{level}_{file_type}.json
+    # e.g. global_year_ledger.json, global_month_submission.json
+    
+    levels = [
+        ("global", bp, f"global_{file_type}.json"),
+        ("year", yd, "global_{file_type}_{year}.json"),
+        ("month", md, "global_{file_type}_{month}.json"),
+        ("week", wd, f"global_{file_type}_{week}.json"),
+        ("day", dd, "global_{file_type}_{day}.json"),
+        ("hour", hd, f"hourly_{file_type}.json") # Hour is usually "hourly_"
+    ]
+    
+    for level_name, dir_path, filename in levels:
+        file_path = dir_path / filename
+        try:
+            file_data = {
+                "metadata": {
+                    "file_type": f"{level_name}_{file_type}",
+                    "level": level_name,
+                    "component": component,
+                    "created": now.isoformat(),
+                    "last_updated": now.isoformat(),
+                    "mode": mode
+                },
+                "entries": []
+            }
+            
+            # Load existing data if file exists
+            if file_path.exists():
+                try:
+                    with open(file_path, 'r') as f:
+                        existing_data = json.load(f)
+                        if isinstance(existing_data, dict):
+                            file_data = existing_data
+                            # Ensure entries list exists
+                            if "entries" not in file_data:
+                                file_data["entries"] = []
+                except json.JSONDecodeError:
+                    pass # Overwrite corrupt file
+            
+            # Append new entry
+            file_data["entries"].append(entry_data)
+            
+            # Update metadata
+            if "metadata" not in file_data:
+                file_data["metadata"] = {}
+            file_data["metadata"]["last_updated"] = now.isoformat()
+            file_data["metadata"]["total_entries"] = len(file_data["entries"])
+            
+            # Write back
+            with open(file_path, 'w') as f:
+                json.dump(file_data, f, indent=2)
+                
+            results[level_name] = {"success": True, "path": str(file_path)}
+            
+        except Exception as e:
+            results[level_name] = {"success": False, "error": str(e)}
+            print(f"❌ Failed to write {level_name} ledger: {e}")
+
+    return results
 
 class HierarchicalFileManager:
     """Brain.QTL-based hierarchical file management"""
@@ -80,14 +162,14 @@ class HierarchicalFileManager:
         hour = timestamp.strftime("%H")
         
         path_map = {
-            "ledger": f"{self.base_path}/Ledgers/{year}/{month}/{day}/{hour}",
-            "submission": f"{self.base_path}/Submissions/{year}/{month}/{day}/{hour}",
-            "system_report": f"{self.base_path}/System/System_Reports/{component}/Hourly/{year}/{month}/{day}/{hour}",
-            "system_log": f"{self.base_path}/System/System_Logs/{component}/Hourly/{year}/{month}/{day}/{hour}",
-            "error_report": f"{self.base_path}/System/Error_Reports/{component}/Hourly/{year}/{month}/{day}/{hour}"
+            "ledger": "{self.base_path}/Ledgers/{year}/{month}/{day}/{hour}",
+            "submission": "{self.base_path}/Submissions/{year}/{month}/{day}/{hour}",
+            "system_report": "{self.base_path}/System/System_Reports/{component}/Hourly/{year}/{month}/{day}/{hour}",
+            "system_log": "{self.base_path}/System/System_Logs/{component}/Hourly/{year}/{month}/{day}/{hour}",
+            "error_report": "{self.base_path}/System/Error_Reports/{component}/Hourly/{year}/{month}/{day}/{hour}"
         }
         
-        return path_map.get(file_type, f"{self.base_path}/{component}/{year}/{month}/{day}/{hour}")
+        return path_map.get(file_type, "{self.base_path}/{component}/{year}/{month}/{day}/{hour}")
     
     def ensure_path_exists(self, path):
         """Create directory structure if it doesn't exist"""
@@ -100,7 +182,6 @@ brain_available = False
 BrainQTLInterpreter = None
 
 # Only import Brain if not just showing help
-import sys
 if '--help' not in sys.argv and '-h' not in sys.argv:
     try:
         from Singularity_Dave_Brainstem_UNIVERSE_POWERED import (
@@ -153,12 +234,20 @@ except ImportError:
     HAS_DASHBOARD = False
 
 # Configure logging - Brain.QTL defines paths
-import os
-from datetime import datetime
 
-def setup_brain_coordinated_logging(component_name, base_dir="Mining/System"):
+def setup_brain_coordinated_logging(component_name, base_dir=None):
     """Setup logging according to Brain.QTL component-based structure"""
-    # Component-based: Mining/System/System_Logs/Looping/Global/ and System_Logs/Looping/Hourly/
+    # Determine base_dir dynamically if not provided
+    if base_dir is None:
+        # Try to detect mode from sys.argv
+        if "--demo" in sys.argv:
+            base_dir = "Test/Demo/System"
+        elif "--test-mode" in sys.argv or "--test" in sys.argv:
+            base_dir = "Test/Test mode/System"
+        else:
+            base_dir = "System" # Root System folder for production
+            
+    # Component-based: System/System_Logs/Looping/Global/ and System_Logs/Looping/Hourly/
     log_dir = os.path.join(base_dir, "System_Logs", "Looping", "Global")
     os.makedirs(log_dir, exist_ok=True)
     
@@ -800,8 +889,8 @@ class BitcoinLoopingSystem:
         self.mining_dir = self.base_dir / "Mining"
         self.ledger_dir = self.mining_dir / "Ledgers"  # PROPER: Mining/Ledgers/
         self.submission_dir = self.mining_dir / "Submissions"  # PROPER: Mining/Submissions/
-        self.template_dir = self.mining_dir / "Temporary Template"
-        self.temporary_template_dir = self.mining_dir / "Temporary Template"  # FIX: Missing temporary_template_dir
+        self.template_dir = self.mining_dir / "Temporary/Template"
+        self.temporary_template_dir = self.mining_dir / "Temporary/Template"  # FIX: Missing temporary_template_dir
         # NOTE: centralized_template_file will be set AFTER mode-specific path setup
 
         # Main submission log path - SPEC COMPLIANCE: Use Submissions
@@ -889,9 +978,9 @@ class BitcoinLoopingSystem:
     def get_temporary_template_dir(self):
         """Get correct temporary template directory based on mode."""
         if self.demo_mode:
-            return Path("Test/Demo/Mining/Temporary Template")
+            return Path("Test/Demo/Mining/Temporary/Template")
         else:
-            return Path("Mining/Temporary Template")
+            return Path("Mining/Temporary/Template")
 
         # NOTE: Dynamic daemon folders will be created after mode-specific paths are set
 
@@ -933,7 +1022,7 @@ class BitcoinLoopingSystem:
         self.miner_command_queue = []
         # Miner control files - USE TEMPORARY TEMPLATE, NOT SHARED_STATE
         # Communication happens through Temporary Template folders (process_1, process_2, etc.)
-        base_temp_path = "Test/Demo/Mining/Temporary Template" if self.demo_mode else "Mining/Temporary Template"
+        base_temp_path = "Test/Demo/Mining/Temporary/Template" if self.demo_mode else "Mining/Temporary/Template"
         self.miner_status_file = Path(f"{base_temp_path}/miner_status.json")
         self.miner_control_file = Path(f"{base_temp_path}/miner_control.json")
 
@@ -1107,7 +1196,8 @@ class BitcoinLoopingSystem:
             # SPECIFICATION COMPLIANCE: Only create Temporary Template and Ledgers folders
             # Per System folders Root System.txt - Hourly files in YYYY/MM/DD/HH structure
             enhanced_dirs = [
-                self.mining_dir / "Temporary Template",
+                self.mining_dir / "Temporary/Template",
+                self.mining_dir / "Temporary/User_Look_At",
             ]
             
             for dir_path in enhanced_dirs:
@@ -1137,7 +1227,7 @@ class BitcoinLoopingSystem:
                 return hourly_dir / f"looping_final_submission_{time_str}.json"
             elif submission_type == "coordination":
                 # Use Temporary Template for coordination files
-                temp_dir = self.mining_dir / "Temporary Template"
+                temp_dir = self.mining_dir / "Temporary/Template"
                 temp_dir.mkdir(parents=True, exist_ok=True) 
                 return temp_dir / f"looping_coordination_{time_str}.json"
             else:
@@ -1359,20 +1449,20 @@ class BitcoinLoopingSystem:
         print("📊 DETAILED MINER STATUS REPORT")
         print("=" * 60)
         
-        print(f"🔧 Configuration:")
+        print("🔧 Configuration:")
         print(f"   Daemon count: {self.daemon_count}")
         print(f"   Terminal mode: {self.terminal_mode}")
         print(f"   Operation mode: {self.miner_operation_mode}")
         print(f"   Day boundary mode: {self.day_boundary_mode}")
         print()
         
-        print(f"📈 Performance Stats:")
+        print("📈 Performance Stats:")
         print(f"   Blocks found today: {self.blocks_found_today}/{self.daily_block_limit}")
         print(f"   ZMQ blocks detected: {self.performance_stats.get('zmq_blocks_detected', 0)}")
         print(f"   Successful submissions: {self.performance_stats.get('successful_submissions', 0)}")
         print()
         
-        print(f"⚙️ Daemon Status:")
+        print("⚙️ Daemon Status:")
         for daemon_number in range(1, self.daemon_count + 1):
             # Get unique daemon ID for this daemon number
             unique_daemon_id = self.daemon_unique_ids.get(daemon_number, f"daemon_{daemon_number}_missing")
@@ -1382,7 +1472,7 @@ class BitcoinLoopingSystem:
             print(f"   Daemon {daemon_number} ({unique_daemon_id[:16]}...): {status} (process: {process_status})")
         
         # List actual running processes
-        print(f"\n🔍 System Process Check:")
+        print("\n🔍 System Process Check:")
         self.list_all_miner_processes()
 
     def _auto_setup_dependencies(self):
@@ -1639,7 +1729,7 @@ class BitcoinLoopingSystem:
         try:
             # Use the Brain.QTL data that's already loaded in the looping system
             # The same values that production miner uses
-            universe_bitload = 208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909
+            universe_bitload = get_bitload()
             knuth_levels = 80  # Base Knuth levels
             knuth_iterations = 156912  # Base Knuth iterations
             collective_levels = 841  # Combined base + modifiers from Brain.QTL
@@ -1724,7 +1814,7 @@ class BitcoinLoopingSystem:
         
         if len(available_blocks) < num_blocks:
             print(f"⚠️ Only {len(available_blocks)} blocks remaining today")
-            print(f"   Scheduling remaining blocks for today + tomorrow")
+            print("   Scheduling remaining blocks for today + tomorrow")
             # Use all remaining today
             selected_blocks = available_blocks
             # Add blocks from tomorrow to reach requested amount
@@ -1780,7 +1870,7 @@ class BitcoinLoopingSystem:
         Returns:
             tuple: (should_mine_now, next_mining_time, time_until_next, should_wake_miners)
         """
-        from datetime import datetime, timedelta
+        from datetime import datetime
         
         now = datetime.now()
         
@@ -2166,7 +2256,6 @@ class BitcoinLoopingSystem:
         """Write submission tracking with network response and update ledger."""
         try:
             from datetime import datetime, timezone
-            import json
             
             submission_timestamp = datetime.now(timezone.utc).isoformat()
             submission_id = f"sub_{submission_timestamp.replace(':', '').replace('-', '').replace('.', '_').replace('+', '_')}"
@@ -2210,7 +2299,7 @@ class BitcoinLoopingSystem:
                     with open(ledger_path, 'w') as f:
                         json.dump(ledger_data, f, indent=2)
                     
-                    logger.info(f"✅ Updated ledger with submission status")
+                    logger.info("✅ Updated ledger with submission status")
                     
         except Exception as e:
             logger.error(f"❌ Failed to update ledger submission status: {e}")
@@ -2559,7 +2648,7 @@ class BitcoinLoopingSystem:
                 config_data = self.load_config_from_file()
                 if config_data:
                     wallet_name = config_data.get(
-                        "wallet_name", "SignalCoreBitcoinWallet"
+                        "wallet_name", get_rpc_credentials()["wallet_name"]
                     )
                     payout_address = config_data.get("payout_address")
                     print(f"💰 Auto-loaded wallet: {wallet_name}")
@@ -2655,7 +2744,7 @@ class BitcoinLoopingSystem:
                         break
                 elif self.production_miner_mode == "direct":
                     print(
-                        f"🚨 WARNING: Using DIRECT mode - mining will start immediately in this terminal!"
+                        "🚨 WARNING: Using DIRECT mode - mining will start immediately in this terminal!"
                     )
                     print(
                         "💡 Use --daemon-mode or --separate-terminal for cleaner operation"
@@ -4458,7 +4547,6 @@ class BitcoinLoopingSystem:
     def create_real_mining_proof(self, mining_results):
         """Create REAL proof file with actual mining results, hashes, and nonces."""
         from datetime import datetime
-        import hashlib
         
         today = datetime.now().strftime("%Y%m%d")
         timestamp = datetime.now().strftime("%H%M%S")
@@ -4844,7 +4932,7 @@ class BitcoinLoopingSystem:
         try:
             # Debug: Check if daemon_unique_ids exists
             if not hasattr(self, 'daemon_unique_ids'):
-                print(f"❌ CRITICAL: daemon_unique_ids attribute missing! Initializing...")
+                print("❌ CRITICAL: daemon_unique_ids attribute missing! Initializing...")
                 self.daemon_unique_ids = {}
                 # Emergency re-initialization
                 import time  # Make sure time is imported
@@ -4881,7 +4969,6 @@ class BitcoinLoopingSystem:
             print(f"   💡 Daemon {daemon_id}: Background process mode")
             print("   🎯 All 5 daemons will work in parallel for consensus mining")
 
-            import os
             import subprocess
             import time
 
@@ -4950,7 +5037,6 @@ class BitcoinLoopingSystem:
             print("   📺 New terminal: Dedicated mining output window")
             print("   🎯 Clean separation: Mining data isolated from main terminal")
 
-            import os
             import subprocess
 
             # Detect terminal and open production miner in new window
@@ -4970,7 +5056,7 @@ class BitcoinLoopingSystem:
                 [
                     "xterm",
                     "-e",
-                    f"python3 production_bitcoin_miner.py",
+                    "python3 production_bitcoin_miner.py",
                 ],
                 # macOS Terminal
                 [
@@ -4978,7 +5064,7 @@ class BitcoinLoopingSystem:
                     "-e",
                     'tell app "Terminal" to do script "cd '
                     + str(self.base_dir)
-                    + f' && python3 production_bitcoin_miner.py"',
+                    + ' && python3 production_bitcoin_miner.py"',
                 ],
                 # Windows Command Prompt
                 [
@@ -4987,7 +5073,7 @@ class BitcoinLoopingSystem:
                     "start",
                     "cmd",
                     "/k",
-                    f"python production_bitcoin_miner.py",
+                    "python production_bitcoin_miner.py",
                 ],
             ]
 
@@ -5150,7 +5236,6 @@ class BitcoinLoopingSystem:
     def start_daemon_monitoring(self):
         """Start continuous daemon monitoring with automatic restart capabilities."""
         import threading
-        import time
         
         print("🔍 STARTING DAEMON MONITORING SYSTEM")
         print("=" * 60)
@@ -5187,7 +5272,7 @@ class BitcoinLoopingSystem:
                         # Check restart cooldown
                         if current_time - last_restart_times[daemon_id] > restart_cooldown:
                             print(f"\n⚠️ DAEMON {daemon_id} HEALTH CHECK FAILED")
-                            print(f"🔄 Attempting automatic restart...")
+                            print("🔄 Attempting automatic restart...")
                             
                             if self.start_production_miner_daemon(daemon_id):
                                 self.daemon_status[daemon_id] = "running"
@@ -5478,7 +5563,7 @@ class BitcoinLoopingSystem:
                           format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         
         # Display system status
-        print(f"🔍 System Information:")
+        print("🔍 System Information:")
         print(f"   - Workspace: {os.getcwd()}")
         print(f"   - Python Version: {sys.version}")
         print(f"   - Time: {time.strftime('%Y-%m-%d %H:%M:%S')}")
@@ -5488,7 +5573,7 @@ class BitcoinLoopingSystem:
             'config.json', 'production_bitcoin_miner.py', 'Singularity_Dave_Brain.QTL',
             'gbt_latest.json', 'dynamic_template_manager.py'
         ]
-        print(f"📁 File Status:")
+        print("📁 File Status:")
         for file in key_files:
             if os.path.exists(file):
                 stat = os.stat(file)
@@ -5502,7 +5587,7 @@ class BitcoinLoopingSystem:
             try:
                 with open(mining_stats_file, 'r') as f:
                     stats = json.load(f)
-                print(f"⛏️  Mining Statistics:")
+                print("⛏️  Mining Statistics:")
                 for key, value in stats.items():
                     print(f"   - {key}: {value}")
             except Exception as e:
@@ -5511,12 +5596,12 @@ class BitcoinLoopingSystem:
         # Test Brain.QTL connection
         try:
             if hasattr(self, 'brain') and self.brain:
-                print(f"🧠 Brain.QTL Status: CONNECTED")
+                print("🧠 Brain.QTL Status: CONNECTED")
                 if hasattr(self.brain, 'get_status'):
                     status = self.brain.get_status()
                     print(f"   - Brain Status: {status}")
             else:
-                print(f"🧠 Brain.QTL Status: NOT INITIALIZED")
+                print("🧠 Brain.QTL Status: NOT INITIALIZED")
         except Exception as e:
             print(f"🧠 Brain.QTL Status: ERROR - {e}")
         
@@ -5672,7 +5757,6 @@ class BitcoinLoopingSystem:
     def test_submission_file_system(self):
         """Test submission file system with proper directory handling."""
         try:
-            import os
             from datetime import datetime
 
             # Test organized directory setup
@@ -5948,7 +6032,6 @@ class BitcoinLoopingSystem:
     def setup_organized_directories(self):
         """Setup organized directory structure using proper Mining/ subdirectories to avoid folder chaos."""
         import os
-        from datetime import datetime
 
         # Create base directories using Mining/ structure (NO MORE ROOT
         # POLLUTION!)
@@ -6082,7 +6165,7 @@ class BitcoinLoopingSystem:
         print(f"   - Global Bitcoin Ledger: {global_ledger_path}")
         print(f"   - Template File: {template_path}")
         print(f"   - Hourly Submission: {hourly_submission_path}")
-        print(f"   (Note: DTM will create ledger/math_proof files when DTM initializes)")
+        print("   (Note: DTM will create ledger/math_proof files when DTM initializes)")
         print(f"🔄 {mode_label} files are ISOLATED from other mode files!")
 
         return True
@@ -6578,7 +6661,7 @@ class BitcoinLoopingSystem:
             "mathematical_framework": {
                 "categories_applied": ["families", "lanes", "strides", "palette", "sandbox"],
                 "knuth_parameters": submission_entry.get("knuth_parameters", {}),
-                "universe_bitload": "208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909"
+                "universe_bitload": "get_bitload()"
             },
             "legal_attestation": {
                 "work_performed_by": system_info['network']['hostname'],
@@ -6598,7 +6681,7 @@ class BitcoinLoopingSystem:
 
     def update_global_ledger(self, block_data: dict):
         """Update global ledger with nonce/merkle/status tracking using System_File_Examples template."""
-        from Singularity_Dave_Brainstem_UNIVERSE_POWERED import load_file_template_from_examples, capture_system_info
+        from Singularity_Dave_Brainstem_UNIVERSE_POWERED import capture_system_info
         
         global_ledger_path = self.ledger_dir / "global_ledger.json"
 
@@ -6707,6 +6790,9 @@ class BitcoinLoopingSystem:
             if hourly_ledger_file.exists():
                 with open(hourly_ledger_file, "r") as f:
                     ledger_data = json.load(f)
+                # Ensure blocks array exists
+                if "blocks" not in ledger_data:
+                    ledger_data["blocks"] = []
                 ledger_data["blocks"].append(new_block)
                 ledger_data["blocks_found_this_hour"] = len(ledger_data["blocks"])
             else:
@@ -6801,7 +6887,7 @@ class BitcoinLoopingSystem:
                     "created": now.isoformat()
                 }
             
-            global_ledger["blocks"].append(ledger_data["blocks"][0])
+            global_ledger["blocks"].append(ledger_data.get("blocks", [new_block])[0] if ledger_data.get("blocks") else new_block)
             global_ledger["total_blocks_processed"] = len(global_ledger["blocks"])
             global_ledger["last_updated"] = now.isoformat()
             
@@ -7429,8 +7515,8 @@ class BitcoinLoopingSystem:
             bitcoind_cmd = ["bitcoind"]
 
             # Add RPC settings if available (use consistent rpcuser format)
-            rpc_user = config_data.get("rpcuser", "SignalCoreBitcoin")
-            rpc_password = config_data.get("rpcpassword", "B1tc0n4L1dz")
+            rpc_user = config_data.get("rpcuser", get_rpc_credentials()["username"])
+            rpc_password = config_data.get("rpcpassword", get_rpc_credentials()["password"])
             rpc_port = config_data.get("rpc_port", 8332)
 
             if rpc_user:
@@ -7722,7 +7808,7 @@ class BitcoinLoopingSystem:
                     break
             except FileNotFoundError:
                 continue
-            except Exception as e:
+            except Exception:
                 continue
 
         if not bitcoin_cli_found:
@@ -7931,11 +8017,11 @@ class BitcoinLoopingSystem:
 
             rpc_cmd = [
                 "bitcoin-cli",
-                f"-rpcuser={config_data.get('rpcuser', 'SignalCoreBitcoin')}",
+                f"-rpcuser={config_data.get('rpcuser', get_rpc_credentials()["username"])}",
                 f"-rpcpassword={
                     config_data.get(
                         'rpcpassword',
-                        'B1tc0n4L1dz')}",
+                        get_rpc_credentials()["password"])}",
                 f"-rpcconnect={config_data.get('rpc_host', '127.0.0.1')}",
                 f"-rpcport={config_data.get('rpc_port', 8332)}",
                 "loadwallet",
@@ -8227,8 +8313,8 @@ class BitcoinLoopingSystem:
             conf_path = os.path.join(bitcoin_dir, "bitcoin.conf")
 
             # Use actual credentials from config.json
-            rpc_user = config_data.get("rpcuser", "SignalCoreBitcoin")
-            rpc_password = config_data.get("rpcpassword", "B1tc0n4L1dz")
+            rpc_user = config_data.get("rpcuser", get_rpc_credentials()["username"])
+            rpc_password = config_data.get("rpcpassword", get_rpc_credentials()["password"])
             rpc_port = config_data.get("rpc_port", 8332)
 
             config_content = f"""# Bitcoin Core Configuration
@@ -8337,8 +8423,8 @@ server=1
             with open(conf_path, "r") as f:
                 content = f.read()
 
-            expected_user = config_data.get("rpcuser", "SignalCoreBitcoin")
-            expected_password = config_data.get("rpcpassword", "B1tc0n4L1dz")
+            expected_user = config_data.get("rpcuser", get_rpc_credentials()["username"])
+            expected_password = config_data.get("rpcpassword", get_rpc_credentials()["password"])
 
             # Check if credentials exist and match
             if (
@@ -8369,14 +8455,14 @@ server=1
 
             # Extract all values from config.json
             rpc_user = config_data.get(
-                "rpcuser", config_data.get("rpc_user", "SignalCoreBitcoin")
+                "rpcuser", config_data.get("rpc_user", get_rpc_credentials()["username"])
             )
             rpc_password = config_data.get(
-                "rpcpassword", config_data.get("rpc_password", "B1tc0n4L1dz")
+                "rpcpassword", config_data.get("rpc_password", get_rpc_credentials()["password"])
             )
             rpc_port = config_data.get("rpc_port", 8332)
             payout_address = config_data.get("payout_address", "")
-            wallet_name = config_data.get("wallet_name", "SignalCoreBitcoinWallet")
+            wallet_name = config_data.get("wallet_name", get_rpc_credentials()["wallet_name"])
 
             # Get ZMQ settings
             zmq_config = config_data.get("zmq", {})
@@ -9039,7 +9125,6 @@ server=1
         try:
             print("🚀 Early Production Miner startup with verification...")
 
-            from production_bitcoin_miner import ProductionBitcoinMiner
 
             # PROPER VERIFICATION: Use real templates and mathematical power
             if self.demo_mode:
@@ -9221,10 +9306,10 @@ server=1
             
             if all_updates_successful:
                 print("✅ ALL EXISTING LEDGERS UPDATED SUCCESSFULLY")
-                print(f"   📊 Global ledger: ✅")
-                print(f"   📈 Mining statistics: ✅") 
-                print(f"   📅 Daily ledger: ✅")
-                print(f"   📤 Submission tracking: ✅")
+                print("   📊 Global ledger: ✅")
+                print("   📈 Mining statistics: ✅") 
+                print("   📅 Daily ledger: ✅")
+                print("   📤 Submission tracking: ✅")
                 
                 # Clean up verification files after successful ledger update
                 self.cleanup_verification_files()
@@ -9379,7 +9464,7 @@ server=1
             with open(submission_path, 'w') as f:
                 json.dump(submission_tracking, f, indent=2)
             
-            print(f"✅ Submission tracking updated")
+            print("✅ Submission tracking updated")
             return True
             
         except Exception as e:
@@ -9498,7 +9583,7 @@ server=1
         """Perform the actual Bitcoin network submission"""
         try:
             # This would contain the actual Bitcoin RPC submission logic
-            print(f"🌐 Submitting to Bitcoin network...")
+            print("🌐 Submitting to Bitcoin network...")
             print(f"   📊 Data: {submission_data}")
             
             # For now, simulate successful submission
@@ -9845,7 +9930,7 @@ server=1
                 f"⏰ Miner timeout: {
                     time_since_last_block:.0f}s without block"
             )
-            logger.info(f"🛑 Stopping Production Miner due to timeout")
+            logger.info("🛑 Stopping Production Miner due to timeout")
             self.stop_production_miner()
             return True
 
@@ -9902,7 +9987,7 @@ server=1
                 efficiency = avg_time / self.expected_block_time
                 self.miner_performance_tracking["efficiency_score"] = efficiency
 
-                logger.info(f"📊 Block timing updated:")
+                logger.info("📊 Block timing updated:")
                 logger.info(f"   ⏱️ This block: {block_time:.0f}s")
                 logger.info(f"   📈 Average: {avg_time:.0f}s")
                 logger.info(f"   🎯 Efficiency: {efficiency:.2f}x")
@@ -10106,7 +10191,6 @@ server=1
         when valid solutions are found. This function reads those notifications.
         """
         try:
-            from pathlib import Path
             import json
             import time
             
@@ -10138,7 +10222,7 @@ server=1
                         miner_id = notification_data.get("miner_id", "unknown")
                         files_created = notification_data.get("files_created", {})
                         
-                        logger.info(f"🎉 DTM NOTIFICATION RECEIVED!")
+                        logger.info("🎉 DTM NOTIFICATION RECEIVED!")
                         logger.info(f"   📨 From: {notification_data.get('created_by', 'DTM')}")
                         logger.info(f"   🏭 Miner: {miner_id}")
                         logger.info(f"   ✅ DTM Status: {notification_data['dtm_status']}")
@@ -10165,8 +10249,8 @@ server=1
                             # Remove original notification
                             notification_file.unlink()
                             
-                            logger.info(f"✅ DTM→Looping communication successful!")
-                            logger.info(f"   📦 Solution ready for Bitcoin submission")
+                            logger.info("✅ DTM→Looping communication successful!")
+                            logger.info("   📦 Solution ready for Bitcoin submission")
                             logger.info(f"   🗃️ Notification archived: {processed_file}")
                             
                             return {
@@ -10806,7 +10890,7 @@ server=1
             except Exception as e:
                 logger.error(f"❌ Even simple logging failed: {e}")
 
-            logger.info(f"📝 Defensive ledger update completed")
+            logger.info("📝 Defensive ledger update completed")
 
         except Exception as e:
             logger.error(f"❌ Ledger update system error: {e}")
@@ -10828,13 +10912,13 @@ server=1
                 self.bitcoin_cli_path,
                 f"-rpcuser={config_data.get('rpcuser',
                                             config_data.get('rpc_user',
-                                                            'SignalCoreBitcoin'))}",
+                                                            get_rpc_credentials()["username"]))}",
                 f"-rpcpassword={
                     config_data.get(
                         'rpcpassword',
                         config_data.get(
                             'rpc_password',
-                            'B1tc0n4L1dz'))}",
+                            get_rpc_credentials()["password"]))}",
                 f"-rpcconnect={config_data.get('rpc_host', '127.0.0.1')}",
                 f"-rpcport={config_data.get('rpc_port', 8332)}",
                 "getblockchaininfo",
@@ -10911,13 +10995,13 @@ server=1
                 self.bitcoin_cli_path,
                 f"-rpcuser={config_data.get('rpcuser',
                                             config_data.get('rpc_user',
-                                                            'SignalCoreBitcoin'))}",
+                                                            get_rpc_credentials()["username"]))}",
                 f"-rpcpassword={
                     config_data.get(
                         'rpcpassword',
                         config_data.get(
                             'rpc_password',
-                            'B1tc0n4L1dz'))}",
+                            get_rpc_credentials()["password"]))}",
                 f"-rpcconnect={config_data.get('rpc_host', '127.0.0.1')}",
                 f"-rpcport={config_data.get('rpc_port', 8332)}",
                 "getblocktemplate",
@@ -10943,7 +11027,7 @@ server=1
                         logger.error(f"❌ Template missing required field: {field}")
                         return None
 
-                logger.info(f"✅ Fresh template retrieved:")
+                logger.info("✅ Fresh template retrieved:")
                 logger.info(
                     f"   🧱 Height: {
                         template.get(
@@ -11251,12 +11335,12 @@ server=1
             is_valid = hash_int < target_int
 
             if is_valid:
-                logger.info(f"✅ Block solution valid!")
+                logger.info("✅ Block solution valid!")
                 logger.info(f"   🎯 Hash: {block_hash[:16]}...")
                 logger.info(f"   📊 Target: {target[:16]}...")
                 logger.info(f"   🔢 Leading zeros: {leading_zeros}")
             else:
-                logger.error(f"❌ Block solution invalid!")
+                logger.error("❌ Block solution invalid!")
                 logger.error(f"   🎯 Hash: {block_hash[:16]}...")
                 logger.error(f"   📊 Target: {target[:16]}...")
                 logger.error(f"   🔢 Leading zeros: {leading_zeros} (insufficient)")
@@ -11420,7 +11504,7 @@ server=1
                         block_hash = solution.get("hash", f"0x{random.getrandbits(256):064x}")
                         difficulty = solution.get("difficulty", 1000000)
                         if verbose_output:
-                            logger.info(f"✅ Brain solved saved template in demo mode")
+                            logger.info("✅ Brain solved saved template in demo mode")
                     else:
                         raise Exception("Brain solution not valid")
                         
@@ -11449,7 +11533,7 @@ server=1
 
             # Update GUI with demo data
             if self.gui_system:
-                self.gui_system.add_activity(f"🎮 Demo mining complete")
+                self.gui_system.add_activity("🎮 Demo mining complete")
 
             # Create block data for logging
             block_data = {
@@ -11502,7 +11586,7 @@ server=1
                 if verbose_output:
                     logger.info("🎮 DEMO: Would submit to network (simulated)")
                 logger.info("✅ DEMO: Block submission simulated successfully!")
-                logger.info(f"📁 Files created in organized structure")
+                logger.info("📁 Files created in organized structure")
                 self.blocks_mined += 1
                 return True
             else:
@@ -11732,7 +11816,7 @@ server=1
                         # Update GUI to show test success
                         if self.gui_system:
                             self.gui_system.add_activity(
-                                f"🧪 Test mining success (no submission)"
+                                "🧪 Test mining success (no submission)"
                             )
 
                         return True
@@ -12044,7 +12128,7 @@ server=1
                                 f"⚠️ Brain.QTL random success notification error: {e}"
                             )
                 else:
-                    logger.info(f"⚠️ Random time mining unsuccessful")
+                    logger.info("⚠️ Random time mining unsuccessful")
 
                 # Brief pause between mining attempts while monitoring ZMQ
                 await asyncio.sleep(5)
@@ -12267,7 +12351,7 @@ server=1
 
             # Wait until next day if more days to go
             if day < days - 1:
-                logger.info(f"⏰ Waiting for next day...")
+                logger.info("⏰ Waiting for next day...")
                 # Sleep until start of next day
                 next_day = datetime.now().replace(
                     hour=0, minute=0, second=0, microsecond=0
@@ -12379,10 +12463,16 @@ server=1
                             "nonce": result.get("nonce", 123456789),
                             "valid": True
                         }
-                        self.save_test_mode_result_files(stock_template, demo_result)
                         
-                        blocks_mined += 1
-                        logger.info(f"✅ Demo Progress: {blocks_mined}/{target} blocks mined")
+                        # TRY TO SAVE - ONLY COUNT AS MINED IF SAVE SUCCEEDS
+                        try:
+                            self.save_test_mode_result_files(stock_template, demo_result)
+                            blocks_mined += 1
+                            logger.info(f"✅ Demo Progress: {blocks_mined}/{target} blocks mined AND SAVED")
+                        except Exception as save_error:
+                            logger.error(f"❌ Demo: Mining succeeded but SAVE FAILED: {save_error}")
+                            logger.error("🚫 Block NOT counted - save must succeed")
+                            continue  # Don't count this as a successful block
                         # Continue looping until target is reached
                     else:
                         logger.warning("⚠️ Demo: Mining attempt did not succeed, retrying...")
@@ -12505,7 +12595,7 @@ server=1
             success = await self.parse_and_execute_enhanced_flag(flag_input)
 
             # Final report
-            logger.info(f"📊 ENHANCED MINING SESSION COMPLETE")
+            logger.info("📊 ENHANCED MINING SESSION COMPLETE")
             logger.info(
                 f"   🎯 Total blocks found today: {
                     self.blocks_found_today}"
@@ -12609,7 +12699,7 @@ server=1
 
             # Wait until next day if more days to go
             if day < days - 1:
-                logger.info(f"⏰ Waiting for next day...")
+                logger.info("⏰ Waiting for next day...")
                 next_day = datetime.now().replace(
                     hour=0, minute=0, second=0, microsecond=0
                 ) + timedelta(days=1)
@@ -13116,7 +13206,7 @@ server=1
             logger.info("📋 Step 6: Looping File validating mining results...")
 
             if mining_result and mining_result.get("valid", False):
-                logger.info(f"🎯 SUCCESS! Looping File confirmed valid mining result:")
+                logger.info("🎯 SUCCESS! Looping File confirmed valid mining result:")
                 logger.info(f"   ⚡ Nonce: {mining_result.get('nonce')}")
                 logger.info(f"   🔗 Hash: {mining_result.get('hash')[:20]}...")
                 logger.info(
@@ -13540,7 +13630,7 @@ server=1
                         f"✅ Day progress: {blocks_mined_today}/{blocks_per_day} blocks"
                     )
                 else:
-                    logger.warning(f"❌ Block mining failed")
+                    logger.warning("❌ Block mining failed")
 
             current_day += 1
             blocks_mined_today = 0
@@ -13719,7 +13809,7 @@ server=1
         self.running = False
 
         # Final status report
-        logger.info(f"📊 Random mining session complete:")
+        logger.info("📊 Random mining session complete:")
         logger.info(f"   🎯 Blocks found today: {self.blocks_found_today}")
         logger.info(
             f"   📡 ZMQ blocks detected: {
@@ -14615,7 +14705,6 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
         """Monitor all running production miners and display detailed statistics."""
         import psutil
         import time
-        import json
         from datetime import datetime
         
         print("🔍 PRODUCTION MINER MONITORING SYSTEM")
@@ -14671,7 +14760,7 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                                 print(f"   🔥 CPU Usage: {proc.info['cpu_percent']:.1f}%")
                                 print(f"   💾 Memory: {miner_info['memory_mb']} MB")
                                 print(f"   ⏱️  Runtime: {miner_info['runtime_hours']} hours")
-                                print(f"   ✅ Status: ACTIVE")
+                                print("   ✅ Status: ACTIVE")
                                 print()
                     except (psutil.NoSuchProcess, psutil.AccessDenied):
                         continue
@@ -14758,7 +14847,7 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
             import random
             # Simulate realistic leading zeros based on your 242 achievement
             return random.randint(18, 242)  # Based on your actual 242 leading zeros achievement
-        except Exception as e:
+        except Exception:
             return 0
     
     def get_miner_blocks_found(self, pid):
@@ -14782,7 +14871,7 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
             # Final fallback: simulate for demo purposes
             import random
             return random.randint(0, 5)
-        except Exception as e:
+        except Exception:
             return 0
     
     def save_monitor_data(self, monitor_data):
@@ -14888,7 +14977,7 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                 base_cmd.extend(["--block", "5"])  # Safe default
                 base_cmd.append("--smoke-test")   # Always use demo mode for quick start
             
-            print(f"\n� Starting daemons with command:")
+            print("\n� Starting daemons with command:")
             print(f"   {' '.join(base_cmd)}")
             print("\n⏳ Starting daemons in background...")
             print("⚠️  Monitoring will stop to avoid conflicts")
@@ -14928,9 +15017,7 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
     def show_terminal_miners(self):
         """Show detailed information about all running production miners in terminals."""
         import subprocess
-        import json
         import time
-        from datetime import datetime
         
         print("\n🖥️  TERMINAL PRODUCTION MINERS")
         print("=" * 60)
@@ -15004,13 +15091,13 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                 for i, miner in enumerate(terminal_miners, 1):
                     print(f"   {i}. Terminal Miner")
                     if miner.get('type') == 'tmux':
-                        print(f"      📺 Type: tmux session")
+                        print("      📺 Type: tmux session")
                         print(f"      🆔 Session: {miner['session']}")
                     elif miner.get('type') == 'screen':
-                        print(f"      📺 Type: screen session")
+                        print("      📺 Type: screen session")
                         print(f"      🆔 Session: {miner['session']}")
                     elif miner.get('type') == 'direct':
-                        print(f"      📺 Type: Direct terminal")
+                        print("      📺 Type: Direct terminal")
                         print(f"      🆔 PID: {miner['pid']}")
                         print(f"      ⏱️  Runtime: {miner['runtime']} hours")
                         print(f"      📝 Command: {miner['cmdline'][:80]}...")
@@ -15040,10 +15127,10 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
             print(f"   📈 Total Active: {total_miners}")
             
             if total_miners > 0:
-                print(f"\n💡 Commands:")
-                print(f"   [K] Kill all miners")
+                print("\n💡 Commands:")
+                print("   [K] Kill all miners")
                 print(f"   [1-{total_miners}] Kill specific miner")
-                print(f"   [Enter] Return to monitoring")
+                print("   [Enter] Return to monitoring")
                 
                 # Get user choice for specific killing
                 try:
@@ -15077,7 +15164,6 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
     def kill_specific_miner(self, miner_info, choice_num):
         """Kill a specific production miner."""
         import subprocess
-        import signal
         
         print(f"\n🎯 KILLING SPECIFIC MINER #{choice_num}")
         print("=" * 50)
@@ -15121,7 +15207,7 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                     proc = psutil.Process(pid)
                     
                     # Try graceful termination first
-                    print(f"   ⏳ Attempting graceful shutdown...")
+                    print("   ⏳ Attempting graceful shutdown...")
                     proc.terminate()
                     
                     # Wait up to 5 seconds for graceful shutdown
@@ -15137,7 +15223,7 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                         
                     except psutil.TimeoutExpired:
                         # Force kill if graceful shutdown failed
-                        print(f"   ⚡ Graceful shutdown timed out, force killing...")
+                        print("   ⚡ Graceful shutdown timed out, force killing...")
                         proc.kill()
                         print(f"   ✅ Force killed PID {pid}")
                         
@@ -15156,7 +15242,7 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                     print(f"   ❌ Error killing PID {pid}: {e}")
                     return False
             else:
-                print(f"❌ Unknown miner type, cannot kill")
+                print("❌ Unknown miner type, cannot kill")
                 return False
                 
         except Exception as e:
@@ -15166,7 +15252,6 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
     def cleanup_daemon_workspace(self, pid):
         """Clean up workspace files for a specific daemon."""
         try:
-            import shutil
             daemon_workspace = self.get_temporary_template_dir()
             if daemon_workspace.exists():
                 # Look for daemon directories that might be associated with this PID
@@ -15193,7 +15278,6 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
     def kill_all_production_miners(self):
         """Kill all production miners (daemons and terminals)."""
         import subprocess
-        import signal
         
         print("\n🛑 KILLING ALL PRODUCTION MINERS")
         print("=" * 50)
@@ -15286,12 +15370,12 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                 pass  # screen not available
             
             # Summary
-            print(f"\n📊 CLEANUP SUMMARY:")
+            print("\n📊 CLEANUP SUMMARY:")
             print(f"   ✅ Successfully killed: {killed_count}")
             print(f"   ❌ Failed to kill: {failed_count}")
             
             if killed_count > 0:
-                print(f"   🧹 All production miners stopped!")
+                print("   🧹 All production miners stopped!")
             
             # Clean up any leftover daemon workspace files
             try:
@@ -15301,7 +15385,7 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                     for daemon_dir in daemon_workspace.glob("daemon_*"):
                         if daemon_dir.is_dir():
                             shutil.rmtree(daemon_dir)
-                    print(f"   🧹 Cleaned up daemon workspaces")
+                    print("   🧹 Cleaned up daemon workspaces")
             except Exception as e:
                 print(f"   ⚠️  Workspace cleanup warning: {e}")
                 
@@ -15311,9 +15395,9 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
     def implement_always_on_mining_mode(self):
         """Implement always-on mining mode per Pipeline flow.txt - miners never turn off, wait for templates."""
         try:
-            print(f"🔄 IMPLEMENTING ALWAYS-ON MINING MODE")
-            print(f"⚡ Mode: Miners stay active after script completion")
-            print(f"📡 Template Feed: Continuous ZMQ monitoring for new templates")
+            print("🔄 IMPLEMENTING ALWAYS-ON MINING MODE")
+            print("⚡ Mode: Miners stay active after script completion")
+            print("📡 Template Feed: Continuous ZMQ monitoring for new templates")
             
             self.miners_always_on = True
             self.always_on_check_interval = 30  # Default 30 seconds between template checks
@@ -15328,10 +15412,10 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                 'kill_command_file': self.base_dir / "Mining" / "System" / "always_on_kill.signal"
             }
             
-            print(f"✅ Always-on mining mode configured:")
+            print("✅ Always-on mining mode configured:")
             print(f"   ⚡ Check interval: {self.always_on_check_interval} seconds")
             print(f"   📁 Kill signal file: {self.always_on_mining_state['kill_command_file']}")
-            print(f"   🎯 Miners will persist after script completion")
+            print("   🎯 Miners will persist after script completion")
             
             return True
             
@@ -15345,12 +15429,12 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
             if not hasattr(self, 'always_on_mining_state') or not self.always_on_mining_state['active']:
                 return False
                 
-            print(f"🔄 Maintaining always-on miners...")
+            print("🔄 Maintaining always-on miners...")
             
             # Check for kill signal
             kill_signal_file = self.always_on_mining_state['kill_command_file']
             if kill_signal_file.exists():
-                print(f"🛑 Kill signal detected - stopping always-on mode")
+                print("🛑 Kill signal detected - stopping always-on mode")
                 kill_signal_file.unlink()  # Remove signal file
                 self.always_on_mining_state['active'] = False
                 return False
@@ -15360,7 +15444,7 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                 try:
                     new_block_detected = self.check_zmq_for_new_blocks()
                     if new_block_detected:
-                        print(f"📡 New template available - feeding to always-on miners")
+                        print("📡 New template available - feeding to always-on miners")
                         self.always_on_mining_state['templates_processed'] += 1
                         # The ZMQ handler will restart miners with new template
                         
@@ -15399,9 +15483,9 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
     def implement_on_demand_mining_mode(self):
         """Implement on-demand mining mode per Pipeline flow.txt - miners sleep between blocks, wake 5min before needed."""
         try:
-            print(f"🔄 IMPLEMENTING ON-DEMAND MINING MODE")
-            print(f"💤 Behavior: Miners sleep between blocks")
-            print(f"⏰ Wake Timer: 5 minutes before next block needed")
+            print("🔄 IMPLEMENTING ON-DEMAND MINING MODE")
+            print("💤 Behavior: Miners sleep between blocks")
+            print("⏰ Wake Timer: 5 minutes before next block needed")
             
             self.on_demand_mode_active = True
             self.activation_window_minutes = 5  # Wake 5 minutes before next block
@@ -15420,7 +15504,7 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                 'last_block_time': datetime.now()
             }
             
-            print(f"✅ On-demand mining mode configured:")
+            print("✅ On-demand mining mode configured:")
             print(f"   ⏰ Activation window: {self.activation_window_minutes} minutes")
             print(f"   📊 Average block interval: {seconds_per_block:.0f} seconds")
             print(f"   🎯 Blocks remaining today: {self.on_demand_mining_state['blocks_remaining_today']}")
@@ -15454,7 +15538,7 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
             
             wake_time = datetime.now() + timedelta(seconds=sleep_duration)
             
-            print(f"⏰ On-demand timing calculated:")
+            print("⏰ On-demand timing calculated:")
             print(f"   📊 Blocks remaining: {blocks_remaining}")
             print(f"   ⏳ Hours remaining: {hours_remaining_in_day:.1f}")
             print(f"   💤 Sleep duration: {sleep_duration/60:.1f} minutes")
@@ -15478,7 +15562,7 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
             hours_remaining = (end_of_day - now).total_seconds() / 3600
             
             if hours_remaining <= 0:
-                print(f"🌅 Day ended - resetting for next day")
+                print("🌅 Day ended - resetting for next day")
                 return False
             
             # Calculate next wake time
@@ -15490,12 +15574,12 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
             self.on_demand_mining_state['miners_sleeping'] = True
             
             # Put miners to sleep
-            print(f"💤 PUTTING MINERS TO SLEEP - On-demand mode")
+            print("💤 PUTTING MINERS TO SLEEP - On-demand mode")
             print(f"⏰ Next wake time: {wake_time.strftime('%Y-%m-%d %H:%M:%S')}")
             
             if hasattr(self, 'production_miner_process') and self.production_miner_process:
                 self.stop_production_miner()
-                print(f"🛑 Production miners stopped for sleep cycle")
+                print("🛑 Production miners stopped for sleep cycle")
             
             # Sleep until wake time with ZMQ monitoring
             while datetime.now() < wake_time:
@@ -15508,16 +15592,16 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
                     try:
                         new_block_detected = self.check_zmq_for_new_blocks()
                         if new_block_detected:
-                            print(f"📡 New block detected during sleep - waking immediately")
+                            print("📡 New block detected during sleep - waking immediately")
                             break
-                    except Exception as e:
+                    except Exception:
                         pass  # Ignore ZMQ errors during sleep
                 
                 # Sleep in small intervals to maintain responsiveness
                 time.sleep(min(30, sleep_remaining))  # Check every 30 seconds or remaining time
             
             # Wake up miners
-            print(f"⏰ WAKING MINERS - On-demand activation window reached")
+            print("⏰ WAKING MINERS - On-demand activation window reached")
             self.on_demand_mining_state['miners_sleeping'] = False
             
             return True
@@ -15551,7 +15635,7 @@ NOTE: All monitoring functions respect the Knuth-Sorrellian-Class framework
 def determine_days_from_period_flags(args):
     """Calculate number of days based on advanced time period flags - standalone function."""
     import calendar
-    from datetime import datetime, timedelta
+    from datetime import datetime
     
     current_date = datetime.now()
     
@@ -15608,6 +15692,85 @@ def determine_days_from_period_flags(args):
     return 1
 
 
+def load_dynamic_flags():
+    """Load dynamic flags from System_File_Examples/flags.json"""
+    try:
+        # Try multiple locations for robustness
+        possible_paths = [
+            Path("System_File_Examples/flags.json"),
+            Path(__file__).parent / "System_File_Examples/flags.json",
+            Path("Mining/System/System_File_Examples/flags.json")
+        ]
+        
+        for flags_path in possible_paths:
+            if flags_path.exists():
+                with open(flags_path, 'r') as f:
+                    return json.load(f)
+    except Exception:
+        # Silent failure is okay here, fallback to hardcoded
+        pass
+    return {}
+
+def preprocess_natural_language_args(argv):
+    """
+    Convert natural language arguments to flags.
+    e.g. "2 blocks" -> "--block 2"
+    e.g. "blocks 2" -> "--block 2"
+    """
+    dynamic_config = load_dynamic_flags()
+    mappings = dynamic_config.get("natural_language_mappings", {
+        "blocks": "--block",
+        "block": "--block",
+        "days": "--day",
+        "day": "--day"
+    })
+    
+    # Skip script name
+    if not argv:
+        return argv
+        
+    script_name = argv[0]
+    args = argv[1:]
+    new_args = []
+    
+    i = 0
+    while i < len(args):
+        arg = args[i]
+        
+        # Check for "N blocks" pattern (number followed by keyword)
+        if arg.isdigit() and i + 1 < len(args):
+            next_arg = args[i+1].lower()
+            # Handle plural/singular variations
+            if next_arg in mappings or next_arg.rstrip('s') in mappings:
+                key = next_arg if next_arg in mappings else next_arg.rstrip('s')
+                flag = mappings.get(key, mappings.get(key + 's'))
+                if flag:
+                    new_args.append(flag)
+                    new_args.append(arg)
+                    i += 2
+                    continue
+        
+        # Check for "blocks N" pattern (keyword followed by number)
+        lower_arg = arg.lower()
+        if lower_arg in mappings or lower_arg.rstrip('s') in mappings:
+            key = lower_arg if lower_arg in mappings else lower_arg.rstrip('s')
+            flag = mappings.get(key, mappings.get(key + 's'))
+            
+            if flag:
+                # Check if next arg is a number
+                if i + 1 < len(args) and args[i+1].isdigit():
+                    new_args.append(flag)
+                    new_args.append(args[i+1])
+                    i += 2
+                    continue
+                # Or just a flag switch if no number follows (though blocks usually needs N)
+                # But for things like "demo mode", it might be just a switch
+        
+        new_args.append(arg)
+        i += 1
+        
+    return [script_name] + new_args
+
 def create_parser():
     """Create comprehensive argument parser with all flags including smoke tests."""
     parser = argparse.ArgumentParser(
@@ -15616,12 +15779,18 @@ def create_parser():
         epilog="""
 Examples:
   python3 Singularity_Dave_Looping.py --block 6             # Mine 6 blocks
+  python3 Singularity_Dave_Looping.py 6 blocks              # Natural language: Mine 6 blocks
+  python3 Singularity_Dave_Looping.py blocks 6              # Natural language: Mine 6 blocks
   python3 Singularity_Dave_Looping.py --smoke-test          # Run individual smoke test
   python3 Singularity_Dave_Looping.py --smoke-network       # Run comprehensive network smoke test
   python3 Singularity_Dave_Looping.py --block-random        # Random mine blocks
   python3 Singularity_Dave_Looping.py --block-all --day 7   # Mine continuously for 7 days
 """
     )
+
+    # Load dynamic flags
+    dynamic_config = load_dynamic_flags()
+    system_flags = dynamic_config.get("system_flags", {})
 
     # Mining modes
     parser.add_argument('--block', type=int, help='Number of blocks to mine (1-144 per day)')
@@ -15647,27 +15816,38 @@ Examples:
     parser.add_argument('--sandbox', action='store_true', help='Run production code without network submission')
     parser.add_argument('--staging', action='store_true', help='Run in staging mode for pre-production testing')
     parser.add_argument('--verbose', action='store_true', help='Enable verbose logging')
+    
+    # Dynamic flags injection (if not already defined)
+    existing_actions = {a.dest for a in parser._actions}
+    for flag_name, flag_data in system_flags.items():
+        dest = flag_name.lstrip('-').replace('-', '_')
+        if dest not in existing_actions:
+            kwargs = {'help': flag_data.get('description', '')}
+            if flag_data.get('type') == 'boolean':
+                kwargs['action'] = 'store_true'
+            elif flag_data.get('type') == 'integer':
+                kwargs['type'] = int
+            
+            if 'default' in flag_data:
+                kwargs['default'] = flag_data['default']
+                
+            parser.add_argument(flag_name, **kwargs)
 
-    # Emergency controls
-    parser.add_argument('--kill-all-miners', action='store_true', help='Emergency: Kill all production miner processes')
-    parser.add_argument('--restart-node', action='store_true', help='Restart Bitcoin node')
-
-    # Status and monitoring
-    parser.add_argument('--list-miner-processes', action='store_true', help='List all production miner processes')
-    parser.add_argument('--miner-status', action='store_true', help='Show detailed miner status')
-    parser.add_argument('--help-monitor', action='store_true', help='Show monitoring help')
-
+    # All flags now come from flags.json - SINGLE SOURCE OF TRUTH
+    # Emergency controls, status/monitoring flags are in flags.json
+    
     return parser
 
 async def main():
     """Main entry point for the looping system."""
     parser = create_parser()
 
-    # Parse arguments with proper error handling
-
-    # Parse arguments with proper error handling
+    # Parse arguments with proper error handling and natural language support
     try:
-        args = parser.parse_args()
+        # Preprocess arguments for natural language support (e.g. "2 blocks")
+        processed_args = preprocess_natural_language_args(sys.argv)
+        # Pass arguments excluding script name
+        args = parser.parse_args(processed_args[1:])
     except SystemExit as e:
         if e.code == 2:  # argparse error code for invalid arguments
             print("\n❌ INVALID ARGUMENTS ERROR")
@@ -15737,7 +15917,7 @@ async def main():
         mining_config['random_mode_active'] = True
         
         print(f"🎲 Block Mode: RANDOM ({mining_config['blocks_per_day']} blocks per day)")
-        print(f"🕐 Random times scheduled throughout the day")
+        print("🕐 Random times scheduled throughout the day")
     elif args.block:
         if args.block > 144:
             print("⚠️ WARNING: Maximum 144 blocks per day possible. Limiting to 144.")
@@ -15750,10 +15930,10 @@ async def main():
         # TEST MODE: Default to 1 block if none specified for testing pipeline
         mining_config['blocks_per_day'] = 1
         mining_config['mining_mode'] = 'test_default'
-        print(f"🧪 Block Mode: TEST DEFAULT (1 block for pipeline verification)")
+        print("🧪 Block Mode: TEST DEFAULT (1 block for pipeline verification)")
     else:
         # Default: mine for rest of current day
-        from datetime import datetime, timedelta
+        from datetime import datetime
         now = datetime.now()
         end_of_day = now.replace(hour=23, minute=59, second=59, microsecond=0)
         hours_left = (end_of_day - now).total_seconds() / 3600
@@ -16030,7 +16210,7 @@ async def main():
         for flag_name in dormant_flags:
             if getattr(args, flag_name, None):
                 print(f"⚠️  Flag --{flag_name} is currently DORMANT (prevents system crashes)")
-                print(f"    The flag is recognized but not executing to maintain system stability")
+                print("    The flag is recognized but not executing to maintain system stability")
         
         # Simple mining value validation (no complex time calculations)
         random_value = getattr(args, 'random', None)
@@ -16109,7 +16289,7 @@ async def main():
                 )
             else:
                 logger.info(
-                    f"📅 Day-All mining: Continuous until end of day (144 blocks max)"
+                    "📅 Day-All mining: Continuous until end of day (144 blocks max)"
                 )
             logger.info(
                 f"🧠 Brain.QTL orchestration: {

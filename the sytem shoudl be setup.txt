@@ -1,0 +1,20 @@
+# Global Setup & Flag Philosophy
+
+## Natural Language Parsing (NLP)
+- **Patterns**: `[Number] [Word]` (2 blocks) OR `[Word] [Number]` (block 2).
+- **Flexibility**: Plurals (blocks/block, days/day) must be accepted.
+- **Context**: Detect variable vs word priority automatically.
+
+## Process & Terminal Identity
+- **Physical IDs**: User gives ID (e.g., 1). Looping maps to `Process_001`.
+- **Permanent Folders**: `Process_00X` folders NEVER change based on execution mode.
+- **Watching**: System must spawn terminals (gnome-terminal/tmux) or use the Brain GUI to watch miners.
+- **Defaults**:
+  - `continuous-2`: Default mode (run until flag finished).
+  - `days`: Defaults to rest of current day.
+  - `daemons`: Dynamic based on hardware.
+
+## Example Files
+- **Initialization**: System generates ALL example files on first run.
+- **Dynamic Help**: `--help` reads from `flags_example.json`.
+- **Inheritance**: If examples change, system output format MUST update to match.
