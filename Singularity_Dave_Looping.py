@@ -1,4 +1,4 @@
-from centralized_config import get_bitload, get_rpc_credentials
+from Singularity_Dave_Brainstem_UNIVERSE_POWERED import get_bitload, get_rpc_credentials
 #!/usr/bin/env if "blocks" not in locals(): blocks = []
 """
 Singularity_Dave_Looping.py

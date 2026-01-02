@@ -14,7 +14,65 @@ import urllib.request
 from pathlib import Path
 
 import yaml
-from centralized_config import get_bitload, get_rpc_credentials
+
+# CONFIGURATION LOGIC - Smart Fallback Integration
+# ----------------------------------------------------------------------------
+def get_bitload():
+    """Get bitload constant from config (Smart Fallback within Brainstem)"""
+    # Try MATH_PARAMS first if loaded
+    if 'MATH_PARAMS' in globals() and MATH_PARAMS:
+        return MATH_PARAMS.get("bitload")
+
+    # Else load config
+    try:
+        config_path = Path("config.json")
+        if config_path.exists():
+            with open(config_path, "r") as f:
+                config = json.load(f)
+                bitload = config.get("mathematical_framework", {}).get("bitload_constant")
+                if bitload:
+                    return int(bitload)
+    except Exception:
+        pass
+
+    # Fallback default
+    return 208500855993373022767225770164375163068756085544106017996338881654571185256056754443039992227128051932599645909
+
+def get_rpc_credentials():
+    """Get RPC credentials from config (Smart Fallback within Brainstem)"""
+    try:
+        config_path = Path("config.json")
+        if config_path.exists():
+            with open(config_path, "r") as f:
+                config = json.load(f)
+
+            if "bitcoin_rpc" in config:
+                rpc = config["bitcoin_rpc"]
+                return {
+                    "host": rpc.get("host", "127.0.0.1"),
+                    "port": rpc.get("port", 8332),
+                    "username": rpc.get("username", ""),
+                    "password": rpc.get("password", ""),
+                    "wallet_name": rpc.get("wallet_name", "")
+                }
+
+            return {
+                "host": config.get("rpc_host", "127.0.0.1"),
+                "port": config.get("rpc_port", 8332),
+                "username": config.get("rpcuser", ""),
+                "password": config.get("rpcpassword", ""),
+                "wallet_name": config.get("wallet_name", "")
+            }
+    except Exception:
+        pass
+
+    return {
+        "host": "127.0.0.1",
+        "port": 8332,
+        "username": "",
+        "password": "",
+        "wallet_name": ""
+    }
 
 # Import config normalizer for consistent key handling
 try:

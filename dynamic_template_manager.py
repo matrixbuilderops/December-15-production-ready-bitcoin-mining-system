@@ -5,7 +5,7 @@ Handles template coordination and GPS-enhanced mining capabilities
 """
 
 from __future__ import annotations
-from centralized_config import get_bitload, get_rpc_credentials
+from Singularity_Dave_Brainstem_UNIVERSE_POWERED import get_bitload, get_rpc_credentials
 
 import copy
 import json
