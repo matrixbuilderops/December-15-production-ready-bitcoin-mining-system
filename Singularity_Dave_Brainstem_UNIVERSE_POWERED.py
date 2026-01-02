@@ -770,7 +770,7 @@ def get_modifier_knuth_sorrellian_class_parameters(modifier_type, framework):
         if modifier_type == "entropy":
             get_func = globals().get('get_entropy_modifier')
             if get_func:
-                result = get_func()
+                result = get_func(framework)
                 if 'modifier_params' in result:
                     mp = result['modifier_params']
                     return convert_knuth_notation_to_parameters(
@@ -780,7 +780,7 @@ def get_modifier_knuth_sorrellian_class_parameters(modifier_type, framework):
         elif modifier_type == "decryption":
             get_func = globals().get('get_decryption_modifier')
             if get_func:
-                result = get_func()
+                result = get_func(framework)
                 if 'modifier_params' in result:
                     mp = result['modifier_params']
                     return convert_knuth_notation_to_parameters(
@@ -790,7 +790,7 @@ def get_modifier_knuth_sorrellian_class_parameters(modifier_type, framework):
         elif modifier_type == "near_solution":
             get_func = globals().get('get_near_solution_modifier')
             if get_func:
-                result = get_func()
+                result = get_func(framework)
                 if 'modifier_params' in result:
                     mp = result['modifier_params']
                     return convert_knuth_notation_to_parameters(
@@ -800,7 +800,7 @@ def get_modifier_knuth_sorrellian_class_parameters(modifier_type, framework):
         elif modifier_type == "math_problems":
             get_func = globals().get('get_mathematical_problems_modifier')
             if get_func:
-                result = get_func()
+                result = get_func(framework)
                 if 'base' in result:
                     return convert_knuth_notation_to_parameters(
                         result['base'],
@@ -811,7 +811,7 @@ def get_modifier_knuth_sorrellian_class_parameters(modifier_type, framework):
         elif modifier_type == "math_paradoxes":
             get_func = globals().get('get_mathematical_paradoxes_modifier')
             if get_func:
-                result = get_func()
+                result = get_func(framework)
                 if 'modifier_params' in result:
                     mp = result['modifier_params']
                     return convert_knuth_notation_to_parameters(
@@ -5044,10 +5044,15 @@ def load_system_flags():
         }
 
 
-def apply_entropy_mode(math_flags, output_mode):
+def apply_entropy_mode(math_flags, output_mode, framework=None):
     """Apply entropy mode - Getting so large we can walk inside the safe and open from the inside"""
     # Get full mathematical parameters from brainstem
-    bitload = MATH_PARAMS.get("bitload")
+    source = framework if framework else (globals().get('MATH_PARAMS') or {})
+    bitload = source.get("bitload")
+    if not bitload:
+        # Fallback to UNIVERSE_BITLOAD if available
+        bitload = globals().get('UNIVERSE_BITLOAD')
+
     if not bitload:
         print("❌ CRITICAL: BitLoad not available for entropy analysis!")
         return {
@@ -5055,10 +5060,10 @@ def apply_entropy_mode(math_flags, output_mode):
             "entropy_results": [],
         }
 
-    cycles = MATH_PARAMS.get("primary_cycles", 161)
-    knuth_sorrellian_class_levels = MATH_PARAMS.get(
+    cycles = source.get("primary_cycles", 161)
+    knuth_sorrellian_class_levels = source.get(
         "knuth_sorrellian_class_levels", 80)
-    knuth_sorrellian_class_iterations = MATH_PARAMS.get(
+    knuth_sorrellian_class_iterations = source.get(
         "knuth_sorrellian_class_iterations", 156912)
 
     print("🌌 ENTROPY MODE - Universe - scale mathematical transcendence")
@@ -5131,10 +5136,15 @@ def apply_entropy_mode(math_flags, output_mode):
     }
 
 
-def apply_decryption_mode(math_flags, output_mode):
+def apply_decryption_mode(math_flags, output_mode, framework=None):
     """Apply decryption mode - It explains itself (self-evident mathematics)"""
     # Get full mathematical parameters from brainstem
-    bitload = MATH_PARAMS.get("bitload")
+    source = framework if framework else (globals().get('MATH_PARAMS') or {})
+    bitload = source.get("bitload")
+    if not bitload:
+        # Fallback to UNIVERSE_BITLOAD if available
+        bitload = globals().get('UNIVERSE_BITLOAD')
+
     if not bitload:
         print("❌ CRITICAL: BitLoad not available for decryption analysis!")
         return {
@@ -5142,10 +5152,10 @@ def apply_decryption_mode(math_flags, output_mode):
             "decryption_results": [],
         }
 
-    cycles = MATH_PARAMS.get("primary_cycles", 161)
-    knuth_sorrellian_class_levels = MATH_PARAMS.get(
+    cycles = source.get("primary_cycles", 161)
+    knuth_sorrellian_class_levels = source.get(
         "knuth_sorrellian_class_levels", 80)
-    knuth_sorrellian_class_iterations = MATH_PARAMS.get(
+    knuth_sorrellian_class_iterations = source.get(
         "knuth_sorrellian_class_iterations", 156912)
 
     print("🌌 DECRYPTION MODE - Self - evident universe - scale mathematics")
@@ -5227,10 +5237,15 @@ def apply_decryption_mode(math_flags, output_mode):
     }
 
 
-def apply_near_solution_mode(math_flags, output_mode):
+def apply_near_solution_mode(math_flags, output_mode, framework=None):
     """Apply near-solution analysis using full 111-digit BitLoad power."""
     # Get full mathematical parameters from brainstem
-    bitload = MATH_PARAMS.get("bitload")
+    source = framework if framework else (globals().get('MATH_PARAMS') or {})
+    bitload = source.get("bitload")
+    if not bitload:
+        # Fallback to UNIVERSE_BITLOAD if available
+        bitload = globals().get('UNIVERSE_BITLOAD')
+
     if not bitload:
         print("❌ CRITICAL: BitLoad not available for near - solution analysis!")
         return {
@@ -5238,10 +5253,10 @@ def apply_near_solution_mode(math_flags, output_mode):
             "near_solutions": [],
         }
 
-    cycles = MATH_PARAMS.get("primary_cycles", 161)
-    knuth_sorrellian_class_levels = MATH_PARAMS.get(
+    cycles = source.get("primary_cycles", 161)
+    knuth_sorrellian_class_levels = source.get(
         "knuth_sorrellian_class_levels", 80)
-    knuth_sorrellian_class_iterations = MATH_PARAMS.get(
+    knuth_sorrellian_class_iterations = source.get(
         "knuth_sorrellian_class_iterations", 156912)
 
     print(
@@ -7728,16 +7743,17 @@ def comprehensive_mathematical_application_orchestrator(
 # =====================================================
 
 
-def get_entropy_modifier():
+def get_entropy_modifier(framework=None):
     """Calculate entropy modifier using actual entropy logic implementation"""
-    bitload = MATH_PARAMS.get("bitload", UNIVERSE_BITLOAD)
-    knuth_sorrellian_class_levels = MATH_PARAMS.get(
+    source = framework if framework else (globals().get('MATH_PARAMS') or {})
+    bitload = source.get("bitload", UNIVERSE_BITLOAD)
+    knuth_sorrellian_class_levels = source.get(
         "knuth_sorrellian_class_levels", 80)
 
     # Use actual entropy logic to calculate modifier
     try:
         # Apply BitLoad^5 calculations (entropy transcendence)
-        entropy_result = apply_entropy_mode({}, "modifier_calculation")
+        entropy_result = apply_entropy_mode({}, "modifier_calculation", framework=framework)
         entropy_count = len(entropy_result.get("entropy_results", []))
 
         # Real Knuth notation calculation
@@ -7780,17 +7796,18 @@ def get_entropy_modifier():
         }
 
 
-def get_near_solution_modifier():
+def get_near_solution_modifier(framework=None):
     """Calculate near solution modifier using actual near solution logic"""
-    bitload = MATH_PARAMS.get("bitload", UNIVERSE_BITLOAD)
-    knuth_sorrellian_class_iterations = MATH_PARAMS.get(
+    source = framework if framework else (globals().get('MATH_PARAMS') or {})
+    bitload = source.get("bitload", UNIVERSE_BITLOAD)
+    knuth_sorrellian_class_iterations = source.get(
         "knuth_sorrellian_class_iterations", 156912)
 
     # Use actual near solution logic to calculate modifier
     try:
         # Apply near solution pattern recognition
         near_solution_result = apply_near_solution_mode(
-            {}, "modifier_calculation")
+            {}, "modifier_calculation", framework=framework)
         near_solution_count = len(
             near_solution_result.get(
                 "near_solutions", []))
@@ -7839,18 +7856,19 @@ def get_near_solution_modifier():
         }
 
 
-def get_decryption_modifier():
+def get_decryption_modifier(framework=None):
     """Calculate decryption modifier using actual self-evident mathematics"""
-    bitload = MATH_PARAMS.get("bitload", UNIVERSE_BITLOAD)
-    knuth_sorrellian_class_levels = MATH_PARAMS.get(
+    source = framework if framework else (globals().get('MATH_PARAMS') or {})
+    bitload = source.get("bitload", UNIVERSE_BITLOAD)
+    knuth_sorrellian_class_levels = source.get(
         "knuth_sorrellian_class_levels", 80)
-    knuth_sorrellian_class_iterations = MATH_PARAMS.get(
+    knuth_sorrellian_class_iterations = source.get(
         "knuth_sorrellian_class_iterations", 156912)
 
     # Use actual decryption logic to calculate modifier
     try:
         # Apply self-evident mathematics
-        decryption_result = apply_decryption_mode({}, "modifier_calculation")
+        decryption_result = apply_decryption_mode({}, "modifier_calculation", framework=framework)
         decryption_count = len(decryption_result.get("decryption_results", []))
 
         # Real Knuth notation calculation - the most powerful
@@ -7897,10 +7915,11 @@ def get_decryption_modifier():
         }
 
 
-def get_mathematical_problems_modifier():
+def get_mathematical_problems_modifier(framework=None):
     """Calculate mathematical problems modifier using all 21 problem implementations"""
-    bitload = MATH_PARAMS.get("bitload", UNIVERSE_BITLOAD)
-    knuth_sorrellian_class_levels = MATH_PARAMS.get(
+    source = framework if framework else (globals().get('MATH_PARAMS') or {})
+    bitload = source.get("bitload", UNIVERSE_BITLOAD)
+    knuth_sorrellian_class_levels = source.get(
         "knuth_sorrellian_class_levels", 80)
 
     # Calculate modifier based on actual mathematical problem implementations
@@ -7989,10 +8008,11 @@ def get_mathematical_problems_modifier():
         }
 
 
-def get_mathematical_paradoxes_modifier():
+def get_mathematical_paradoxes_modifier(framework=None):
     """Calculate mathematical paradoxes modifier using all 46 paradox implementations"""
-    bitload = MATH_PARAMS.get("bitload", UNIVERSE_BITLOAD)
-    knuth_sorrellian_class_levels = MATH_PARAMS.get(
+    source = framework if framework else (globals().get('MATH_PARAMS') or {})
+    bitload = source.get("bitload", UNIVERSE_BITLOAD)
+    knuth_sorrellian_class_levels = source.get(
         "knuth_sorrellian_class_levels", 80)
 
     # Calculate modifier based on actual paradox implementations
