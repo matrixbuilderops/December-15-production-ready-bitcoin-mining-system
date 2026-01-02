@@ -694,50 +694,6 @@ def _validate_against_example(file_key: str, payload: Any) -> None:
             f"Payload for {file_key} does not match example structure"
         )
 
-def create_parser():
-    """Create ArgumentParser with Brain.QTL flag orchestration"""
-    parser = argparse.ArgumentParser(
-        description="Singularity Dave Bitcoin Mining Loop Manager - Brain.QTL Orchestrated",
-        formatter_class=argparse.RawDescriptionHelpFormatter
-    )
-    
-    # BRAIN.QTL FLAG ORCHESTRATION - All flags centralized
-    try:
-        from Singularity_Dave_Brainstem_UNIVERSE_POWERED import brain_get_flags
-        brain_flags = brain_get_flags("looping")
-        
-        if brain_flags and not brain_flags.get("error"):
-            # Add Brain.QTL flags dynamically (skip empty production flag)
-            for category, flags in brain_flags.items():
-                if isinstance(flags, dict):
-                    for flag_name, flag_def in flags.items():
-                        if isinstance(flag_def, dict) and flag_def.get('flag') and flag_def['flag'].strip():
-                            flag = flag_def['flag']
-                            help_text = flag_def.get('description', f'{flag_name} flag')
-                            
-                            if flag_def.get('type') == 'int':
-                                parser.add_argument(flag, type=int, help=help_text)
-                            elif flag_def.get('type') == 'boolean':
-                                parser.add_argument(flag, action='store_true', help=help_text)
-                            elif flag_def.get('type') == 'choice':
-                                choices = flag_def.get('choices', [])
-                                default = flag_def.get('default')
-                                parser.add_argument(flag, choices=choices, default=default, help=help_text)
-                            elif flag_def.get('type') == 'string':
-                                parser.add_argument(flag, type=str, help=help_text)
-                            else:
-                                parser.add_argument(flag, action='store_true', help=help_text)
-            
-            print("✅ Brain.QTL flags loaded into Looping component")
-            return parser
-    except Exception as e:
-        print(f"⚠️ Brain.QTL flag loading failed, using fallback: {e}")
-    
-    # FALLBACK: Brain.QTL integration failed - using minimal parser
-    print("⚠️ Using minimal fallback parser - Brain.QTL integration failed")
-    
-    return parser
-    return parser
 
 
 class BitcoinLoopingSystem:
@@ -15788,7 +15744,42 @@ Examples:
 """
     )
 
-    # Load dynamic flags
+    # BRAIN.QTL FLAG ORCHESTRATION - All flags centralized
+    try:
+        from Singularity_Dave_Brainstem_UNIVERSE_POWERED import brain_get_flags
+        brain_flags = brain_get_flags("looping")
+
+        if brain_flags and not brain_flags.get("error"):
+            # Add Brain.QTL flags dynamically (skip empty production flag)
+            for category, flags in brain_flags.items():
+                if isinstance(flags, dict):
+                    for flag_name, flag_def in flags.items():
+                        if isinstance(flag_def, dict) and flag_def.get('flag') and flag_def['flag'].strip():
+                            flag = flag_def['flag']
+                            # Skip if already added (prevent duplicates)
+                            if any(a.dest == flag.lstrip('-').replace('-', '_') for a in parser._actions):
+                                continue
+
+                            help_text = flag_def.get('description', f'{flag_name} flag')
+
+                            if flag_def.get('type') == 'int':
+                                parser.add_argument(flag, type=int, help=help_text)
+                            elif flag_def.get('type') == 'boolean':
+                                parser.add_argument(flag, action='store_true', help=help_text)
+                            elif flag_def.get('type') == 'choice':
+                                choices = flag_def.get('choices', [])
+                                default = flag_def.get('default')
+                                parser.add_argument(flag, choices=choices, default=default, help=help_text)
+                            elif flag_def.get('type') == 'string':
+                                parser.add_argument(flag, type=str, help=help_text)
+                            else:
+                                parser.add_argument(flag, action='store_true', help=help_text)
+
+            print("✅ Brain.QTL flags loaded into Looping component")
+    except Exception as e:
+        print(f"⚠️ Brain.QTL flag loading failed, using fallback: {e}")
+
+    # Load dynamic flags (legacy/fallback)
     dynamic_config = load_dynamic_flags()
     system_flags = dynamic_config.get("system_flags", {})
 
