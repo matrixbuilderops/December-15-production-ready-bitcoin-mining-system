@@ -1089,7 +1089,7 @@ class ProductionBitcoinMiner:
         self.ultra_hex_oversight_active = False  # Activates when target >= 65 zeros
         
         # Ultra Hex mathematical framework for oversight
-        ultra_hex_bitload = 53440218233631381765817797802176041745569365867804164607062753263570287425650497137535998136628173279129731368756
+        ultra_hex_bitload = get_bitload()
         # USE DYNAMIC COLLECTIVE VALUES INSTEAD OF HARDCODED (145, 13631168)
         # This will be set after collective values are calculated
         self.ultra_hex_framework_power = None  # Will be set to: ultra_hex_bitload * self.collective_collective_levels * self.collective_collective_iterations
@@ -1179,7 +1179,7 @@ class ProductionBitcoinMiner:
         self.galaxy_enhanced_operations = int((universe_bitload * collective_concurrent_power) // 10**100)
         
         # NOW set Ultra Hex framework power with ACTUAL collective values
-        ultra_hex_bitload = 53440218233631381765817797802176041745569365867804164607062753263570287425650497137535998136628173279129731368756
+        ultra_hex_bitload = get_bitload()
         self.ultra_hex_framework_power = ultra_hex_bitload * self.collective_collective_levels * self.collective_collective_iterations
         
         # Configure universe-scale targeting
@@ -1253,7 +1253,7 @@ class ProductionBitcoinMiner:
         self.current_template = None
         self.current_target = None
         self.current_difficulty = 2**64  # Universe-scale difficulty for full SHA-256 ceiling
-        self.universe_target_zeros = 22  # MATHEMATICAL ENHANCEMENT TARGET - HONEST MINING!
+        self.universe_target_zeros = self.config_data.get("mining_target_zeros", 22)  # DYNAMIC TARGET
 
         # Brain.QTL enhanced difficulty for mathematical superiority
         if self.brain_qtl_connection.get("brainstem_connected"):
@@ -4393,7 +4393,7 @@ class ProductionBitcoinMiner:
 
         # Calculate Brain.QTL multipliers using DYNAMIC COLLECTIVE VALUES
         # DYNAMIC COLLECTIVE FRAMEWORK: Base (400, 784560) + Modifiers (441, 2353680) = Total (841, 3138240)
-        ultra_hex_bitload = 53440218233631381765817797802176041745569365867804164607062753263570287425650497137535998136628173279129731368756
+        ultra_hex_bitload = get_bitload()
         ultra_hex_knuth_levels = self.collective_collective_levels  # Dynamic: 841
         ultra_hex_iterations = self.collective_collective_iterations  # Dynamic: 3,138,240
         ultra_hex_cycles = 666           # Cycles remain constant

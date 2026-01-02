@@ -3092,7 +3092,7 @@ class GPSEnhancedDynamicTemplateManager:
 
             # Fallback to simple path generation (no folder creation)
             time_str = current_time().strftime("%H_%M_%S")
-            base_path = "Mining/Output"
+            base_path = f"{brain_get_base_path()}/Output"
 
             # Generate appropriate filename based on template type
             if template_type == "instruction":
@@ -3753,14 +3753,14 @@ class GPSEnhancedDynamicTemplateManager:
             }
             
             # Save to hourly math proof
-            hourly_dir = Path("Mining/Ledgers") / str(timestamp.year) / f"{timestamp.month:02d}" / f"{timestamp.day:02d}" / f"{timestamp.hour:02d}"
+            hourly_dir = Path(brain_get_path("ledger")) / str(timestamp.year) / f"{timestamp.month:02d}" / f"{timestamp.day:02d}" / f"{timestamp.hour:02d}"
             hourly_dir.mkdir(parents=True, exist_ok=True)
             
             math_proof_file = hourly_dir / f"math_proof_{date_str}_{time_str}.json"
             defensive_write_json(str(math_proof_file), math_proof, "DTM_Validation")
             
             # 2. Update Global Ledger
-            ledger_file = Path("Mining/Ledgers/global_ledger.json")
+            ledger_file = Path(brain_get_path("ledger")) / "global_ledger.json"
             if ledger_file.exists():
                 try:
                     with open(ledger_file, 'r') as f:
@@ -5023,7 +5023,7 @@ class GPSEnhancedDynamicTemplateManager:
                     self.brain_path_provider("output", self.environment)
                 )
             else:
-                base_path_obj = to_absolute_from_string("Mining/Output")
+                base_path_obj = to_absolute_from_string(f"{brain_get_base_path()}/Output")
 
             if not base_path_obj.exists():
                 print("ℹ️ No output directory found for cleanup")
@@ -5073,10 +5073,7 @@ class GPSEnhancedDynamicTemplateManager:
             import json
             
             # 🎯 MODE-AWARE: Use correct path based on demo mode
-            if self.demo_mode:
-                temp_template_dir = Path("Test/Demo/Temporary Template")
-            else:
-                temp_template_dir = Path("Mining/Temporary Template")
+            temp_template_dir = Path(brain_get_path("template"))
             
             if not temp_template_dir.exists():
                 if self.verbose:
@@ -6178,7 +6175,7 @@ class GPSEnhancedDynamicTemplateManager:
     def _provide_miner_feedback(self, miner_id, validation_result):
         """Provide detailed feedback to miners per Pipeline flow.txt: 'tells it why it is bad'"""
         try:
-            feedback_dir = Path("Mining/Temporary Template") / miner_id / "feedback"
+            feedback_dir = Path(brain_get_path("template")) / miner_id / "feedback"
             feedback_dir.mkdir(parents=True, exist_ok=True)
             
             timestamp = int(time.time())
@@ -6197,11 +6194,7 @@ class GPSEnhancedDynamicTemplateManager:
     def _get_submission_path(self):
         """Get submission folder path based on mode."""
         if hasattr(self, 'demo_mode') and self.demo_mode:
-            return Path("Test/Demo/Mining/Submissions")
-        elif hasattr(self, 'test_mode') and self.test_mode:
-            return Path("Test/Test mode/Mining/Submissions")
-        else:
-            return Path("Mining/Submissions")
+            return Path(brain_get_path("submission"))
 
 
     def _create_global_submission_file(self, solution, miner_id):
@@ -6629,7 +6622,7 @@ def main():
     def provide_miner_feedback(self, miner_id, feedback_message):
         """Provide feedback to miners as per Pipeline flow.txt."""
         try:
-            feedback_dir = Path("Mining/Temporary Template") / miner_id / "feedback"
+            feedback_dir = Path(brain_get_path("template")) / miner_id / "feedback"
             feedback_dir.mkdir(parents=True, exist_ok=True)
             
             feedback_file = feedback_dir / f"feedback_{int(time.time())}.txt"
@@ -6709,8 +6702,10 @@ def _write_dtm_smoke_report(component: str, results: dict, output_path: str) -> 
             return False
 
 
-def run_smoke_test(output_path: str = "Mining/User_Look_At/dtm_smoke_test.json") -> bool:
+def run_smoke_test(output_path: str = None) -> bool:
     """Component-level smoke test for the Dynamic Template Manager."""
+    if output_path is None:
+        output_path = f"{brain_get_base_path()}/User_Look_At/dtm_smoke_test.json"
     results = {
         "initialized": False,
         "example_template": False,
@@ -6748,8 +6743,10 @@ def run_smoke_test(output_path: str = "Mining/User_Look_At/dtm_smoke_test.json")
     return all(results.values())
 
 
-def run_smoke_network_test(output_path: str = "Mining/User_Look_At/dtm_smoke_network.json") -> bool:
+def run_smoke_network_test(output_path: str = None) -> bool:
     """Network-level smoke test for DTM plus miner coordination."""
+    if output_path is None:
+        output_path = f"{brain_get_base_path()}/User_Look_At/dtm_smoke_network.json"
     results = {
         "component_smoke": run_smoke_test(output_path),
         "miner_interface": False,
@@ -7042,34 +7039,5 @@ if __name__ == "__main__":
     # CRITICAL FIX: Pass arguments to mini_orchestrator_main so it can parse --demo flag
     # Run continuous orchestrator mode (handles --demo flag internally via argparse)
     success = mini_orchestrator_main()
-
-
-    def create_math_proof(self, solution, knuth_params):
-        """Create math proof entry when validating solution"""
-        proof_entry = {
-            "timestamp": datetime.now(CENTRAL_TZ).isoformat(),
-            "nonce": solution.get('nonce', 0),
-            "hash": solution.get('hash', ''),
-            "difficulty": solution.get('difficulty', 0),
-            "knuth_parameters": knuth_params,
-            "sorrellian_class": "Type-A",
-            "validation_status": "ACCEPTED"
-        }
-        
-        # Write to global math proof
-        global_path = self.base_path / "Math Proof" / "global_math_proof.json"
-        if global_path.exists():
-            try:
-                with open(global_path, 'r') as f:
-                    data = json.load(f)
-                data['proofs'].append(proof_entry)
-                data['total_proofs'] = len(data['proofs'])
-                data['last_updated'] = datetime.now(CENTRAL_TZ).isoformat()
-                with open(global_path, 'w') as f:
-                    json.dump(data, f, indent=2)
-            except Exception as e:
-                print(f"⚠️ Could not write math proof: {e}")
-        
-        return proof_entry
 
     exit(0 if success else 1)
