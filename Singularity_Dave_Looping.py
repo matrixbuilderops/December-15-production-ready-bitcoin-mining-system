@@ -805,7 +805,7 @@ class BitcoinLoopingSystem:
         # ESSENTIAL: Fix missing attributes that cause crashes
         self.brain_flags = {}  # Initialize brain flags dictionary
         self.miner_control_enabled = True  # Enable miner control by default
-        self.bitcoin_cli_path = "/usr/local/bin/bitcoin-cli"  # Default to standard path (will work on user's system)
+        self.bitcoin_cli_path = shutil.which("bitcoin-cli") or "/usr/local/bin/bitcoin-cli"
         self.production_miner_process = None  # Initialize production miner process
         self.brain_qtl_orchestration = False  # Initialize QTL orchestration flag
         self.production_miner_mode = "daemon"  # Initialize production miner mode
@@ -1114,9 +1114,9 @@ class BitcoinLoopingSystem:
         self.cross_day_miners = {}  # Track miners across day boundaries
 
         # Bitcoin node sync command (using bitcoin-cli with RPC credentials)
-        self.sync_check_cmd = ["/usr/local/bin/bitcoin-cli", "-rpcuser=SignalCoreBitcoin", "-rpcpassword=B1tc0n4L1dz", "getblockchaininfo"]
-        self.sync_tail_cmd = ["/usr/local/bin/bitcoin-cli", "-rpcuser=SignalCoreBitcoin", "-rpcpassword=B1tc0n4L1dz", "getbestblockhash"]
-        self.bitcoin_cli_path = "/usr/local/bin/bitcoin-cli"  # Updated to correct path
+        self.bitcoin_cli_path = shutil.which("bitcoin-cli") or "/usr/local/bin/bitcoin-cli"
+        self.sync_check_cmd = [self.bitcoin_cli_path, "-rpcuser=SignalCoreBitcoin", "-rpcpassword=B1tc0n4L1dz", "getblockchaininfo"]
+        self.sync_tail_cmd = [self.bitcoin_cli_path, "-rpcuser=SignalCoreBitcoin", "-rpcpassword=B1tc0n4L1dz", "getbestblockhash"]
 
         # AUTO-INITIALIZE ESSENTIAL FILES ON ANY SYSTEM CREATION
         # This ensures files are created whenever someone downloads and uses
